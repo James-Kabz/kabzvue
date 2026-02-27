@@ -145,8 +145,8 @@ const handleSubmenuClick = (item, event) => {
     if (!isMobile.value && target) {
       const rect = target.getBoundingClientRect()
       submenuPosition.value = {
-        top: rect.top,
-        left: rect.right + 12
+        top: Math.max(15, rect.top - 60),
+        left: rect.right + 17
       }
     }
   } else {
