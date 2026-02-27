@@ -699,19 +699,20 @@ const handleMultiFileRemoved = (field, files) => {
               <!-- Select Dropdown -->
               <div
                 v-else-if="field.type === 'select'"
-                class="flex items-center gap-2"
+                class="flex w-full items-center gap-2"
               >
-                <Select
-                  :id="fieldId"
-                  :model-value="getFieldValue(field.name)"
-                  :options="field.options"
-                  :placeholder="field.placeholder || 'Select an option'"
-                  :disabled="isLoading || field.disabled"
-                  :has-error="hasError"
-                  :aria-describedby="ariaDescribedBy"
-                  class="flex-1"
-                  @update:model-value="handleSelectChange(field, $event)"
-                />
+                <div class="flex-1 min-w-0">
+                  <Select
+                    :id="fieldId"
+                    :model-value="getFieldValue(field.name)"
+                    :options="field.options"
+                    :placeholder="field.placeholder || 'Select an option'"
+                    :disabled="isLoading || field.disabled"
+                    :has-error="hasError"
+                    :aria-describedby="ariaDescribedBy"
+                    @update:model-value="handleSelectChange(field, $event)"
+                  />
+                </div>
                 <Button
                   v-if="showFieldActionButton(field)"
                   type="button"
@@ -730,19 +731,20 @@ const handleMultiFileRemoved = (field, files) => {
               <!-- MultiSelect Dropdown -->
               <div
                 v-else-if="field.type === 'multiselect'"
-                class="flex items-center gap-2"
+                class="flex w-full items-center gap-2"
               >
-                <MultiSelect
-                  :id="fieldId"
-                  :model-value="getFieldValue(field.name)"
-                  :options="field.options"
-                  :disabled="isLoading || field.disabled"
-                  :placeholder="field.placeholder || 'Select options'"
-                  :has-error="hasError"
-                  :aria-describedby="ariaDescribedBy"
-                  class="flex-1"
-                  @update:model-value="setFieldValue(field.name, $event)"
-                />
+                <div class="flex-1 min-w-0">
+                  <MultiSelect
+                    :id="fieldId"
+                    :model-value="getFieldValue(field.name)"
+                    :options="field.options"
+                    :disabled="isLoading || field.disabled"
+                    :placeholder="field.placeholder || 'Select options'"
+                    :has-error="hasError"
+                    :aria-describedby="ariaDescribedBy"
+                    @update:model-value="setFieldValue(field.name, $event)"
+                  />
+                </div>
                 <Button
                   v-if="showFieldActionButton(field)"
                   type="button"
@@ -761,20 +763,21 @@ const handleMultiFileRemoved = (field, files) => {
               <!-- Combobox -->
               <div
                 v-else-if="field.type === 'combobox'"
-                class="flex items-center gap-2"
+                class="flex w-full items-center gap-2"
               >
-                <Select
-                  :id="fieldId"
-                  :model-value="getFieldValue(field.name)"
-                  :options="field.options"
-                  :placeholder="field.placeholder || 'Select or type to add new'"
-                  :disabled="isLoading || field.disabled"
-                  :has-error="hasError"
-                  :aria-describedby="ariaDescribedBy"
-                  :allow-create="field.allowCreate"
-                  class="flex-1"
-                  @update:model-value="handleSelectChange(field, $event)"
-                />
+                <div class="flex-1 min-w-0">
+                  <Select
+                    :id="fieldId"
+                    :model-value="getFieldValue(field.name)"
+                    :options="field.options"
+                    :placeholder="field.placeholder || 'Select or type to add new'"
+                    :disabled="isLoading || field.disabled"
+                    :has-error="hasError"
+                    :aria-describedby="ariaDescribedBy"
+                    :allow-create="field.allowCreate"
+                    @update:model-value="handleSelectChange(field, $event)"
+                  />
+                </div>
                 <Button
                   v-if="showFieldActionButton(field)"
                   type="button"
