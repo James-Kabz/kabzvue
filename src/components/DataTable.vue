@@ -57,7 +57,7 @@ const props = defineProps({
   },
   striped: {
     type: Boolean,
-    default: false
+    default: true
   },
   hoverable: {
     type: Boolean,

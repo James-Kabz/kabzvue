@@ -49,9 +49,10 @@ const faSize = computed(() => {
   return sizes[props.size] || 'lg'
 })
 
-const colorClasses = computed(() =>
-  props.color ? `text-${props.color}` : 'ui-text'
-)
+const colorClasses = computed(() => {
+  if (!props.color) return 'text-current'
+  return props.color.startsWith('text-') ? props.color : `text-${props.color}`
+})
 
 const iconClasses = computed(() => [
   colorClasses.value,

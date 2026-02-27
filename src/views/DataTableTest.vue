@@ -415,12 +415,10 @@ const bulkActions = [
 const filteredUsers = computed(() => {
   let filtered = users.value
 
-  // Apply organisation filter first - only if organisation is selected
-  if (props.currentOrganisation) {
-    filtered = filtered.filter(user => user.organisation_id === props.currentOrganisation.org_id)
-  } else {
-    // If no organisation selected, show no data
-    return []
+  // Apply organisation filter only when an organisation is provided
+  const activeOrgId = props.currentOrganisation?.org_id ?? props.currentOrganisation?.id
+  if (activeOrgId) {
+    filtered = filtered.filter(user => user.organisation_id === Number(activeOrgId))
   }
 
   // Apply search filter
@@ -535,8 +533,26 @@ const handleAddButtonClick = (buttonConfig) => {
 }
 
 const handleAddUser = () => {
-  console.log('Add user clicked')
-  showStatusMessage('Add user dialog would open here')
+  const nextId = users.value.length > 0 ? Math.max(...users.value.map(u => u.id)) + 1 : 1
+  const activeOrgId = props.currentOrganisation?.org_id ?? props.currentOrganisation?.id
+  const organisationId = activeOrgId ? Number(activeOrgId) : 1
+
+  const newUser = {
+    id: nextId,
+    name: `Test User ${nextId}`,
+    email: `test.user.${nextId}@example.com`,
+    role: 'Viewer',
+    department: 'Engineering',
+    status: 'active',
+    lastLogin: new Date(),
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`Test User ${nextId}`)}&background=e2e8f0&color=334155&size=32`,
+    salary: 50000 + (nextId * 500),
+    joinDate: new Date().toISOString().slice(0, 10),
+    organisation_id: organisationId
+  }
+
+  users.value.unshift(newUser)
+  showStatusMessage(`Added ${newUser.name}`)
 }
 
 const handleBulkAction = (actionInfo) => {
