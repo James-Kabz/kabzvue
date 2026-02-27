@@ -246,7 +246,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
 <template>
   <header
     :class="cn(
-      'fixed top-0 z-9999 w-full border-b ui-border-strong bg-[color:color-mix(in oklab, var(--ui-surface), transparent 8%)] backdrop-blur-md transition-all duration-300 ease-out'
+      'fixed top-0 z-50 w-full border-b ui-border-strong bg-[color:color-mix(in oklab, var(--ui-surface), transparent 8%)] backdrop-blur-md transition-all duration-300 ease-out'
     )"
     :style="{ left: '0' }"
   >

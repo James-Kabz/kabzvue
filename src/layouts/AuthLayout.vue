@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted } from 'vue'
 import Typography from '../components/Typography.vue'
 import Divider from '../components/Divider.vue'
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: 'Login to your account:'
