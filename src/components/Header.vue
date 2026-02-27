@@ -30,6 +30,10 @@ const props = defineProps({
   notificationsTitle: { type: String, default: 'Notifications' },
   organisationSwitcherTitle: { type: String, default: 'Switch Organisation' },
   organisationSwitcherDescription: { type: String, default: 'Select an organisation to view its data' },
+  settingsMenuItems: { type: Array, default: () => [] },
+  showSettings: { type: Boolean, default: true },
+  settingsTitle: { type: String, default: 'Settings' },
+  settingsBadgeCount: { type: Number, default: 0 },
   userInitialsOverride: { type: String, default: '' },
   userRoleDisplayOverride: { type: String, default: '' }
 })
@@ -42,7 +46,8 @@ const emit = defineEmits([
   'toggle-mobile-sidebar',
   'organisation-change',
   'notification-click',
-  'view-all-notifications'
+  'view-all-notifications',
+  'settings-action'
 ])
 
 const searchQuery = ref('')
@@ -51,9 +56,14 @@ const showProfile = ref(false)
 const showMobileSearch = ref(false)
 const isMobile = ref(false)
 const showOrganisationDropdown = ref(false)
+const showSettingsDropdown = ref(false)
 
 const notificationCount = computed(() => {
   return props.notifications.filter(n => !n.read).length
+})
+const resolvedSettingsBadge = computed(() => {
+  if (props.settingsBadgeCount > 0) return props.settingsBadgeCount
+  return props.settingsMenuItems.length
 })
 const userInitials = computed(() => {
   if (props.userInitialsOverride) return props.userInitialsOverride
@@ -101,23 +111,34 @@ const formattedActiveRoles = computed(() => {
 const toggleNotifications = () => {
   showNotificationsDropdown.value = !showNotificationsDropdown.value
   showProfile.value = false
+  showSettingsDropdown.value = false
 }
 
 const toggleProfile = () => {
   showProfile.value = !showProfile.value
   showNotificationsDropdown.value = false
   showOrganisationDropdown.value = false
+  showSettingsDropdown.value = false
 }
 
 const toggleOrganisationDropdown = () => {
   showOrganisationDropdown.value = !showOrganisationDropdown.value
   showProfile.value = false
   showNotificationsDropdown.value = false
+  showSettingsDropdown.value = false
+}
+
+const toggleSettingsDropdown = () => {
+  showSettingsDropdown.value = !showSettingsDropdown.value
+  showProfile.value = false
+  showNotificationsDropdown.value = false
+  showOrganisationDropdown.value = false
 }
 
 const handleNavigation = (item) => {
   emit('navigate', item)
   showProfile.value = false
+  showSettingsDropdown.value = false
 }
 
 const isItemActive = (item) => {
@@ -151,11 +172,17 @@ const handleViewAllNotifications = () => {
   showNotificationsDropdown.value = false
 }
 
+const handleSettingsAction = (item) => {
+  emit('settings-action', item)
+  showSettingsDropdown.value = false
+}
+
 const handleClickOutside = (event) => {
   if (!event.target.closest('.absolute') && !event.target.closest('button')) {
     showNotificationsDropdown.value = false
     showProfile.value = false
     showOrganisationDropdown.value = false
+    showSettingsDropdown.value = false
   }
 }
 
@@ -680,6 +707,92 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             </div>
           </div>
         </transition>
+
+        <!-- Settings Dropdown -->
+        <div
+          v-if="showSettings && settingsMenuItems.length > 0"
+          class="relative"
+        >
+          <button
+            class="relative p-2 ui-text rounded-xl hover:bg-(--ui-surface-muted) transition-colors"
+            @click="toggleSettingsDropdown"
+          >
+            <Icon
+              icon="cog"
+              class="w-5 h-5"
+            />
+            <span
+              v-if="resolvedSettingsBadge > 0"
+              class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[18px] sm:h-[18px] bg-amber-500 text-white text-[10px] sm:text-xs rounded-full flex items-center justify-center font-semibold px-0.5 sm:px-1"
+            >
+              {{ resolvedSettingsBadge > 99 ? '99+' : resolvedSettingsBadge }}
+            </span>
+          </button>
+
+          <transition
+            enter-active-class="transition-all duration-200 ease-out"
+            leave-active-class="transition-all duration-200 ease-in"
+            enter-from-class="opacity-0 translate-y-2 scale-95"
+            enter-to-class="opacity-100 translate-y-0 scale-100"
+            leave-from-class="opacity-100 translate-y-0 scale-100"
+            leave-to-class="opacity-0 translate-y-2 scale-95"
+          >
+            <div
+              v-if="showSettingsDropdown"
+              class="ui-surface absolute right-0 mt-2 w-64 rounded-xl border ui-border-strong shadow-xl z-50 overflow-hidden"
+            >
+              <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
+                <p class="text-sm font-semibold ui-text">
+                  {{ settingsTitle }}
+                </p>
+              </div>
+
+              <div class="py-2">
+                <template
+                  v-for="item in settingsMenuItems"
+                  :key="item.name || item.label"
+                >
+                  <div
+                    v-if="item.type === 'section'"
+                    class="px-4 py-1 text-[11px] font-semibold uppercase tracking-wider ui-text-muted"
+                  >
+                    {{ item.label }}
+                  </div>
+
+                  <router-link
+                    v-else-if="item.route"
+                    :to="item.route"
+                    :class="cn(
+                      'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                      isItemActive(item)
+                        ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
+                        : 'ui-text hover:bg-(--ui-surface-muted)'
+                    )"
+                    @click="handleNavigation(item)"
+                  >
+                    <Icon
+                      :icon="item.icon || 'cog'"
+                      class="w-4 h-4 shrink-0"
+                    />
+                    <span class="truncate">{{ item.label }}</span>
+                  </router-link>
+
+                  <button
+                    v-else
+                    class="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ui-text hover:bg-(--ui-surface-muted) transition-colors"
+                    @click="handleSettingsAction(item)"
+                  >
+                    <Icon
+                      :icon="item.icon || 'cog'"
+                      class="w-4 h-4 shrink-0"
+                    />
+                    <span class="truncate">{{ item.label }}</span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </transition>
+        </div>
 
         <!-- Profile Dropdown -->
         <div class="relative">
