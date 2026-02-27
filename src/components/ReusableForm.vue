@@ -58,6 +58,7 @@ const props = defineProps({
             'search',
             'hidden',
             'multiselect',
+            'combobox',
           ].includes(field.type),
       )
     },
@@ -295,6 +296,32 @@ const handleSliderChange = (field, value) => {
       console.error('Error in onChange handler:', error)
       toast.error('An error occurred while processing the change')
     }
+  }
+}
+
+const showFieldActionButton = (field) => {
+  return !!field?.actionButton && field.actionButton.show !== false
+}
+
+const fieldActionDisabled = (field) => {
+  if (!field?.actionButton) return true
+  const actionDisabled =
+    typeof field.actionButton.disabled === 'function'
+      ? field.actionButton.disabled(formData.value, field)
+      : field.actionButton.disabled
+  return Boolean(isLoading.value || field.disabled || actionDisabled)
+}
+
+const fieldActionLoading = (field) => {
+  if (!field?.actionButton) return false
+  return typeof field.actionButton.loading === 'function'
+    ? field.actionButton.loading(formData.value, field)
+    : Boolean(field.actionButton.loading)
+}
+
+const handleFieldActionClick = (field) => {
+  if (field?.actionButton?.onClick) {
+    field.actionButton.onClick(formData.value, field)
   }
 }
 
@@ -610,30 +637,98 @@ const handleCancel = () => {
             />
 
             <!-- Select Dropdown -->
-            <Select
+            <div
               v-else-if="field.type === 'select'"
-              :id="fieldId"
-              :model-value="formData[field.name]"
-              :options="field.options"
-              :placeholder="field.placeholder || 'Select an option'"
-              :disabled="isLoading || field.disabled"
-              :has-error="hasError"
-              :aria-describedby="ariaDescribedBy"
-              @update:model-value="handleSelectChange(field, $event)"
-            />
+              class="flex items-center gap-2"
+            >
+              <Select
+                :id="fieldId"
+                :model-value="formData[field.name]"
+                :options="field.options"
+                :placeholder="field.placeholder || 'Select an option'"
+                :disabled="isLoading || field.disabled"
+                :has-error="hasError"
+                :aria-describedby="ariaDescribedBy"
+                class="flex-1"
+                @update:model-value="handleSelectChange(field, $event)"
+              />
+              <Button
+                v-if="showFieldActionButton(field)"
+                type="button"
+                :variant="field.actionButton.variant || 'outline'"
+                :size="field.actionButton.size || 'icon'"
+                :class="field.actionButton.class || ''"
+                :title="field.actionButton.title || field.actionButton.label || 'Action'"
+                :disabled="fieldActionDisabled(field)"
+                :loading="fieldActionLoading(field)"
+                @click="handleFieldActionClick(field)"
+              >
+                {{ field.actionButton.label || '+' }}
+              </Button>
+            </div>
 
             <!-- MultiSelect Dropdown -->
-            <MultiSelect
+            <div
               v-else-if="field.type === 'multiselect'"
-              :id="fieldId"
-              :model-value="formData[field.name]"
-              :options="field.options"
-              :disabled="isLoading || field.disabled"
-              :placeholder="field.placeholder || 'Select options'"
-              :has-error="hasError"
-              :aria-describedby="ariaDescribedBy"
-              @update:model-value="formData[field.name] = $event"
-            />
+              class="flex items-center gap-2"
+            >
+              <MultiSelect
+                :id="fieldId"
+                :model-value="formData[field.name]"
+                :options="field.options"
+                :disabled="isLoading || field.disabled"
+                :placeholder="field.placeholder || 'Select options'"
+                :has-error="hasError"
+                :aria-describedby="ariaDescribedBy"
+                class="flex-1"
+                @update:model-value="formData[field.name] = $event"
+              />
+              <Button
+                v-if="showFieldActionButton(field)"
+                type="button"
+                :variant="field.actionButton.variant || 'outline'"
+                :size="field.actionButton.size || 'icon'"
+                :class="field.actionButton.class || ''"
+                :title="field.actionButton.title || field.actionButton.label || 'Action'"
+                :disabled="fieldActionDisabled(field)"
+                :loading="fieldActionLoading(field)"
+                @click="handleFieldActionClick(field)"
+              >
+                {{ field.actionButton.label || '+' }}
+              </Button>
+            </div>
+
+            <!-- Combobox -->
+            <div
+              v-else-if="field.type === 'combobox'"
+              class="flex items-center gap-2"
+            >
+              <Select
+                :id="fieldId"
+                :model-value="formData[field.name]"
+                :options="field.options"
+                :placeholder="field.placeholder || 'Select or type to add new'"
+                :disabled="isLoading || field.disabled"
+                :has-error="hasError"
+                :aria-describedby="ariaDescribedBy"
+                :allow-create="field.allowCreate"
+                class="flex-1"
+                @update:model-value="handleSelectChange(field, $event)"
+              />
+              <Button
+                v-if="showFieldActionButton(field)"
+                type="button"
+                :variant="field.actionButton.variant || 'outline'"
+                :size="field.actionButton.size || 'icon'"
+                :class="field.actionButton.class || ''"
+                :title="field.actionButton.title || field.actionButton.label || 'Action'"
+                :disabled="fieldActionDisabled(field)"
+                :loading="fieldActionLoading(field)"
+                @click="handleFieldActionClick(field)"
+              >
+                {{ field.actionButton.label || '+' }}
+              </Button>
+            </div>
 
             <!-- Checkbox -->
             <div
