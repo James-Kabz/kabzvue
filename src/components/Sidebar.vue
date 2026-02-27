@@ -17,19 +17,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  managementSettings: {
-    type: Array,
-    default: () => []
-  },
-  showManagementSettings: {
-    type: Boolean,
-    default: true
-  },
   mobileOpen: {
-    type: Boolean,
-    default: false
-  },
-  isManagementSettingsActive: {
     type: Boolean,
     default: false
   },
@@ -63,7 +51,6 @@ const emit = defineEmits([
 const isMobile = ref(false)
 const submenuOpen = ref(false)
 const currentSubmenu = ref(null)
-const managementSettingsOpen = ref(false)
 const searchQuery = ref('')
 const submenuPosition = ref({ top: 0, left: 0 })
 
@@ -112,11 +99,10 @@ const handleNavigation = (item) => {
   if (isMobile.value) {
     closeMobileSidebar()
   }
-  // On mobile, always close menus after navigation
-  // On desktop, don't close submenu if navigating to a subitem, or management settings if navigating to a setting
+  // On mobile, always close menus after navigation.
+  // On desktop, keep submenu open when navigating within it.
   const isSubmenuItem = submenuOpen.value && currentSubmenu.value && currentSubmenu.value.subItems.some(sub => sub.route === item.route)
-  const isManagementItem = managementSettingsOpen.value && props.managementSettings.some(setting => setting.route === item.route)
-  if (isMobile.value || !(isSubmenuItem || isManagementItem)) {
+  if (isMobile.value || !isSubmenuItem) {
     closeAllMenus()
   }
 }
@@ -131,11 +117,6 @@ const hasSubItems = (item) => {
 
 const handleSubmenuClick = (item, event) => {
   const target = event?.currentTarget
-
-  // Close any open menus
-  if (managementSettingsOpen.value) {
-    closeManagementSettings()
-  }
 
   if (!submenuOpen.value || currentSubmenu.value?.name !== item.name) {
     currentSubmenu.value = item
@@ -154,38 +135,17 @@ const handleSubmenuClick = (item, event) => {
   }
 }
 
-const handleManagementSettingsClick = () => {
-  // Close any open menus
-  if (submenuOpen.value) {
-    closeSubmenu()
-  }
-  if (!managementSettingsOpen.value) {
-    managementSettingsOpen.value = true
-  } else {
-    closeManagementSettings()
-  }
-}
-
 const closeSubmenu = () => {
   submenuOpen.value = false
   searchQuery.value = '' // Reset search when closing submenu
   currentSubmenu.value = null
 }
 
-const closeManagementSettings = () => {
-  managementSettingsOpen.value = false
-}
-
 const closeAllMenus = () => {
   closeSubmenu()
-  closeManagementSettings()
 }
 
 const handleSubmenuNavigation = (item) => {
-  handleNavigation(item)
-}
-
-const handleManagementSettingsNavigation = (item) => {
   handleNavigation(item)
 }
 
@@ -199,8 +159,7 @@ const clearSearch = () => {
 }
 
 const handleClickOutside = (event) => {
-  if (!event.target.closest('[data-settings-dropdown]') && !event.target.closest('[data-submenu-dropdown]')) {
-    managementSettingsOpen.value = false
+  if (!event.target.closest('[data-submenu-dropdown]')) {
     closeSubmenu()
   }
 }
@@ -239,7 +198,7 @@ const checkMobile = () => {
 // Handle escape key to close mobile sidebar and menus
 const handleEscape = (event) => {
   if (event.key === 'Escape') {
-    if (submenuOpen.value || managementSettingsOpen.value) {
+    if (submenuOpen.value) {
       closeAllMenus()
     } else if (isMobile.value && isMobileOpen.value) {
       closeMobileSidebar()
@@ -266,7 +225,6 @@ defineExpose({
   isMobile,
   isMobileOpen,
   submenuOpen,
-  managementSettingsOpen,
   contentMarginLeft,
   closeAllMenus
 })
@@ -275,31 +233,57 @@ defineExpose({
 <template>
   <div>
     <!-- Mobile Overlay -->
-    <transition enter-active-class="transition-opacity duration-300"
-      leave-active-class="transition-opacity duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100"
-      leave-from-class="opacity-100" leave-to-class="opacity-0">
-      <div v-if="isMobileOpen && isMobile" class="fixed inset-0 z-30 lg:hidden bg-black/30 backdrop-blur-2xs"
-        @click="closeMobileSidebar" />
+    <transition
+      enter-active-class="transition-opacity duration-300"
+      leave-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="isMobileOpen && isMobile"
+        class="fixed inset-0 z-30 lg:hidden bg-black/30 backdrop-blur-2xs"
+        @click="closeMobileSidebar"
+      />
     </transition>
 
     <!-- Sidebar -->
-    <aside :class="cn(
-      'fixed left-0 z-40 ui-surface border-r ui-border-strong overflow-visible flex flex-col shadow-xl shadow-black/5',
-      'transition-transform duration-300 ease-out',
-      isMobile
-        ? cn('transform h-screen', isMobileOpen ? 'translate-x-0' : '-translate-x-full')
-        : 'translate-x-0 h-[calc(100vh-4rem)]'
-    )" :style="{ width: sidebarWidth + 'px', top: isMobile ? '0px' : '4rem' }">
+    <aside
+      :class="cn(
+        'fixed left-0 z-40 ui-surface border-r ui-border-strong overflow-visible flex flex-col shadow-xl shadow-black/5',
+        'transition-transform duration-300 ease-out',
+        isMobile
+          ? cn('transform h-screen', isMobileOpen ? 'translate-x-0' : '-translate-x-full')
+          : 'translate-x-0 h-[calc(100vh-4rem)]'
+      )"
+      :style="{ width: sidebarWidth + 'px', top: isMobile ? '0px' : '4rem' }"
+    >
       <!-- Mobile Header with Close Button -->
-      <div v-if="isMobile"
-        class="flex ui-surface items-center justify-between p-4 border-b ui-border-strong shrink-0 lg:hidden">
+      <div
+        v-if="isMobile"
+        class="flex ui-surface items-center justify-between p-4 border-b ui-border-strong shrink-0 lg:hidden"
+      >
         <h2 class="text-base font-semibold ui-text">
           {{ header?.title }}
         </h2>
-        <button class="p-2 rounded-lg ui-text hover:bg-(--ui-surface-muted) transition-colors"
-          aria-label="Close sidebar" @click="closeMobileSidebar">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <button
+          class="p-2 rounded-lg ui-text hover:bg-(--ui-surface-muted) transition-colors"
+          aria-label="Close sidebar"
+          @click="closeMobileSidebar"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -308,82 +292,117 @@ defineExpose({
       <!-- Navigation -->
       <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4">
         <div class="space-y-2">
-          <template v-for="item in navigationItems" :key="item.name || item.label">
+          <template
+            v-for="item in navigationItems"
+            :key="item.name || item.label"
+          >
             <!-- Navigation Links -->
             <div v-if="item.type === 'link'">
               <!-- Regular Link (no subitems) -->
-              <router-link v-if="!hasSubItems(item)" :to="item.route" :class="cn(
-                'flex flex-col items-center justify-center rounded-xl transition-all duration-200 group relative py-3 px-2.5',
-                isItemActive(item)
-                  ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
-                  : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
-              )" @click="handleNavigation(item)">
-                <!-- Icon Container -->
-                <div :class="cn(
-                  'flex items-center justify-center rounded-lg transition-colors mb-2',
-                  'w-10 h-10',
-                  isItemActive(item)
-                    ? 'ui-primary-bg shadow-sm'
-                    : 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
-                )">
-                  <Icon :icon="item.icon" class="w-5 h-5" />
-                </div>
-
-                <!-- Label -->
-                <span :class="cn(
-                  'text-[11px] leading-tight font-medium text-center',
-                  isItemActive(item)
-                    ? 'ui-primary font-semibold'
-                    : 'ui-text group-hover:text-(--ui-text)'
-                )">
-                  {{ item.label }}
-                </span>
-
-                <!-- Badge -->
-                <span v-if="item.badge"
-                  class="absolute top-1.5 right-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse">
-                  {{ item.badge }}
-                </span>
-              </router-link>
-
-              <!-- Parent item with sub-items -->
-              <div v-else class="relative" data-submenu-dropdown>
-                <div :class="cn(
-                  'flex flex-col items-center justify-center rounded-xl transition-all duration-200 cursor-pointer group relative py-3 px-2.5',
+              <router-link
+                v-if="!hasSubItems(item)"
+                :to="item.route"
+                :class="cn(
+                  'flex flex-col items-center justify-center rounded-xl transition-all duration-200 group relative py-3 px-2.5',
                   isItemActive(item)
                     ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
                     : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
-                )" @click="handleSubmenuClick(item, $event)">
-                  <!-- Icon Container -->
-                  <div :class="cn(
+                )"
+                @click="handleNavigation(item)"
+              >
+                <!-- Icon Container -->
+                <div
+                  :class="cn(
                     'flex items-center justify-center rounded-lg transition-colors mb-2',
                     'w-10 h-10',
                     isItemActive(item)
                       ? 'ui-primary-bg shadow-sm'
                       : 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
-                  )">
-                    <Icon :icon="item.icon" class="w-5 h-5" />
-                  </div>
+                  )"
+                >
+                  <Icon
+                    :icon="item.icon"
+                    class="w-5 h-5"
+                  />
+                </div>
 
-                  <!-- Label -->
-                  <span :class="cn(
+                <!-- Label -->
+                <span
+                  :class="cn(
                     'text-[11px] leading-tight font-medium text-center',
                     isItemActive(item)
                       ? 'ui-primary font-semibold'
                       : 'ui-text group-hover:text-(--ui-text)'
-                  )">
+                  )"
+                >
+                  {{ item.label }}
+                </span>
+
+                <!-- Badge -->
+                <span
+                  v-if="item.badge"
+                  class="absolute top-1.5 right-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse"
+                >
+                  {{ item.badge }}
+                </span>
+              </router-link>
+
+              <!-- Parent item with sub-items -->
+              <div
+                v-else
+                class="relative"
+                data-submenu-dropdown
+              >
+                <div
+                  :class="cn(
+                    'flex flex-col items-center justify-center rounded-xl transition-all duration-200 cursor-pointer group relative py-3 px-2.5',
+                    isItemActive(item)
+                      ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
+                      : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
+                  )"
+                  @click="handleSubmenuClick(item, $event)"
+                >
+                  <!-- Icon Container -->
+                  <div
+                    :class="cn(
+                      'flex items-center justify-center rounded-lg transition-colors mb-2',
+                      'w-10 h-10',
+                      isItemActive(item)
+                        ? 'ui-primary-bg shadow-sm'
+                        : 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
+                    )"
+                  >
+                    <Icon
+                      :icon="item.icon"
+                      class="w-5 h-5"
+                    />
+                  </div>
+
+                  <!-- Label -->
+                  <span
+                    :class="cn(
+                      'text-[11px] leading-tight font-medium text-center',
+                      isItemActive(item)
+                        ? 'ui-primary font-semibold'
+                        : 'ui-text group-hover:text-(--ui-text)'
+                    )"
+                  >
                     {{ item.label }}
                   </span>
 
                   <!-- Badge -->
-                  <span v-if="item.badge"
-                    class="absolute top-1.5 right-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse">
+                  <span
+                    v-if="item.badge"
+                    class="absolute top-1.5 right-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse"
+                  >
                     {{ item.badge }}
                   </span>
 
                   <!-- Active indicator dot for parent items -->
-                  <div v-if="isItemActive(item) && hasSubItems(item)"
-                    class="absolute top-1.5 right-1.5 w-2 h-2 ui-primary-bg rounded-full" />
+                  <div
+                    v-if="isItemActive(item) && hasSubItems(item)"
+                    class="absolute top-1.5 right-1.5 w-2 h-2 ui-primary-bg rounded-full"
+                  />
                 </div>
               </div>
             </div>
@@ -392,57 +411,94 @@ defineExpose({
       </nav>
 
       <!-- Shared Submenu Dropdown -->
-      <transition enter-active-class="transition-all duration-200 ease-out"
-        leave-active-class="transition-all duration-150 ease-in" enter-from-class="opacity-0 translate-y-1 scale-95"
-        enter-to-class="opacity-100 translate-y-0 scale-100" leave-from-class="opacity-100 translate-y-0 scale-100"
-        leave-to-class="opacity-0 translate-y-1 scale-95">
-        <div v-if="submenuOpen && currentSubmenu" data-submenu-dropdown :class="cn(
-          'ui-surface border ui-border-strong shadow-2xl rounded-xl overflow-hidden z-50',
-          isMobile
-            ? 'fixed left-4 right-4 bottom-4'
-            : 'fixed w-64'
-        )" :style="isMobile ? undefined : { top: `${submenuPosition.top}px`, left: `${submenuPosition.left}px` }">
+      <transition
+        enter-active-class="transition-all duration-200 ease-out"
+        leave-active-class="transition-all duration-150 ease-in"
+        enter-from-class="opacity-0 translate-y-1 scale-95"
+        enter-to-class="opacity-100 translate-y-0 scale-100"
+        leave-from-class="opacity-100 translate-y-0 scale-100"
+        leave-to-class="opacity-0 translate-y-1 scale-95"
+      >
+        <div
+          v-if="submenuOpen && currentSubmenu"
+          data-submenu-dropdown
+          :class="cn(
+            'ui-surface border ui-border-strong shadow-2xl rounded-xl overflow-hidden z-50',
+            isMobile
+              ? 'fixed left-4 right-4 bottom-4'
+              : 'fixed w-64'
+          )"
+          :style="isMobile ? undefined : { top: `${submenuPosition.top}px`, left: `${submenuPosition.left}px` }"
+        >
           <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
             <p class="text-sm font-semibold ui-text">
               {{ currentSubmenu.label }}
             </p>
           </div>
 
-          <div v-if="shouldShowSubmenuSearch" class="px-4 pt-3 pb-2">
+          <div
+            v-if="shouldShowSubmenuSearch"
+            class="px-4 pt-3 pb-2"
+          >
             <div class="relative">
-              <input v-model="searchQuery" type="text" :placeholder="searchPlaceholder"
+              <input
+                v-model="searchQuery"
+                type="text"
+                :placeholder="searchPlaceholder"
                 class="w-full px-3 py-2 pl-9 pr-9 text-sm border ui-border-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all ui-bg"
-                @input="handleSearch(searchQuery)">
+                @input="handleSearch(searchQuery)"
+              >
               <div class="absolute left-3 top-1/2 transform -translate-y-1/2 ui-text-soft">
-                <Icon icon="search" class="w-4 h-4" />
+                <Icon
+                  icon="search"
+                  class="w-4 h-4"
+                />
               </div>
-              <button v-if="searchQuery"
+              <button
+                v-if="searchQuery"
                 class="absolute right-2 top-1/2 transform -translate-y-1/2 ui-text-soft hover:text-(--ui-text) transition-colors p-1"
-                @click="clearSearch">
-                <Icon icon="times" class="w-4 h-4" />
+                @click="clearSearch"
+              >
+                <Icon
+                  icon="times"
+                  class="w-4 h-4"
+                />
               </button>
             </div>
           </div>
 
           <nav class="py-2 max-h-72 overflow-y-auto">
-            <div v-if="shouldShowSubmenuSearch && searchQuery && filteredSubmenuItems.length === 0"
-              class="px-4 py-6 text-center">
+            <div
+              v-if="shouldShowSubmenuSearch && searchQuery && filteredSubmenuItems.length === 0"
+              class="px-4 py-6 text-center"
+            >
               <p class="text-sm ui-text">
                 No results found
               </p>
             </div>
 
             <template v-else>
-              <router-link v-for="subItem in filteredSubmenuItems" :key="subItem.name" :to="subItem.route" :class="cn(
-                'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                isItemActive(subItem)
-                  ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
-                  : 'ui-text hover:bg-(--ui-surface-muted)'
-              )" @click="handleSubmenuNavigation(subItem)">
-                <Icon :icon="subItem.icon || 'circle'" class="w-4 h-4 shrink-0" />
+              <router-link
+                v-for="subItem in filteredSubmenuItems"
+                :key="subItem.name"
+                :to="subItem.route"
+                :class="cn(
+                  'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                  isItemActive(subItem)
+                    ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
+                    : 'ui-text hover:bg-(--ui-surface-muted)'
+                )"
+                @click="handleSubmenuNavigation(subItem)"
+              >
+                <Icon
+                  :icon="subItem.icon || 'circle'"
+                  class="w-4 h-4 shrink-0"
+                />
                 <span class="truncate">{{ subItem.label }}</span>
-                <span v-if="subItem.badge"
-                  class="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse">
+                <span
+                  v-if="subItem.badge"
+                  class="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse"
+                >
                   {{ subItem.badge }}
                 </span>
               </router-link>
@@ -450,84 +506,22 @@ defineExpose({
           </nav>
         </div>
       </transition>
-
-      <!-- Bottom Navigation - Management Settings -->
-      <div v-if="showManagementSettings" class="relative border-t ui-border-strong p-3 sm:p-4 shrink-0 ui-surface"
-        data-settings-dropdown>
-        <div :class="cn(
-          'flex flex-col items-center justify-center rounded-xl transition-all duration-200 cursor-pointer group relative py-3 px-2.5',
-          isManagementSettingsActive
-            ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
-            : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
-        )" @click="handleManagementSettingsClick">
-          <div :class="cn(
-            'flex items-center justify-center rounded-lg transition-colors mb-2',
-            'w-10 h-10',
-            isManagementSettingsActive
-              ? 'ui-primary-bg shadow-sm'
-              : 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
-          )">
-            <Icon icon="cog" class="w-5 h-5" />
-          </div>
-          <span :class="cn(
-            'text-[11px] leading-tight font-medium text-center',
-            isManagementSettingsActive
-              ? 'ui-primary font-semibold'
-              : 'ui-text group-hover:text-(--ui-text)'
-          )">
-            Settings
-          </span>
-
-          <!-- Active indicator dot for management settings -->
-          <div v-if="isManagementSettingsActive"
-            class="absolute top-1.5 right-1.5 w-2 h-2 ui-primary-bg rounded-full" />
-        </div>
-
-        <transition enter-active-class="transition-all duration-200 ease-out"
-          leave-active-class="transition-all duration-150 ease-in" enter-from-class="opacity-0 translate-y-1 scale-95"
-          enter-to-class="opacity-100 translate-y-0 scale-100" leave-from-class="opacity-100 translate-y-0 scale-100"
-          leave-to-class="opacity-0 translate-y-1 scale-95">
-          <div v-if="managementSettingsOpen" :class="cn(
-            'ui-surface border ui-border-strong shadow-2xl rounded-xl overflow-hidden z-50',
-            isMobile
-              ? 'fixed left-4 right-4 bottom-4'
-              : 'absolute bottom-2 left-full ml-3 w-64'
-          )">
-            <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
-              <p class="text-sm font-semibold ui-text">
-                Management Settings
-              </p>
-            </div>
-
-            <nav class="py-2 max-h-72 overflow-y-auto">
-              <template v-for="setting in managementSettings" :key="setting.name || setting.label">
-                <div v-if="setting.type === 'section'"
-                  class="px-4 py-1 text-[11px] font-semibold uppercase tracking-wider ui-text-muted">
-                  {{ setting.label }}
-                </div>
-
-                <router-link v-else-if="setting.route" :to="setting.route" :class="cn(
-                  'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                  isItemActive(setting)
-                    ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
-                    : 'ui-text hover:bg-(--ui-surface-muted)'
-                )" @click="handleManagementSettingsNavigation(setting)">
-                  <Icon :icon="setting.icon || 'cog'" class="w-4 h-4 shrink-0" />
-                  <span class="truncate">{{ setting.label }}</span>
-                </router-link>
-              </template>
-            </nav>
-          </div>
-        </transition>
-      </div>
     </aside>
 
     <!-- Overlay for mobile submenus -->
-    <transition enter-active-class="transition-opacity duration-300"
-      leave-active-class="transition-opacity duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100"
-      leave-from-class="opacity-100" leave-to-class="opacity-0">
-      <div v-if="(submenuOpen || managementSettingsOpen) && isMobile" class="fixed inset-0 z-30 bg-black/20"
-        @click="closeAllMenus" />
+    <transition
+      enter-active-class="transition-opacity duration-300"
+      leave-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="submenuOpen && isMobile"
+        class="fixed inset-0 z-30 bg-black/20"
+        @click="closeAllMenus"
+      />
     </transition>
   </div>
 </template>

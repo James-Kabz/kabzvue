@@ -111,8 +111,6 @@ const handleMobileSidebarToggle = () => {
       :sidebar-width="sidebarWidth"
       :header="{ title: 'STL Horizon' }"
       :navigation-items="navigationItems"
-      :management-settings="[]"
-      :show-management-settings="false"
       :mobile-open="mobileOpen"
       :current-path="resolvedRoute"
       @navigate="handleNavigation"

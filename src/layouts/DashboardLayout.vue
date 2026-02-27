@@ -155,10 +155,6 @@ const navigationItems = [
 // Computed
 const sidebarWidth = computed(() => 130)
 
-const isManagementSettingsActive = computed(() => {
-  return route.path.startsWith('/management')
-})
-
 // Methods
 const handleMobileSidebarToggle = () => {
   mobileOpen.value = !mobileOpen.value
@@ -234,10 +230,7 @@ defineExpose({
       :sidebar-width="sidebarWidth"
       :header="{ title: 'Risk & Compliance' }"
       :navigation-items="navigationItems"
-      :management-settings="managementSettingsItems"
-      :show-management-settings="true"
       :mobile-open="mobileOpen"
-      :is-management-settings-active="isManagementSettingsActive"
       :current-path="currentRoute"
       @navigate="handleNavigation"
       @update:mobile-open="handleMobileToggle"
