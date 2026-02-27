@@ -1,212 +1,181 @@
-<script>
-import { computed } from 'vue'
+<script setup>
+import { computed, onBeforeUnmount, onMounted } from 'vue'
+import Typography from '../components/Typography.vue'
+import Divider from '../components/Divider.vue'
 
-export default {
-  name: 'AuthLayout',
-  props: {
-    title: {
-      type: String,
-      default: null
-    },
-    subtitle: {
-      type: String,
-      default: null
-    },
-    logoUrl: {
-      type: String,
-      default: '/logo.png' // Update this with your logo path
-    },
-    quote: {
-      type: String,
-      default: ''
-    },
-    primaryColor: {
-      type: String,
-      default: '#e74c3c'
-    },
-    backgroundColor: {
-      type: String,
-      default: 'ui-bg'
-    },
-    backgroundImage: {
-      type: String,
-      default: 'https://lh3.googleusercontent.com/gps-cs-s/AG0ilSxeN2zWMjNsmwOrn8a8dDwnu2e5jjzYNembgPZFUXus_sLxUfpCJSKS-8Z7fj3ta1Q_xXDZ-skeFTUoGR75RTIlxQCIYrmjLOqfBNsk8Cjd_qrJaa72l1D2-aEoDwJJKKeTpUmeEg=s1360-w1360-h1020-rw'
-    },
-    backgroundOpacity: {
-      type: Number,
-      default: 0.4
-    },
-    appName: {
-      type: String,
-      default: 'eHorizon eBoard X'
-    },
-    appVersion: {
-      type: String,
-      default: 'Version 2.0'
-    },
-    copyright: {
-      type: String,
-      default: 'Copyright © 2025 Software Technologies Limited'
-    },
-    showFooter: {
-      type: Boolean,
-      default: true
-    },
-    socialLinks: {
-      type: Array,
-      default: () => [
-        { name: 'linkedin', url: '#', icon: 'linkedin-in', variant: 'primary' },
-        { name: 'facebook', url: '#', icon: 'facebook-f', variant: 'primary' },
-        { name: 'twitter', url: '#', icon: 'twitter', variant: 'info' }
-      ]
-    }
+const props = defineProps({
+  title: {
+    type: String,
+    default: 'Login to your account:'
   },
-  setup() {
-    const currentYear = computed(() => new Date().getFullYear())
-
-    return {
-      currentYear
-    }
+  subtitle: {
+    type: String,
+    default: null
+  },
+  logoUrl: {
+    type: String,
+    default: '/applogo.png'
+  },
+  quote: {
+    type: String,
+    default: 'MANAGEMENT IS DOING THINGS RIGHT, BUT LEADERSHIP IS DOING RIGHT THINGS'
+  },
+  backgroundImage: {
+    type: String,
+    default: '/stlbacklogo.jpeg'
+  },
+  backgroundOpacity: {
+    type: Number,
+    default: 1
+  },
+  appName: {
+    type: String,
+    default: 'applogo'
+  },
+  appVersion: {
+    type: String,
+    default: '0.0.1'
+  },
+  copyright: {
+    type: String,
+    default: 'Software Technologies Limited'
+  },
+  showFooter: {
+    type: Boolean,
+    default: true
   }
-}
+})
+
+const currentYear = computed(() => new Date().getFullYear())
+
+onMounted(() => {
+  document.documentElement.classList.add('auth-page')
+  document.body.classList.add('auth-page')
+})
+
+onBeforeUnmount(() => {
+  document.documentElement.classList.remove('auth-page')
+  document.body.classList.remove('auth-page')
+})
 </script>
 
 <template>
-  <div
-    class="min-h-screen relative flex items-center justify-center overflow-x-hidden"
-    :style="{ backgroundColor: backgroundColor }"
-  >
-    <!-- Background Image -->
+  <div class="relative min-h-screen overflow-hidden">
     <div
       class="absolute inset-0 bg-cover bg-center"
       :style="{
         backgroundImage: `url('${backgroundImage}')`,
-        opacity: backgroundOpacity
       }"
     />
+    <div class="absolute inset-0 " />
 
-    <!-- Main Container -->
-    <div class="container mx-auto px-4 py-10 lg:py-0 relative z-10 w-full">
-      <div class="grid lg:grid-cols-10 gap-6 lg:gap-8 items-center min-h-screen">
-        <!-- Branding Section (Left Side) - Hidden on mobile -->
-        <div class="hidden lg:block lg:col-span-6 ui-text text-center lg:text-left space-y-6">
-          <!-- Logo -->
-          <div class="mb-6 flex justify-center lg:justify-start">
-            <img
-              :src="logoUrl"
-              alt="Company Logo"
-              class="h-52 lg:h-72 w-auto object-contain"
-            >
-          </div>
+    <div class="relative z-10 mx-auto flex min-h-screen w-full max-w-[1400px] items-center px-4 py-4 sm:px-8 sm:py-6 lg:px-14">
+      <section class="hidden w-full max-w-4xl pr-10 lg:block">
+        <Typography
+          v-if="quote"
+          variant="body-xl"
+          class="max-w-3xl text-2xl leading-[1.4] font-light tracking-wide text-white/90 xl:text-[38px]"
+        >
+          "{{ quote }}"
+        </Typography>
+      </section>
 
-          <!-- Quote -->
-          <div
-            v-if="quote"
-            class="max-w-md mx-auto lg:mx-0"
-          >
-            <p class="text-sm lg:text-base font-light text-[color:color-mix(in oklab, var(--ui-text), transparent 30%)] italic leading-relaxed">
-              "{{ quote }}"
-            </p>
-          </div>
-        </div>
+      <section class="ml-auto w-full max-w-[390px]">
+        <div class="overflow-hidden rounded-sm ui-surface">
+          <div class="px-1 sm:pt-2">
+            <div class="flex items-start justify-between gap-2">
+              <img
+                :src="logoUrl"
+                alt="App logo"
+                class="h-12 w-auto max-w-[180px] object-contain sm:h-32"
+              >
+              <img
+                src="/logo.png"
+                alt="Software logo"
+                class="h-8 w-auto object-contain sm:h-32"
+              >
+            </div>
 
-        <!-- Form Section (Right Side) -->
-        <div class="lg:col-span-4 w-full">
-          <!-- Mobile Logo - Only shown on mobile -->
-          <div class="lg:hidden mb-6 flex justify-center">
-            <img
-              :src="logoUrl"
-              alt="Company Logo"
-              class="h-24 w-auto object-contain"
-            >
-          </div>
-
-          <div class="rounded-lg shadow-xl p-4 sm:p-6 lg:p-8 max-w-md mx-auto w-full ui-surface-muted">
-            <!-- Card Header -->
             <div
               v-if="$slots['card-header'] || title"
-              class="mb-4 sm:mb-6"
             >
               <slot name="card-header">
-                <div class="text-center">
-                  <h1 class="text-xl sm:text-2xl font-bold ui-text">
-                    {{ title }}
-                  </h1>
-                  <p
-                    v-if="subtitle"
-                    class="text-sm sm:text-base ui-text mt-2"
-                  >
-                    {{ subtitle }}
-                  </p>
-                </div>
+                <Typography
+                  variant="text-xl"
+                  align="center"
+                  class="font-normal leading-tight text-[#1f2328] text-center"
+                >
+                  {{ title }}
+                </Typography>
+                <Typography
+                  v-if="subtitle"
+                  variant="body-sm"
+                  class="mt-1 text-xs leading-normal text-[#5f6a74]"
+                >
+                  {{ subtitle }}
+                </Typography>
               </slot>
             </div>
+          </div>
 
-            <!-- Main Form Content -->
-            <div class="space-y-4 sm:space-y-6">
+          <Divider
+            size="sm"
+            class="my-0 bg-[#c7ccd2]"
+          />
+
+          <div class="px-5 py-4 sm:px-6 sm:py-2">
+            <div class="space-y-4">
               <router-view />
             </div>
-
-            <!-- Card Footer -->
-            <div
-              v-if="$slots['card-footer']"
-              class="mt-4 sm:mt-6"
-            >
-              <slot name="card-footer" />
-            </div>
           </div>
 
-          <!-- Additional Links -->
           <div
-            v-if="$slots.links"
-            class="mt-4 sm:mt-6 text-center"
+            v-if="$slots['card-footer']"
+            class="px-6 pb-6 sm:px-8 sm:pb-8"
           >
-            <slot name="links" />
+            <slot name="card-footer" />
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Footer (Bottom Right) - Adjusted for mobile -->
-    <div 
-      v-if="showFooter" 
-      class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 text-right"
-    >
-      <img
-        :src="logoUrl"
-        alt="Company Logo"
-        class="hidden sm:block h-20 sm:h-32 lg:h-40 w-auto object-contain ml-auto mb-2"
-      >
-      <div class="text-[color:color-mix(in oklab, var(--ui-text), transparent 10%)] text-[10px] sm:text-xs bg-[color:color-mix(in oklab, var(----ui-bg), transparent 70%)] sm:bg-transparent px-2 py-1 sm:p-0 rounded">
-        <div class="font-medium">
-          {{ appName }}
+        <div
+          v-if="showFooter"
+          class="mt-5 text-center text-white"
+        >
+          <Typography
+            variant="body-md"
+            class="text-xs font-light leading-none text-white sm:text-[14px]"
+          >
+            {{ appVersion }}
+          </Typography>
+          <Typography
+            variant="body-md"
+            class="mt-2 text-sm font-light leading-none text-white sm:text-[16px]"
+          >
+            &copy; {{ copyright }}
+          </Typography>
+          <Typography
+            variant="body-sm"
+            class="mt-1 text-sm font-light leading-none text-white sm:text-[14px]"
+          >
+            (2011 - {{ currentYear }})
+          </Typography>
         </div>
-        <div class="hidden sm:block">
-          ({{ appVersion }})
-        </div>
-        <div class="hidden sm:block">
-          {{ copyright }}
-        </div>
-      </div>
-    </div>
 
-    <!-- Social Media Links (Bottom Left) - Adjusted for mobile -->
-    <div class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 flex gap-1.5 sm:gap-2">
-      <a
-        v-for="social in socialLinks"
-        :key="social.name"
-        :href="social.url"
-        :class="[
-          'w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded text-xs transition-colors',
-          social.variant === 'primary'
-            ? 'ui-primary-bg hover:bg-(--ui-primary-strong) ui-text'
-            : social.variant === 'info'
-              ? 'ui-primary-bg hover:bg-(--ui-primary) ui-text'
-              : 'ui-bg hover:bg-(--ui-bg) ui-text'
-        ]"
-      >
-        <font-awesome-icon :icon="['fab', social.icon]" />
-      </a>
+        <div
+          v-if="$slots.links"
+          class="mt-4 text-center"
+        >
+          <slot name="links" />
+        </div>
+      </section>
     </div>
   </div>
 </template>
+
+<style scoped>
+:global(html.auth-page),
+:global(body.auth-page) {
+  background-color: #1e1a18;
+  overscroll-behavior-y: none;
+}
+</style>

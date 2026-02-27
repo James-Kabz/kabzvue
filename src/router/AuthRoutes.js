@@ -7,17 +7,24 @@ const AuthRoutes = {
     companyInitials: 'STL',
     companyName: 'SOFTWARE',
     variant: 'centered',
-    appName: 'eRisk & Compliance Management',
-    appVersion: '1.0.0',
+    appName: 'applogo',
+    appVersion: '0.0.1',
+    title: 'Login to your account:',
+    logoUrl: '/applogo.png',
     secondaryLogoText: 'Risk & Compliance Management',
     backgroundOpacity: 1,
-    backgroundImage: './stlbacklogo.png'
+    backgroundImage: '/stlbacklogo.jpeg'
   },
   meta: { requiresAuth: false },
   children: [
     {
+      path: '',
+      redirect: { name: 'login' }
+    },
+    {
       name: 'login',
-      path: '/login',
+      path: 'login',
+      alias: ['/login'],
       component: () => import('../views/authentication/LoginPage.vue')
     },
     {
