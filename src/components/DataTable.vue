@@ -186,7 +186,7 @@ const props = defineProps({
   },
   skeletonRows: {
     type: Number,
-    default: 5
+    default: 10
   },
   // Toolbar
   showToolbar: {
