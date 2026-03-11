@@ -46,7 +46,12 @@ app.use(router)
 
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(VueApexCharts)
-app.use(VueUI)
+app.use(VueUI, {
+  authResolver: ({ permission, role, requireAll }) => {
+    // Wire to your auth store/composable
+    return myCanAccess(permission, role, requireAll)
+  }
+})
 app.directive('tooltip', tooltip)
 
 initTheme()

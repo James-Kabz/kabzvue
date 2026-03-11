@@ -193,7 +193,7 @@ const workflowAndLayouts = new Set([
 const usageOverrides = {
   Toast: 'toast.success("Saved successfully")',
   Tooltip: '<Button v-tooltip="\'Helpful hint\'">Hover me</Button>',
-  Button: '<Button variant="primary">Save</Button>',
+  Button: '<Button permission="users.update" unauthorized="hide">Save</Button>',
   Input: '<Input v-model="value" placeholder="Type here" />',
   Select: '<Select v-model="plan" :options="planOptions" />',
   Checkbox: '<Checkbox v-model="enabled" label="Enable notifications" />',

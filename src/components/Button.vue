@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 import Icon from './Icon.vue'
+import { AUTH_RESOLVER_KEY } from '../lib/auth.js'
 
 defineOptions({
   inheritAttrs: false
@@ -55,6 +56,71 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  permission: {
+    type: [String, Array, Boolean, Function],
+    default: null,
+  },
+  role: {
+    type: [String, Array, Boolean, Function],
+    default: null,
+  },
+  requireAll: {
+    type: Boolean,
+    default: false,
+  },
+  unauthorized: {
+    type: String,
+    default: 'show',
+    validator: (value) => ['show', 'hide', 'disable'].includes(value),
+  },
+})
+
+const authResolver = inject(AUTH_RESOLVER_KEY, null)
+
+const normalizeRule = (rule) => {
+  if (rule === null || rule === undefined) return null
+  if (typeof rule === 'boolean') return rule
+  if (typeof rule === 'function') return !!rule()
+  return rule
+}
+
+const hasAccess = computed(() => {
+  const normalizedPermission = normalizeRule(props.permission)
+  const normalizedRole = normalizeRule(props.role)
+
+  // No access requirements configured
+  if (normalizedPermission === null && normalizedRole === null) return true
+
+  // Direct boolean/function outcome path
+  const isBooleanOnly =
+    (normalizedPermission === null || typeof normalizedPermission === 'boolean') &&
+    (normalizedRole === null || typeof normalizedRole === 'boolean')
+
+  if (isBooleanOnly) {
+    return (normalizedPermission ?? true) && (normalizedRole ?? true)
+  }
+
+  // Delegate string/array checks to injected resolver
+  if (typeof authResolver === 'function') {
+    return !!authResolver({
+      permission: normalizedPermission,
+      role: normalizedRole,
+      requireAll: props.requireAll,
+    })
+  }
+
+  // Fallback: keep visible when resolver isn't configured.
+  return true
+})
+
+const shouldHide = computed(() => props.unauthorized === 'hide' && !hasAccess.value)
+
+const isUnauthorizedDisabled = computed(() => {
+  return props.unauthorized === 'disable' && !hasAccess.value
+})
+
+const isDisabled = computed(() => {
+  return props.disabled || props.loading || isUnauthorizedDisabled.value
 })
 
 const buttonVariants = cva(
@@ -157,9 +223,10 @@ const spinnerSizeClass = computed(() => {
 
 <template>
   <button
+    v-if="!shouldHide"
     :class="cn(buttonVariants({ variant, size }), $attrs.class)"
-    :disabled="disabled || loading"
-    :aria-disabled="disabled || loading"
+    :disabled="isDisabled"
+    :aria-disabled="isDisabled"
     :aria-busy="loading"
     v-bind="$attrs"
   >

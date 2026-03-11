@@ -190,6 +190,55 @@ describe('Component', () => {
 
 This document provides comprehensive usage examples and API reference for all Vue components and directives in the STL Horizon Vue Atomic UI library.
 
+## Button Authorization Access Control
+
+`Button` supports access-control props directly:
+
+- `permission`: `string | string[] | boolean | () => boolean`
+- `role`: `string | string[] | boolean | () => boolean`
+- `requireAll`: `boolean` (used for permission arrays)
+- `unauthorized`: `'show' | 'hide' | 'disable'` (default: `'show'`)
+
+### Configure auth resolver
+
+```js
+import { createApp } from 'vue'
+import VueUI from 'kabzvue'
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.use(VueUI, {
+  authResolver: ({ permission, role, requireAll }) => {
+    // Return true if user can access this button
+    return myCanAccess(permission, role, requireAll)
+  },
+})
+```
+
+### Usage examples
+
+```vue
+<Button permission="update.compliance" unauthorized="hide">Save</Button>
+
+<Button
+  :permission="['risk.create', 'risk.update']"
+  :requireAll="true"
+  unauthorized="disable"
+>
+  Submit
+</Button>
+
+<Button :role="['super-admin', 'admin']" unauthorized="hide">Delete</Button>
+```
+
+### Notes
+
+- Without `permission`/`role`, `Button` works as normal.
+- `unauthorized="hide"` removes the button from render output.
+- `unauthorized="disable"` keeps it visible but disabled.
+- If no `authResolver` is configured, restricted buttons default to visible.
+
 ## Tooltip Directive
 
 A custom Vue directive for displaying tooltips on hover with customizable positioning and styling.
@@ -252,6 +301,7 @@ or else import in the main.js as
 
 ## Table of Contents
 
+- [Button Authorization Access Control](#button-authorization-access-control)
 - [Tooltip Directive](#tooltip-directive)
 - [Accordion](#accordion)
 - [AccordionItem](#accordionitem)

@@ -90,6 +90,7 @@ import ReminderConfig from "./components/ReminderConfig.vue"
 // Import toast function and composable (not a component!)
 import { toast, useToaster } from './lib/toast'
 import { initTheme, setTheme, setMode, getTheme, getMode } from './lib/theme'
+import { AUTH_RESOLVER_KEY } from "./lib/auth.js"
 import { tooltip } from "./directives/tooltip.js"
 // Utils
 export { cn } from "./utils/cn.js"
@@ -185,10 +186,91 @@ const components = {
   ReminderConfig
 }
 
+const normalizeName = (value) => {
+  if (typeof value === "string") return value
+  if (value && typeof value === "object" && typeof value.name === "string") return value.name
+  return null
+}
+
+const resolveCollection = (value) => {
+  return typeof value === "function" ? value() : value
+}
+
+const createFallbackAuthResolver = (options = {}) => {
+  const {
+    permissions = null,
+    roles = null,
+    checkPermission = null,
+    checkAnyPermission = null,
+    checkAllPermissions = null,
+    checkRole = null,
+    checkAnyRole = null,
+  } = options
+
+  const hasAuthConfig =
+    permissions !== null ||
+    roles !== null ||
+    typeof checkPermission === "function" ||
+    typeof checkAnyPermission === "function" ||
+    typeof checkAllPermissions === "function" ||
+    typeof checkRole === "function" ||
+    typeof checkAnyRole === "function"
+
+  if (!hasAuthConfig) return null
+
+  const listHasName = (collection, target) => {
+    if (!Array.isArray(collection) || !target) return false
+    return collection.some((item) => normalizeName(item) === target)
+  }
+
+  const evaluatePermission = (permission, requireAll = false) => {
+    if (permission === null || permission === undefined) return true
+    if (typeof permission === "boolean") return permission
+    if (typeof permission === "function") return !!permission()
+
+    const normalizedPermissions = resolveCollection(permissions)
+
+    if (Array.isArray(permission)) {
+      if (requireAll) {
+        if (typeof checkAllPermissions === "function") return !!checkAllPermissions(permission)
+        return permission.every((item) => listHasName(normalizedPermissions, item))
+      }
+
+      if (typeof checkAnyPermission === "function") return !!checkAnyPermission(permission)
+      return permission.some((item) => listHasName(normalizedPermissions, item))
+    }
+
+    if (typeof checkPermission === "function") return !!checkPermission(permission)
+    return listHasName(normalizedPermissions, permission)
+  }
+
+  const evaluateRole = (role) => {
+    if (role === null || role === undefined) return true
+    if (typeof role === "boolean") return role
+    if (typeof role === "function") return !!role()
+
+    const normalizedRoles = resolveCollection(roles)
+
+    if (Array.isArray(role)) {
+      if (typeof checkAnyRole === "function") return !!checkAnyRole(role)
+      return role.some((item) => listHasName(normalizedRoles, item))
+    }
+
+    if (typeof checkRole === "function") return !!checkRole(role)
+    return listHasName(normalizedRoles, role)
+  }
+
+  return ({ permission, role, requireAll = false } = {}) => {
+    return evaluatePermission(permission, requireAll) && evaluateRole(role)
+  }
+}
+
 // Plugin installer
 const VueUI = {
   install(app, options = {}) {
-    const { prefix = "" } = options
+    const { prefix = "", authResolver = null } = options
+    const resolvedAuthResolver =
+      typeof authResolver === "function" ? authResolver : createFallbackAuthResolver(options)
     
     Object.keys(components).forEach((name) => {
       const componentName = prefix ? `${prefix}${name}` : name
@@ -200,6 +282,10 @@ const VueUI = {
 
     app.config.globalProperties.$tooltip = tooltip
     app.provide('tooltip', tooltip)
+
+    app.config.globalProperties.$authResolver = resolvedAuthResolver
+    app.config.globalProperties.$canAccess = resolvedAuthResolver
+    app.provide(AUTH_RESOLVER_KEY, resolvedAuthResolver)
   },
 }
 
@@ -299,5 +385,6 @@ export {
   // Export toast function and composable
   toast,
   useToaster,
-  tooltip
+  tooltip,
+  AUTH_RESOLVER_KEY
 }
