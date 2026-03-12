@@ -587,6 +587,7 @@ const handleMultiFileRemoved = (field, files) => {
             :required="field.required && !field.disabled"
             :error="errors[field.name]"
             :error-message="errors[field.name]"
+            :help-text="field.helpText"
           >
             <template #default="{ fieldId, hasError, ariaDescribedBy }">
               <Input
@@ -804,12 +805,6 @@ const handleMultiFileRemoved = (field, files) => {
                   @files-selected="handleFileSelected(field, $event)"
                   @file-removed="handleFileRemoved(field, $event)"
                 />
-                <p
-                  v-if="field.helpText"
-                  class="mt-2 text-xs ui-text"
-                >
-                  {{ field.helpText }}
-                </p>
               </div>
 
               <div
@@ -825,12 +820,6 @@ const handleMultiFileRemoved = (field, files) => {
                   @files-selected="handleMultiFileSelected(field, $event)"
                   @file-removed="handleMultiFileRemoved(field, $event)"
                 />
-                <p
-                  v-if="field.helpText"
-                  class="mt-2 text-xs ui-text"
-                >
-                  {{ field.helpText }}
-                </p>
               </div>
 
               <Slider

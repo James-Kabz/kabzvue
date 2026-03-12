@@ -948,7 +948,8 @@ Each field in the `fields` array should have:
   calendarPosition: 'left-0 bottom-full', // For date
   validate: (value, formData) => errorMessage || null, // Custom validation
   onChange: (value, formData) => {}, // Change handler
-  errorMessage: 'Custom error message'
+  errorMessage: 'Custom error message',
+  helpText: 'Short helper text shown under the field'
 }
 ```
 
