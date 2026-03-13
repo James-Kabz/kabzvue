@@ -252,7 +252,7 @@ defineExpose({
       :organisations="user?.organisations || []"
       :show-search="false"
       :settings-menu-items="managementSettingsItems"
-      :settings-badge-count="managementSettingsItems.length"
+      :settings-badge-count="managementSettingsItems.filter(item => item?.route).length"
       @search="handleSearch"
       @profile-action="handleProfileAction"
       @logout="handleLogout"

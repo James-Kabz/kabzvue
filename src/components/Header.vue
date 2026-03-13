@@ -63,7 +63,7 @@ const notificationCount = computed(() => {
 })
 const resolvedSettingsBadge = computed(() => {
   if (props.settingsBadgeCount > 0) return props.settingsBadgeCount
-  return props.settingsMenuItems.length
+  return props.settingsMenuItems.filter(item => item?.route).length
 })
 const userInitials = computed(() => {
   if (props.userInitialsOverride) return props.userInitialsOverride
