@@ -744,15 +744,17 @@ const handleMultiFileRemoved = (field, files) => {
                   :aria-checked="getFieldValue(field.name)"
                   :disabled="isLoading || field.disabled"
                   :class="[
-                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:ring-offset-2',
-                    getFieldValue(field.name) ? 'ui-primary-bg' : 'ui-bg',
+                    'relative inline-flex h-6 w-11 items-center rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:ring-offset-2',
+                    getFieldValue(field.name)
+                      ? 'ui-primary-bg border-(--ui-primary)'
+                      : 'ui-surface-soft border-(--ui-border-strong)',
                     (isLoading || field.disabled) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                   ]"
                   @click="setFieldValue(field.name, !getFieldValue(field.name))"
                 >
                   <span
                     :class="[
-                      'inline-block h-4 w-4 transform rounded-full ui-surface transition-transform',
+                      'inline-block h-4 w-4 transform rounded-full ui-surface border ui-border-strong transition-transform',
                       getFieldValue(field.name) ? 'translate-x-6' : 'translate-x-1'
                     ]"
                   />

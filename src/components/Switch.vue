@@ -30,7 +30,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const switchVariants = cva(
-  'inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-ring) focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-ring) focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       size: {
@@ -39,15 +39,15 @@ const switchVariants = cva(
         lg: 'h-7 w-12'
       },
       checked: {
-        true: 'ui-danger-bg',
-        false: 'ui-bg'
+        true: 'ui-danger-bg border-(--ui-danger)',
+        false: 'ui-surface-soft border-(--ui-border-strong)'
       }
     }
   }
 )
 
 const thumbVariants = cva(
-  'pointer-events-none block rounded-full ui-surface  shadow-lg ring-0 transition-transform',
+  'pointer-events-none block rounded-full ui-surface border ui-border-strong shadow-sm ring-0 transition-transform',
   {
     variants: {
       size: {
