@@ -65,7 +65,7 @@ const emit = defineEmits([
   'search',
   'profile-action',
   'logout',
-  'organisation-change',
+  'company-change',
   'sidebar-toggle'
 ])
 
@@ -76,26 +76,26 @@ const sidebarRef = ref(null)
 const mobileOpen = ref(false)
 const sidebarWidth = 130
 
-const organisations = ref([
-  { org_id: 1, organisation_name: 'STL Horizon', type: { name: 'Product' }, role: 'Admin' },
-  { org_id: 2, organisation_name: 'Northwind Labs', type: { name: 'Research' }, role: 'Manager' },
-  { org_id: 3, organisation_name: 'Atlas Systems', type: { name: 'Operations' }, role: 'Analyst' }
+const companies = ref([
+  { company_id: 1, company_name: 'STL Horizon', type: { name: 'Product' }, role: 'Admin' },
+  { company_id: 2, company_name: 'Northwind Labs', type: { name: 'Research' }, role: 'Manager' },
+  { company_id: 3, company_name: 'Atlas Systems', type: { name: 'Operations' }, role: 'Analyst' }
 ])
 
-const currentOrganisation = ref(organisations.value[0])
+const currentCompany = ref(companies.value[0])
 
 const activeRoles = computed(() => {
-  if (!currentOrganisation.value?.role) return []
-  return [currentOrganisation.value.role]
+  if (!currentCompany.value?.role) return []
+  return [currentCompany.value.role]
 })
 
 const handleNavigation = (item) => emit('navigate', item)
 const handleSearch = (query) => emit('search', query)
 const handleProfileAction = (item) => emit('profile-action', item)
 const handleLogout = () => emit('logout')
-const handleOrganisationChange = (org) => {
-  currentOrganisation.value = org
-  emit('organisation-change', org)
+const handleCompanyChange = (company) => {
+  currentCompany.value = company
+  emit('company-change', company)
 }
 
 const handleMobileSidebarToggle = () => {
@@ -126,16 +126,15 @@ const handleMobileSidebarToggle = () => {
       :notifications="notifications"
       :profile-menu-items="profileMenuItems"
       :mobile-open="mobileOpen"
-      :current-organisation="currentOrganisation"
-      :organisations="organisations"
+      :current-company="currentCompany"
+      :companies="companies"
       :active-roles="activeRoles"
-      :show-organisation-dropdown="organisations.length > 1"
       @search="handleSearch"
       @profile-action="handleProfileAction"
       @logout="handleLogout"
       @navigate="handleNavigation"
       @toggle-mobile-sidebar="handleMobileSidebarToggle"
-      @organisation-change="handleOrganisationChange"
+      @company-change="handleCompanyChange"
     />
 
     <main

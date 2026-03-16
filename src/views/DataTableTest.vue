@@ -171,7 +171,7 @@ import DataTable from '../components/DataTable.vue'
 
 // Props
 const props = defineProps({
-  currentOrganisation: {
+  currentCompany: {
     type: Object,
     default: null
   }
@@ -267,7 +267,7 @@ const userActions = computed(() => [
   }
 ])
 
-// Sample data with better avatars and organisation field
+// Sample data with better avatars and company field
 const users = ref([
   {
     id: 1,
@@ -280,7 +280,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 75000,
     joinDate: '2023-03-15',
-    organisation_id: 1
+    company_id: 1
   },
   {
     id: 2,
@@ -293,7 +293,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b332c3c7?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 65000,
     joinDate: '2023-05-22',
-    organisation_id: 1
+    company_id: 1
   },
   {
     id: 3,
@@ -306,7 +306,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 55000,
     joinDate: '2023-07-08',
-    organisation_id: 2
+    company_id: 2
   },
   {
     id: 4,
@@ -319,7 +319,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 70000,
     joinDate: '2023-02-14',
-    organisation_id: 2
+    company_id: 2
   },
   {
     id: 5,
@@ -332,7 +332,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 80000,
     joinDate: '2023-01-10',
-    organisation_id: 1
+    company_id: 1
   },
   {
     id: 6,
@@ -345,7 +345,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 62000,
     joinDate: '2023-06-20',
-    organisation_id: 2
+    company_id: 2
   }
 ])
 
@@ -415,10 +415,10 @@ const bulkActions = [
 const filteredUsers = computed(() => {
   let filtered = users.value
 
-  // Apply organisation filter only when an organisation is provided
-  const activeOrgId = props.currentOrganisation?.org_id ?? props.currentOrganisation?.id
-  if (activeOrgId) {
-    filtered = filtered.filter(user => user.organisation_id === Number(activeOrgId))
+  // Apply company filter only when a company is provided
+  const activeCompanyId = props.currentCompany?.company_id ?? props.currentCompany?.id
+  if (activeCompanyId) {
+    filtered = filtered.filter(user => user.company_id === Number(activeCompanyId))
   }
 
   // Apply search filter
@@ -534,8 +534,8 @@ const handleAddButtonClick = (buttonConfig) => {
 
 const handleAddUser = () => {
   const nextId = users.value.length > 0 ? Math.max(...users.value.map(u => u.id)) + 1 : 1
-  const activeOrgId = props.currentOrganisation?.org_id ?? props.currentOrganisation?.id
-  const organisationId = activeOrgId ? Number(activeOrgId) : 1
+  const activeCompanyId = props.currentCompany?.company_id ?? props.currentCompany?.id
+  const companyId = activeCompanyId ? Number(activeCompanyId) : 1
 
   const newUser = {
     id: nextId,
@@ -548,7 +548,7 @@ const handleAddUser = () => {
     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`Test User ${nextId}`)}&background=e2e8f0&color=334155&size=32`,
     salary: 50000 + (nextId * 500),
     joinDate: new Date().toISOString().slice(0, 10),
-    organisation_id: organisationId
+    company_id: companyId
   }
 
   users.value.unshift(newUser)

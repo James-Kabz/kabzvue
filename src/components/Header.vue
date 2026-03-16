@@ -12,24 +12,25 @@ const props = defineProps({
   notifications: { type: Array, default: () => [] },
   profileMenuItems: { type: Array, required: true },
   mobileOpen: { type: Boolean, default: false },
-  currentOrganisation: { type: Object, default: null },
+  currentCompany: { type: Object, default: null },
   companyLogo: { type: String, default: '' },
-  organisationLogo: { type: String, default: '' },
-  organisationLogos: { type: Object, default: () => ({}) },
-  organisations: { type: Array, default: () => [] },
+  currentCompanyLogo: { type: String, default: '' },
+  companyLogos: { type: Object, default: () => ({}) },
+  companies: { type: Array, default: () => [] },
   activeRoles: { type: Array, default: () => [] },
-  // New props for customization
   showSearch: { type: Boolean, default: true },
   showNotifications: { type: Boolean, default: true },
   showBreadcrumb: { type: Boolean, default: true },
-  showOrganisationInfo: { type: Boolean, default: true },
+  showCompanyInfo: { type: Boolean, default: true },
   showUserDetails: { type: Boolean, default: true },
   showHeaderLogo: { type: Boolean, default: true },
   headerLogo: { type: String, default: 'dist/logo.png' },
   searchPlaceholder: { type: String, default: 'Search...' },
   notificationsTitle: { type: String, default: 'Notifications' },
-  organisationSwitcherTitle: { type: String, default: 'Switch Organisation' },
-  organisationSwitcherDescription: { type: String, default: 'Select an organisation to view its data' },
+  companySwitcherTitle: { type: String, default: 'Switch Company' },
+  companySwitcherDescription: { type: String, default: 'Select a company to view its data' },
+  entityLabel: { type: String, default: 'Company' },
+  entityFieldMap: { type: Object, default: () => ({}) },
   settingsMenuItems: { type: Array, default: () => [] },
   showSettings: { type: Boolean, default: true },
   settingsTitle: { type: String, default: 'Settings' },
@@ -44,7 +45,7 @@ const emit = defineEmits([
   'logout',
   'navigate',
   'toggle-mobile-sidebar',
-  'organisation-change',
+  'company-change',
   'notification-click',
   'view-all-notifications',
   'settings-action'
@@ -55,21 +56,89 @@ const showNotificationsDropdown = ref(false)
 const showProfile = ref(false)
 const showMobileSearch = ref(false)
 const isMobile = ref(false)
-const showOrganisationDropdown = ref(false)
+const showCompanyDropdown = ref(false)
 const showSettingsDropdown = ref(false)
 
-const notificationCount = computed(() => {
-  return props.notifications.filter(n => !n.read).length
-})
+const notificationCount = computed(() => props.notifications.filter(n => !n.read).length)
+
 const resolvedSettingsBadge = computed(() => {
   if (props.settingsBadgeCount > 0) return props.settingsBadgeCount
   return props.settingsMenuItems.filter(item => item?.route).length
 })
+
 const userInitials = computed(() => {
   if (props.userInitialsOverride) return props.userInitialsOverride
   const name = props.user?.name || 'Guest'
   return name.split(' ').map(n => n[0] || '').join('').toUpperCase()
 })
+
+const entityLabelLower = computed(() => String(props.entityLabel || 'Company').toLowerCase())
+const resolvedShowCompanyInfo = computed(() => props.showCompanyInfo)
+const resolvedSwitcherTitle = computed(() => props.companySwitcherTitle || `Switch ${props.entityLabel || 'Company'}`)
+const resolvedSwitcherDescription = computed(() => {
+  return props.companySwitcherDescription || `Select a ${(props.entityLabel || 'Company').toLowerCase()} to view its data`
+})
+
+const resolvedFieldMap = computed(() => ({
+  id: props.entityFieldMap?.id || '',
+  name: props.entityFieldMap?.name || '',
+  role: props.entityFieldMap?.role || '',
+  type: props.entityFieldMap?.type || '',
+  typeName: props.entityFieldMap?.typeName || ''
+}))
+
+const companyIdAliases = ['company_id', 'companyId', 'id']
+const companyNameAliases = ['company_name', 'companyName', 'name']
+const companyRoleAliases = ['company_role', 'companyRole', 'role']
+const companyTypeAliases = ['company_type', 'companyType', 'type']
+const companyTypeNameAliases = ['name', 'label', 'title', 'company_type_name', 'companyTypeName']
+
+const getFieldValue = (obj, preferredKey, aliases = []) => {
+  if (!obj || typeof obj !== 'object') return null
+  if (preferredKey && obj[preferredKey] != null) return obj[preferredKey]
+  for (const key of aliases) {
+    if (obj[key] != null) return obj[key]
+  }
+  return null
+}
+
+const getCompanyTypeName = (company) => {
+  if (!company || typeof company !== 'object') return ''
+
+  const typeValue = getFieldValue(company, resolvedFieldMap.value.type, companyTypeAliases)
+  if (typeof typeValue === 'string') return typeValue
+
+  if (typeValue && typeof typeValue === 'object') {
+    const nestedTypeName = getFieldValue(typeValue, resolvedFieldMap.value.typeName, companyTypeNameAliases)
+    if (nestedTypeName != null) return String(nestedTypeName)
+  }
+
+  const directTypeName = getFieldValue(company, resolvedFieldMap.value.typeName, companyTypeNameAliases)
+  if (directTypeName != null) return String(directTypeName)
+  return ''
+}
+
+const normalizeCompany = (company) => {
+  if (!company || typeof company !== 'object') return null
+
+  const id = getFieldValue(company, resolvedFieldMap.value.id, companyIdAliases)
+  const name = getFieldValue(company, resolvedFieldMap.value.name, companyNameAliases)
+  const role = getFieldValue(company, resolvedFieldMap.value.role, companyRoleAliases)
+
+  return {
+    ...company,
+    __id: id,
+    __name: name != null ? String(name) : 'Unknown',
+    __role: role != null ? String(role) : '',
+    __typeName: getCompanyTypeName(company),
+    __raw: company
+  }
+}
+
+const sourceCurrentCompany = computed(() => props.currentCompany)
+const sourceCompanies = computed(() => (Array.isArray(props.companies) ? props.companies : []))
+const normalizedCurrentCompany = computed(() => normalizeCompany(sourceCurrentCompany.value))
+const normalizedCompanies = computed(() => sourceCompanies.value.map(normalizeCompany).filter(Boolean))
 
 const userRoleNames = computed(() => {
   if (props.userRoleDisplayOverride) return props.userRoleDisplayOverride
@@ -77,19 +146,15 @@ const userRoleNames = computed(() => {
   const roles = []
 
   if (props.activeRoles?.length > 0) {
-    roles.push(...props.activeRoles.map(role =>
-      typeof role === 'string' ? role : role.name
-    ))
+    roles.push(...props.activeRoles.map(role => (typeof role === 'string' ? role : role.name)))
   }
 
   if (roles.length === 0 && props.user?.roles?.length > 0) {
-    roles.push(...props.user.roles.map(role =>
-      typeof role === 'string' ? role : role.name
-    ))
+    roles.push(...props.user.roles.map(role => (typeof role === 'string' ? role : role.name)))
   }
 
-  if (roles.length === 0 && props.currentOrganisation?.role) {
-    roles.push(props.currentOrganisation.role)
+  if (roles.length === 0 && normalizedCurrentCompany.value?.__role) {
+    roles.push(normalizedCurrentCompany.value.__role)
   }
 
   if (roles.length === 0) return 'Member'
@@ -101,9 +166,8 @@ const userRoleNames = computed(() => {
 
 const formattedActiveRoles = computed(() => {
   if (!props.activeRoles || props.activeRoles.length === 0) return ''
-
   return props.activeRoles
-    .map(role => typeof role === 'string' ? role : role.name)
+    .map(role => (typeof role === 'string' ? role : role.name))
     .map(role => role.charAt(0).toUpperCase() + role.slice(1).replace(/-/g, ' '))
     .join(', ')
 })
@@ -117,12 +181,12 @@ const toggleNotifications = () => {
 const toggleProfile = () => {
   showProfile.value = !showProfile.value
   showNotificationsDropdown.value = false
-  showOrganisationDropdown.value = false
+  showCompanyDropdown.value = false
   showSettingsDropdown.value = false
 }
 
-const toggleOrganisationDropdown = () => {
-  showOrganisationDropdown.value = !showOrganisationDropdown.value
+const toggleCompanyDropdown = () => {
+  showCompanyDropdown.value = !showCompanyDropdown.value
   showProfile.value = false
   showNotificationsDropdown.value = false
   showSettingsDropdown.value = false
@@ -132,7 +196,7 @@ const toggleSettingsDropdown = () => {
   showSettingsDropdown.value = !showSettingsDropdown.value
   showProfile.value = false
   showNotificationsDropdown.value = false
-  showOrganisationDropdown.value = false
+  showCompanyDropdown.value = false
 }
 
 const handleNavigation = (item) => {
@@ -158,9 +222,10 @@ const handleLogout = () => {
   showProfile.value = false
 }
 
-const handleOrganisationChange = (organisation) => {
-  emit('organisation-change', organisation)
-  showOrganisationDropdown.value = false
+const handleCompanyChange = (company) => {
+  const selectedCompany = company?.__raw || company
+  emit('company-change', selectedCompany)
+  showCompanyDropdown.value = false
 }
 
 const handleNotificationClick = (notification) => {
@@ -181,7 +246,7 @@ const handleClickOutside = (event) => {
   if (!event.target.closest('.absolute') && !event.target.closest('button')) {
     showNotificationsDropdown.value = false
     showProfile.value = false
-    showOrganisationDropdown.value = false
+    showCompanyDropdown.value = false
     showSettingsDropdown.value = false
   }
 }
@@ -191,32 +256,24 @@ const checkMobile = () => {
 }
 
 const getNotificationTypeClass = (notification) => {
-  if (notification.title.includes('Overdue')) {
-    return 'ui-danger-soft ui-danger'
-  }
-
-  if (notification.title.includes('Due in 0')) {
-    return 'ui-warning-soft ui-warning'
-  }
+  if (notification.title.includes('Overdue')) return 'ui-danger-soft ui-danger'
+  if (notification.title.includes('Due in 0')) return 'ui-warning-soft ui-warning'
 
   const classes = {
-    'due_date_reminder': 'ui-warning-soft ui-warning',
-    'info': 'ui-primary-soft ui-primary',
-    'success': 'ui-success-soft ui-success',
-    'warning': 'ui-warning-soft ui-warning',
-    'error': 'ui-danger-soft ui-danger'
+    due_date_reminder: 'ui-warning-soft ui-warning',
+    info: 'ui-primary-soft ui-primary',
+    success: 'ui-success-soft ui-success',
+    warning: 'ui-warning-soft ui-warning',
+    error: 'ui-danger-soft ui-danger'
   }
 
   return classes[notification.type] || classes.info
 }
 
-
 const formatModelName = (model) => {
   if (!model) return ''
-
   const parts = model.split('\\')
   const modelName = parts[parts.length - 1]
-
   return modelName
     .replace(/([A-Z])/g, ' $1')
     .trim()
@@ -250,11 +307,11 @@ const formatDueDate = (dateString) => {
   })
 }
 
-const getOrgLogoUrl = (org) => {
-  if (!org?.id) return null
-  return props.organisationLogos[org.id] || null
+const getCompanyLogoUrl = (company) => {
+  const companyId = company?.__id ?? getFieldValue(company, resolvedFieldMap.value.id, companyIdAliases)
+  if (companyId == null) return null
+  return props.companyLogos[companyId] || null
 }
-
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -278,7 +335,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
     :style="{ left: '0' }"
   >
     <div class="flex items-center justify-between h-16 sm:h-18 px-3 sm:px-4 md:px-6">
-      <!-- Left side - Organisation & Page Info -->
+      <!-- Left side - Company & Page Info -->
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
         <!-- Mobile Sidebar Toggle - Moved to far left -->
         <button
@@ -306,24 +363,24 @@ watch(searchQuery, (newValue) => emit('search', newValue))
 
         <!-- Divider -->
         <div
-          v-if="companyLogo && showOrganisationInfo && currentOrganisation"
+          v-if="companyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
           class="h-6 sm:h-8 w-px ui-border-strong-bg shrink-0 hidden sm:block"
         />
 
-        <!-- Organisation Info Card - Simplified for mobile -->
+        <!-- Company Info Card - Simplified for mobile -->
         <div
-          v-if="showOrganisationInfo && currentOrganisation"
+          v-if="resolvedShowCompanyInfo && normalizedCurrentCompany"
           class="shrink-0 ui-surface border ui-border-strong px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-(--ui-surface-muted) transition-colors max-w-44 sm:max-w-md"
         >
-          <!-- Organisation Logo - Smaller on all screens -->
+          <!-- Company Logo - Smaller on all screens -->
           <div
-            v-if="organisationLogo"
+            v-if="currentCompanyLogo"
             class="shrink-0"
           >
             <div class="relative">
               <img
-                :src="organisationLogo"
-                :alt="`${currentOrganisation.organisationName} logo`"
+                :src="currentCompanyLogo"
+                :alt="`${normalizedCurrentCompany.__name} ${entityLabelLower} logo`"
                 class="w-6 h-6 sm:w-8 sm:h-8 object-contain rounded-md ui-bg p-0.5 border border-(--ui-primary-soft) shadow-sm"
               >
               <!-- Online indicator - smaller -->
@@ -331,17 +388,17 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             </div>
           </div>
 
-          <!-- Organisation Details with Switcher -->
+          <!-- Company Details with Switcher -->
           <button
-            v-if="organisations.length > 1"
+            v-if="normalizedCompanies.length > 1"
             class="flex items-center gap-2 sm:gap-3 w-52 sm:w-60 cursor-pointer hover:bg-[color:color-mix(in oklab, var(--ui-surface-muted), transparent 35%)] rounded-md px-1.5 py-1 transition-all group"
-            @click="toggleOrganisationDropdown"
+            @click="toggleCompanyDropdown"
           >
             <div class="flex-1 min-w-0">
               <p
                 class="text-sm font-semibold ui-text truncate group-hover:text-(--ui-primary) leading-tight"
               >
-                {{ currentOrganisation.organisationName }}
+                {{ normalizedCurrentCompany.__name }}
               </p>
               <div class="flex items-center gap-1.5">
                 <Icon
@@ -359,17 +416,17 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             <Icon
               icon="chevron-down"
               class="w-4 h-4 ui-primary shrink-0 group-hover:text-(--ui-primary) transition-transform"
-              :class="{ 'rotate-180': showOrganisationDropdown }"
+              :class="{ 'rotate-180': showCompanyDropdown }"
             />
           </button>
 
-          <!-- Static display when only one organisation -->
+          <!-- Static display when only one company -->
           <div
             v-else
             class="min-w-0 flex-1"
           >
             <p class="text-xs font-bold ui-primary truncate max-w-[100px] sm:max-w-40 leading-tight">
-              {{ currentOrganisation.organisationName }}
+              {{ normalizedCurrentCompany.__name }}
             </p>
             <div class="flex items-center gap-1 mt-0.5">
               <Icon
@@ -385,7 +442,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             </div>
           </div>
 
-          <!-- Organisation Dropdown - Same as before but positioned better -->
+          <!-- Company Dropdown - Same as before but positioned better -->
           <transition
             enter-active-class="transition-all duration-200 ease-out"
             leave-active-class="transition-all duration-200 ease-in"
@@ -395,7 +452,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             leave-to-class="opacity-0 translate-y-2 scale-95"
           >
             <div
-              v-if="showOrganisationDropdown"
+              v-if="showCompanyDropdown"
               class="ui-surface absolute top-full left-0 right-0 sm:left-0 sm:right-auto mt-2 w-72 sm:w-80 rounded-2xl border ui-border-strong shadow-2xl z-50 max-h-96 overflow-hidden"
             >
               <div class="p-3 sm:p-4 border-b ui-border-strong ui-surface-muted">
@@ -404,31 +461,31 @@ watch(searchQuery, (newValue) => emit('search', newValue))
                     icon="list"
                     class="w-4 h-4 ui-primary"
                   />
-                  {{ organisationSwitcherTitle }}
+                  {{ resolvedSwitcherTitle }}
                 </h3>
                 <p class="text-xs ui-text mt-1">
-                  {{ organisationSwitcherDescription }}
+                  {{ resolvedSwitcherDescription }}
                 </p>
               </div>
               <div class="py-2 max-h-80 overflow-y-auto">
                 <button
-                  v-for="org in organisations"
-                  :key="org.id || org.organisationName"
+                  v-for="company in normalizedCompanies"
+                  :key="company.__id || company.__name"
                   :class="cn(
                     'flex items-center w-full px-3 sm:px-4 py-2.5 text-sm transition-all group',
-                    org.id === currentOrganisation?.id
+                    company.__id === normalizedCurrentCompany?.__id
                       ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 30%)] ui-primary border-l-4 border-(--ui-primary)'
                       : 'ui-text hover:bg-(--ui-surface-muted) border-l-4 border-transparent'
                   )"
-                  @click="handleOrganisationChange(org)"
+                  @click="handleCompanyChange(company)"
                 >
                   <div
-                    v-if="getOrgLogoUrl(org)"
+                    v-if="getCompanyLogoUrl(company)"
                     class="shrink-0 mr-2 sm:mr-3"
                   >
                     <img
-                      :src="getOrgLogoUrl(org)"
-                      :alt="`${org.organisationName} logo`"
+                      :src="getCompanyLogoUrl(company)"
+                      :alt="`${company.__name} ${entityLabelLower} logo`"
                       class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-lg ui-surface p-0.5 sm:p-1 border ui-border-strong group-hover:border-(--ui-primary-soft) transition-colors"
                     >
                   </div>
@@ -443,17 +500,17 @@ watch(searchQuery, (newValue) => emit('search', newValue))
                   </div>
                   <div class="flex-1 text-left min-w-0">
                     <p class="font-semibold truncate text-md">
-                      {{ org.organisationName }}
+                      {{ company.__name }}
                     </p>
                     <p
-                      v-if="org.type"
+                      v-if="company.__typeName"
                       class="text-xs ui-text truncate"
                     >
-                      {{ org.type.name }}
+                      {{ company.__typeName }}
                     </p>
                   </div>
                   <Icon
-                    v-if="org.id === currentOrganisation?.id"
+                    v-if="company.__id === normalizedCurrentCompany?.__id"
                     icon="check-circle"
                     class="w-4 h-4 sm:w-5 sm:h-5 ui-primary shrink-0 ml-2"
                   />

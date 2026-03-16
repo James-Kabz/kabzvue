@@ -62,7 +62,7 @@ const tableActions = computed(() => [
 const allColumns = [
   { key: 'title', label: 'Title', sortable: true },
   { key: 'is_completed', label: 'Completed', sortable: true },
-  { key: 'organisation.organisation_name', label: 'Organisation', sortable: true },
+  { key: 'company.company_name', label: 'Company', sortable: true },
   { key: 'owner.name', label: 'Owner', sortable: true },
   { key: 'description', label: 'Description', sortable: true },
   { key: 'due_date', label: 'Due Date', sortable: true },
@@ -72,7 +72,7 @@ const allColumns = [
 const visibleColumns = ref([
   'title',
   'is_completed',
-  'organisation.organisation_name',
+  'company.company_name',
   'owner.name',
   'description',
   'due_date',
@@ -94,8 +94,8 @@ const filteredCompliances = computed(() => {
         compliance.title.toLowerCase().includes(query) ||
         compliance.description.toLowerCase().includes(query) ||
         (compliance.owner && compliance.owner.name.toLowerCase().includes(query)) ||
-        (compliance.organisation &&
-          compliance.organisation.organisation_name.toLowerCase().includes(query)),
+        (compliance.company &&
+          compliance.company.company_name.toLowerCase().includes(query)),
     )
   }
 

@@ -74,7 +74,7 @@ const emit = defineEmits([
   'search',
   'profile-action',
   'logout',
-  'organisation-change'
+  'company-change'
 ])
 
 const profileMenuItems = [
@@ -154,6 +154,30 @@ const navigationItems = [
 
 // Computed
 const sidebarWidth = computed(() => 130)
+const resolvedCompanies = computed(() => {
+  if (Array.isArray(props.user?.companies) && props.user.companies.length > 0) return props.user.companies
+  return []
+})
+
+const resolvedCurrentCompany = computed(() => {
+  return props.user?.currentCompany
+    || props.user?.company
+    || resolvedCompanies.value[0]
+    || null
+})
+
+const resolveEntityLogo = (entity) => {
+  if (!entity || typeof entity !== 'object') return ''
+  return entity.logo || entity.company_logo || ''
+}
+
+const resolvedCompanyLogo = computed(() => {
+  return props.user?.companyLogo || props.user?.company_logo || props.user?.brandLogo || ''
+})
+
+const resolvedCurrentCompanyLogo = computed(() => {
+  return resolveEntityLogo(resolvedCurrentCompany.value) || resolveEntityLogo(resolvedCompanies.value[0]) || ''
+})
 
 // Methods
 const handleMobileSidebarToggle = () => {
@@ -202,8 +226,8 @@ const handleLogout = () => {
   emit('logout')
 }
 
-const handleOrganisationChange = (organisation) => {
-  emit('organisation-change', organisation)
+const handleCompanyChange = (company) => {
+  emit('company-change', company)
 }
 
 // Watch for route changes
@@ -246,10 +270,10 @@ defineExpose({
       :notifications="[]"
       :profile-menu-items="profileMenuItems"
       :mobile-open="mobileOpen"
-      :current-organisation="user?.currentOrganisation || user?.organisations?.[0]"
-      :company-logo="user?.companyLogo || ''"
-      :organisation-logo="user?.currentOrganisation?.logo || user?.organisations?.[0]?.logo || ''"
-      :organisations="user?.organisations || []"
+      :current-company="resolvedCurrentCompany"
+      :company-logo="resolvedCompanyLogo"
+      :current-company-logo="resolvedCurrentCompanyLogo"
+      :companies="resolvedCompanies"
       :show-search="false"
       :settings-menu-items="managementSettingsItems"
       :settings-badge-count="managementSettingsItems.filter(item => item?.route).length"
@@ -259,7 +283,7 @@ defineExpose({
       @settings-action="handleProfileAction"
       @navigate="handleNavigation"
       @toggle-mobile-sidebar="handleMobileSidebarToggle"
-      @organisation-change="handleOrganisationChange"
+      @company-change="handleCompanyChange"
     />
 
     <!-- Main Content -->
