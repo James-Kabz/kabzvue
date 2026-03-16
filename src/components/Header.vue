@@ -313,6 +313,11 @@ const getCompanyLogoUrl = (company) => {
   return props.companyLogos[companyId] || null
 }
 
+const resolvedCurrentCompanyLogo = computed(() => {
+  if (props.currentCompanyLogo) return props.currentCompanyLogo
+  return getCompanyLogoUrl(normalizedCurrentCompany.value)
+})
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   checkMobile()
@@ -352,12 +357,12 @@ watch(searchQuery, (newValue) => emit('search', newValue))
         <!-- Company Logo (Software Provider) -->
         <div
           v-if="companyLogo && showHeaderLogo"
-          class="shrink-0 hidden sm:block"
+          class="shrink-0"
         >
           <img
             :src="companyLogo"
             alt="Company logo"
-            class="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-lg shadow-sm"
+            class="w-9 h-9 sm:w-11 sm:h-11 object-contain rounded-xl bg-(--ui-surface) p-1 border ui-border-strong shadow-md"
           >
         </div>
 
@@ -374,17 +379,17 @@ watch(searchQuery, (newValue) => emit('search', newValue))
         >
           <!-- Company Logo - Smaller on all screens -->
           <div
-            v-if="currentCompanyLogo"
+            v-if="resolvedCurrentCompanyLogo"
             class="shrink-0"
           >
             <div class="relative">
               <img
-                :src="currentCompanyLogo"
+                :src="resolvedCurrentCompanyLogo"
                 :alt="`${normalizedCurrentCompany.__name} ${entityLabelLower} logo`"
-                class="w-6 h-6 sm:w-8 sm:h-8 object-contain rounded-md ui-bg p-0.5 border border-(--ui-primary-soft) shadow-sm"
+                class="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-lg ui-bg p-1 border-2 border-(--ui-primary-soft) shadow-md"
               >
               <!-- Online indicator - smaller -->
-              <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 ui-success-bg border ui-border-surface rounded-full" />
+              <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 ui-success-bg border-2 ui-border-surface rounded-full" />
             </div>
           </div>
 
