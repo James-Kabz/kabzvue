@@ -716,6 +716,10 @@ Each field in the `fields` array should have:
   calendarPosition: 'left-0 bottom-full', // For date
   validate: (value, formData) => errorMessage || null, // Custom validation
   onChange: (value, formData) => {}, // Change handler
+  trailingIcon: 'eye', // Optional right-side inline icon (input-like fields)
+  trailingIconTitle: 'Show password', // Optional tooltip/title for trailing icon
+  trailingIconAriaLabel: 'Show password', // Optional aria-label for accessibility
+  onTrailingIconClick: (formData, field) => {}, // Optional click handler for trailing icon
   errorMessage: 'Custom error message',
   helpText: 'Short helper text shown under the field'
 }

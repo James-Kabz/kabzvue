@@ -444,6 +444,45 @@ const handleSubmit = async () => {
   }
 }
 
+const resolveFieldOption = (option, field, fallback = undefined) => {
+  if (typeof option === 'function') {
+    return option(formData.value, field)
+  }
+  return option !== undefined ? option : fallback
+}
+
+const hasTrailingIcon = (field) => {
+  return !!resolveFieldOption(field.trailingIcon, field, null)
+}
+
+const getTrailingIcon = (field) => {
+  return resolveFieldOption(field.trailingIcon, field, null)
+}
+
+const getTrailingIconTitle = (field) => {
+  return resolveFieldOption(field.trailingIconTitle, field, 'Action')
+}
+
+const getTrailingIconAriaLabel = (field) => {
+  return resolveFieldOption(field.trailingIconAriaLabel, field, getTrailingIconTitle(field))
+}
+
+const getTrailingIconClass = (field) => {
+  return resolveFieldOption(field.trailingIconClass, field, 'w-4 h-4')
+}
+
+const isTrailingIconDisabled = (field) => {
+  const trailingDisabled = resolveFieldOption(field.trailingIconDisabled, field, false)
+  return Boolean(isLoading.value || field.disabled || trailingDisabled)
+}
+
+const handleTrailingIconClick = (field) => {
+  if (isTrailingIconDisabled(field)) return
+  if (field?.onTrailingIconClick && typeof field.onTrailingIconClick === 'function') {
+    field.onTrailingIconClick(formData.value, field)
+  }
+}
+
 const convertToFormData = (data) => {
   const formDataObj = new FormData()
 
@@ -590,18 +629,42 @@ const handleMultiFileRemoved = (field, files) => {
             :help-text="field.helpText"
           >
             <template #default="{ fieldId, hasError, ariaDescribedBy }">
-              <Input
+              <div
                 v-if="['text', 'number', 'password', 'color', 'email', 'tel', 'url', 'search'].includes(field.type)"
-                :id="fieldId"
-                :model-value="getFieldValue(field.name)"
-                :type="field.type"
-                :placeholder="field.placeholder"
-                :disabled="isLoading || field.disabled"
-                :readonly="field.disabled"
-                :class="hasError ? 'border-(--ui-danger)' : 'ui-border-strong'"
-                :aria-describedby="ariaDescribedBy"
-                @update:model-value="setFieldValue(field.name, $event)"
-              />
+                :class="[
+                  'relative',
+                  hasTrailingIcon(field) ? 'has-trailing-icon' : ''
+                ]"
+              >
+                <Input
+                  :id="fieldId"
+                  :model-value="getFieldValue(field.name)"
+                  :type="field.type"
+                  :placeholder="field.placeholder"
+                  :disabled="isLoading || field.disabled"
+                  :readonly="field.disabled"
+                  :class="hasError ? 'border-(--ui-danger)' : 'ui-border-strong'"
+                  :aria-describedby="ariaDescribedBy"
+                  @update:model-value="setFieldValue(field.name, $event)"
+                />
+                <button
+                  v-if="hasTrailingIcon(field)"
+                  type="button"
+                  :class="[
+                    'absolute right-3 top-1/2 -translate-y-1/2 ui-text hover:text-(--ui-text) transition-colors',
+                    isTrailingIconDisabled(field) ? 'opacity-50 cursor-not-allowed' : ''
+                  ]"
+                  :title="getTrailingIconTitle(field)"
+                  :aria-label="getTrailingIconAriaLabel(field)"
+                  :disabled="isTrailingIconDisabled(field)"
+                  @click="handleTrailingIconClick(field)"
+                >
+                  <font-awesome-icon
+                    :icon="getTrailingIcon(field)"
+                    :class="getTrailingIconClass(field)"
+                  />
+                </button>
+              </div>
 
               <Textarea
                 v-else-if="field.type === 'textarea'"
@@ -953,3 +1016,9 @@ const handleMultiFileRemoved = (field, files) => {
     </form>
   </div>
 </template>
+
+<style scoped>
+.has-trailing-icon :deep(input) {
+  padding-right: 2.5rem;
+}
+</style>
