@@ -117,7 +117,7 @@ const props = defineProps({
   },
   padding: {
     type: String,
-    default: 'md',
+    default: 'none',
     validator: (value) => ['none', 'sm', 'md', 'lg', 'xl'].includes(value)
   },
   bordered: {

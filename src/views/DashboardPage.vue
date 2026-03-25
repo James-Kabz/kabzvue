@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, inject } from 'vue'
 import Icon from '../components/Icon.vue'
+import Card from '../components/Card.vue'
 
 // Layout reference
 const layoutRef = ref(null)
@@ -152,10 +153,10 @@ const getStatusColor = (status) => {
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div
+      <Card
         v-for="stat in stats"
         :key="stat.label"
-        class="ui-surface p-6 rounded-lg shadow-sm border ui-border-strong"
+        variant="elevated"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -179,13 +180,13 @@ const getStatusColor = (status) => {
           </span>
           <span class="text-sm ui-text ml-2">from last month</span>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Chart 1 -->
-      <div class="ui-surface p-6 rounded-lg shadow-sm border ui-border-strong">
+      <Card variant="elevated">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-semibold ui-text">
             Revenue Overview
@@ -218,10 +219,10 @@ const getStatusColor = (status) => {
             </p>
           </div>
         </div>
-      </div>
+      </Card>
 
       <!-- Chart 2 -->
-      <div class="ui-surface p-6 rounded-lg shadow-sm border ui-border-strong">
+      <Card variant="elevated">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-semibold ui-text">
             User Activity
@@ -253,11 +254,11 @@ const getStatusColor = (status) => {
             </p>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Recent Activity Table -->
-    <div class="ui-surface rounded-lg shadow-sm border ui-border-strong">
+    <Card variant="elevated">
       <div class="p-6 border-b ui-border-strong">
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold ui-text">
@@ -324,10 +325,10 @@ const getStatusColor = (status) => {
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
 
     <!-- Debug Info -->
-    <div class="ui-surface-muted p-4 rounded-lg">
+    <Card variant="filled">
       <h4 class="font-medium ui-text mb-2">
         Layout Debug Info
       </h4>
@@ -345,7 +346,7 @@ const getStatusColor = (status) => {
           <span class="font-medium">Current Page:</span> {{ currentPage }}
         </div>
       </div>
-    </div>
+    </Card>
   </div>
   <!-- </DashboardLayout> -->
 </template>
