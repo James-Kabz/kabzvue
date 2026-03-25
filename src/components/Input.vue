@@ -190,7 +190,7 @@ const inputClasses = computed(() => [
   'block rounded-lg border ui-surface   transition-colors duration-200',
   'focus:outline-none focus:ring-2 focus:ring-offset-0',
   'disabled:bg-(--ui-surface) disabled:text-(--ui-text) disabled:cursor-not-allowed',
-  'placeholder:text-(--ui-text)',
+  'placeholder:text-(--ui-text-muted)',
   props.type === 'color' ? 'w-20 h-12 cursor-pointer' : 'w-full',
   sizeClasses.value,
   variantClasses.value,

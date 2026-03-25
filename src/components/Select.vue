@@ -229,7 +229,7 @@ watch(isOpen, (open) => {
     >
       <div
         v-if="!selectedOption"
-        class="ui-text"
+        class="ui-text-muted"
       >
         {{ placeholder || 'Select an option' }}
       </div>
@@ -267,7 +267,7 @@ watch(isOpen, (open) => {
             v-model="searchQuery"
             type="text"
             placeholder="Search options..."
-            class="w-full px-2 py-1 text-sm border ui-border-strong  rounded focus:outline-none focus:ring-1 focus:ring-(--ui-primary) ui-surface "
+            class="w-full px-2 py-1 text-sm border ui-border-strong  rounded focus:outline-none focus:ring-1 focus:ring-(--ui-primary) ui-surface placeholder:text-(--ui-text-muted)"
             @input="filterOptions"
             @keydown="handleKeydown"
             @keydown.enter.prevent="handleKeydown"

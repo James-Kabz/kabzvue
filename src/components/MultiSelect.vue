@@ -169,7 +169,7 @@ watch(isOpen, (open) => {
     >
       <div
         v-if="selectedLabels.length === 0"
-        class="ui-text"
+        class="ui-text-muted"
       >
         {{ placeholder || 'Select options' }}
       </div>
@@ -222,7 +222,7 @@ watch(isOpen, (open) => {
               v-model="searchQuery"
               type="text"
               placeholder="Search options..."
-              class="w-full px-3 py-2 text-sm border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent ui-surface "
+              class="w-full px-3 py-2 text-sm border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent ui-surface placeholder:text-(--ui-text-muted)"
               @input="filterOptions"
               @keydown.stop
             >
