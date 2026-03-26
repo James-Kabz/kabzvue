@@ -53,74 +53,72 @@ const containerClasses = computed(() =>
   cn(containerVariants({ size: props.size }), props.class)
 )
 
+const defaultContrastScale = [
+  { max: 20, class: 'bg-red-700' },
+  { max: 40, class: 'bg-orange-600' },
+  { max: 60, class: 'bg-amber-500' },
+  { max: 80, class: 'bg-lime-600' },
+  { max: 100, class: 'bg-emerald-700' }
+]
+
+const variantContrastScale = {
+  success: [
+    { max: 33, class: 'bg-emerald-500' },
+    { max: 66, class: 'bg-emerald-600' },
+    { max: 100, class: 'bg-emerald-700' }
+  ],
+  warning: [
+    { max: 33, class: 'bg-amber-500' },
+    { max: 66, class: 'bg-amber-600' },
+    { max: 100, class: 'bg-orange-700' }
+  ],
+  danger: [
+    { max: 33, class: 'bg-rose-500' },
+    { max: 66, class: 'bg-red-600' },
+    { max: 100, class: 'bg-red-700' }
+  ]
+}
+
+const getScaleClass = (scale, percentage) =>
+  scale.find((step) => percentage <= step.max)?.class || scale[scale.length - 1].class
+
+const progressToneClass = computed(() => {
+  if (props.variant === 'default') {
+    return getScaleClass(defaultContrastScale, clampedValue.value)
+  }
+
+  const scale = variantContrastScale[props.variant] || defaultContrastScale
+  return getScaleClass(scale, clampedValue.value)
+})
+
 const progressClasses = computed(() =>
-  progressVariants()
+  cn(progressVariants(), progressToneClass.value)
 )
 
 const labelClasses = computed(() =>
   'absolute inset-0 flex items-center justify-center text-xs font-medium ui-text'
 )
 
-const variantColorTokens = {
-  default: {
-    soft: '--ui-primary-soft',
-    strong: '--ui-primary-strong'
-  },
-  success: {
-    soft: '--ui-success-soft',
-    strong: '--ui-success-strong'
-  },
-  warning: {
-    soft: '--ui-warning-soft',
-    strong: '--ui-warning-strong'
-  },
-  danger: {
-    soft: '--ui-danger-soft',
-    strong: '--ui-danger-strong'
-  }
-}
-
-const getScaledVariantColor = (variant, percentage) => {
-  const tokens = variantColorTokens[variant] || variantColorTokens.default
-  const strongWeight = Math.round(20 + (percentage / 100) * 80)
-  const softWeight = 100 - strongWeight
-
-  return `color-mix(in oklab, var(${tokens.strong}) ${strongWeight}%, var(${tokens.soft}) ${softWeight}%)`
-}
-
-const getDefaultAdaptiveColor = (percentage) => {
-  if (percentage <= 50) {
-    const warningWeight = Math.round((percentage / 50) * 100)
-    const dangerWeight = 100 - warningWeight
-    return `color-mix(in oklab, var(--ui-warning-strong) ${warningWeight}%, var(--ui-danger-strong) ${dangerWeight}%)`
-  }
-
-  const successWeight = Math.round(((percentage - 50) / 50) * 100)
-  const warningWeight = 100 - successWeight
-  return `color-mix(in oklab, var(--ui-success-strong) ${successWeight}%, var(--ui-warning-strong) ${warningWeight}%)`
-}
-
-const progressColor = computed(() => {
-  if (props.variant === 'default') {
-    return getDefaultAdaptiveColor(clampedValue.value)
-  }
-
-  return getScaledVariantColor(props.variant, clampedValue.value)
-})
-
 const progressStyle = computed(() => ({
-  width: `${clampedValue.value}%`,
-  backgroundColor: progressColor.value
+  width: `${clampedValue.value}%`
 }))
 </script>
 
 <template>
   <div :class="containerClasses">
-    <div :class="progressClasses" :style="progressStyle" role="progressbar" :aria-valuenow="clampedValue"
-      :aria-valuemin="0" :aria-valuemax="100" />
-    <span v-if="showLabel" :class="labelClasses">
+    <div
+      :class="progressClasses"
+      :style="progressStyle"
+      role="progressbar"
+      :aria-valuenow="clampedValue"
+      :aria-valuemin="0"
+      :aria-valuemax="100"
+    />
+    <span
+      v-if="showLabel"
+      :class="labelClasses"
+    >
       {{ clampedValue }}%
     </span>
   </div>
 </template>
-
