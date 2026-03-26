@@ -2,7 +2,7 @@
   <div :class="containerClasses">
     <div 
       :class="progressClasses"
-      :style="{ width: `${clampedValue}%` }"
+      :style="progressStyle"
       role="progressbar"
       :aria-valuenow="clampedValue"
       :aria-valuemin="0"
@@ -46,12 +46,13 @@ const props = defineProps({
 })
 
 const clampedValue = computed(() => {
-  const percentage = (props.value / props.max) * 100
+  const safeMax = props.max > 0 ? props.max : 100
+  const percentage = (props.value / safeMax) * 100
   return Math.min(Math.max(percentage, 0), 100)
 })
 
 const containerVariants = cva(
-  'relative w-full overflow-hidden rounded-full bg-secondary',
+  'relative w-full overflow-hidden rounded-full ui-surface-muted border ui-border-strong',
   {
     variants: {
       size: {
@@ -64,17 +65,7 @@ const containerVariants = cva(
 )
 
 const progressVariants = cva(
-  'h-full w-full flex-1 transition-all duration-300 ease-in-out',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary',
-        success: 'ui-success-bg',
-        warning: 'ui-warning-bg',
-        danger: 'bg-danger'
-      }
-    }
-  }
+  'h-full w-full flex-1 transition-[width,background-color] duration-300 ease-in-out'
 )
 
 const containerClasses = computed(() => 
@@ -82,10 +73,62 @@ const containerClasses = computed(() =>
 )
 
 const progressClasses = computed(() => 
-  progressVariants({ variant: props.variant })
+  progressVariants()
 )
 
 const labelClasses = computed(() => 
   'absolute inset-0 flex items-center justify-center text-xs font-medium ui-text'
 )
+
+const variantColorTokens = {
+  default: {
+    soft: '--ui-primary-soft',
+    strong: '--ui-primary-strong'
+  },
+  success: {
+    soft: '--ui-success-soft',
+    strong: '--ui-success-strong'
+  },
+  warning: {
+    soft: '--ui-warning-soft',
+    strong: '--ui-warning-strong'
+  },
+  danger: {
+    soft: '--ui-danger-soft',
+    strong: '--ui-danger-strong'
+  }
+}
+
+const getScaledVariantColor = (variant, percentage) => {
+  const tokens = variantColorTokens[variant] || variantColorTokens.default
+  const strongWeight = Math.round(20 + (percentage / 100) * 80)
+  const softWeight = 100 - strongWeight
+
+  return `color-mix(in oklab, var(${tokens.strong}) ${strongWeight}%, var(${tokens.soft}) ${softWeight}%)`
+}
+
+const getDefaultAdaptiveColor = (percentage) => {
+  if (percentage <= 50) {
+    const warningWeight = Math.round((percentage / 50) * 100)
+    const dangerWeight = 100 - warningWeight
+    return `color-mix(in oklab, var(--ui-warning-strong) ${warningWeight}%, var(--ui-danger-strong) ${dangerWeight}%)`
+  }
+
+  const successWeight = Math.round(((percentage - 50) / 50) * 100)
+  const warningWeight = 100 - successWeight
+  return `color-mix(in oklab, var(--ui-success-strong) ${successWeight}%, var(--ui-warning-strong) ${warningWeight}%)`
+}
+
+const progressColor = computed(() => {
+  if (props.variant === 'default') {
+    return getDefaultAdaptiveColor(clampedValue.value)
+  }
+
+  return getScaledVariantColor(props.variant, clampedValue.value)
+})
+
+const progressStyle = computed(() => ({
+  width: `${clampedValue.value}%`,
+  backgroundColor: progressColor.value
+}))
 </script>

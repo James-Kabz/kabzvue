@@ -59,7 +59,7 @@ const rowVariants = cva(
   {
   variants: {
     striped: {
-      true: 'odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 35%)] even:bg-[color:color-mix(in oklab, var(--ui-surface-muted), transparent 5%)]',
+      true: 'odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft) 72%, var(--ui-surface) 28%)] even:bg-(--ui-surface-soft)',
       false: ''
     },
     hoverable: {
