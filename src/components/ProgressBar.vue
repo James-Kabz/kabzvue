@@ -1,22 +1,3 @@
-<template>
-  <div :class="containerClasses">
-    <div 
-      :class="progressClasses"
-      :style="progressStyle"
-      role="progressbar"
-      :aria-valuenow="clampedValue"
-      :aria-valuemin="0"
-      :aria-valuemax="100"
-    />
-    <span
-      v-if="showLabel"
-      :class="labelClasses"
-    >
-      {{ clampedValue }}%
-    </span>
-  </div>
-</template>
-
 <script setup>
 import { computed } from 'vue'
 import { cva } from 'class-variance-authority'
@@ -68,15 +49,15 @@ const progressVariants = cva(
   'h-full w-full flex-1 transition-[width,background-color] duration-300 ease-in-out'
 )
 
-const containerClasses = computed(() => 
+const containerClasses = computed(() =>
   cn(containerVariants({ size: props.size }), props.class)
 )
 
-const progressClasses = computed(() => 
+const progressClasses = computed(() =>
   progressVariants()
 )
 
-const labelClasses = computed(() => 
+const labelClasses = computed(() =>
   'absolute inset-0 flex items-center justify-center text-xs font-medium ui-text'
 )
 
@@ -132,3 +113,14 @@ const progressStyle = computed(() => ({
   backgroundColor: progressColor.value
 }))
 </script>
+
+<template>
+  <div :class="containerClasses">
+    <div :class="progressClasses" :style="progressStyle" role="progressbar" :aria-valuenow="clampedValue"
+      :aria-valuemin="0" :aria-valuemax="100" />
+    <span v-if="showLabel" :class="labelClasses">
+      {{ clampedValue }}%
+    </span>
+  </div>
+</template>
+
