@@ -55,19 +55,19 @@ const emit = defineEmits(['toggle-selection', 'row-click'])
 
 // CVA variants
 const rowVariants = cva(
-  'transition-colors even:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 88%)] odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 80%)]',
+  'transition-colors',
   {
   variants: {
     striped: {
-      true: 'even:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 82%)] odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 70%)]',
+      true: 'odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 35%)] even:bg-[color:color-mix(in oklab, var(--ui-surface-muted), transparent 5%)]',
       false: ''
     },
     hoverable: {
-      true: 'hover:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 58%)]',
+      true: 'hover:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 20%)]',
       false: ''
     },
     clickable: {
-      true: 'cursor-pointer hover:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 58%)]',
+      true: 'cursor-pointer hover:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 20%)]',
       false: ''
     },
     selected: {
