@@ -48,6 +48,7 @@ import ModalBody from "./components/ModalBody.vue"
 import ModalFooter from "./components/ModalFooter.vue"
 import Notification from "./components/Notification.vue"
 import Toast from "./components/Toast.vue"
+import MultiSelect from "./components/MultiSelect.vue"
 
 import Search from "./components/Search.vue"
 
@@ -150,6 +151,7 @@ const components = {
   ModalFooter,
   Notification,
   Toast,
+  MultiSelect,
   Search,
   Slider,
   Stepper,
@@ -342,6 +344,7 @@ export {
   ModalFooter,
   Notification,
   Toast,
+  MultiSelect,
   Search,
   Slider,
   BarChart,
