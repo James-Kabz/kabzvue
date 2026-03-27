@@ -42,7 +42,7 @@ const emit = defineEmits(['update:modelValue', 'validation-error'])
 
 const isOpen = ref(false)
 const calendarRef = ref(null)
-// const inputRef = ref(null)
+const inputRef = ref(null)
 const calendarStyle = ref({})
 const today = new Date()
 const currentMonth = ref(today.getMonth())
@@ -192,7 +192,7 @@ function validateDate(date) {
 async function calculatePosition() {
   await nextTick()
   
-  const input = document.getElementById(props.id)
+  const input = inputRef.value || (props.id ? document.getElementById(props.id) : null)
   if (!input || !calendarRef.value) return
 
   const inputRect = input.getBoundingClientRect()
@@ -348,6 +348,7 @@ onBeforeUnmount(() => {
     <div class="relative">
       <input
         :id="id"
+        ref="inputRef"
         type="text"
         :value="displayValue"
         readonly
@@ -358,7 +359,7 @@ onBeforeUnmount(() => {
         :class="[
           'w-full px-3 py-2 pr-10 border rounded-md ui-surface ui-text placeholder-slate-400 text-sm  ',
           'focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary) cursor-pointer transition-colors',
-          'disabled:bg-(----ui-bg) disabled:text-(--ui-text) disabled:cursor-not-allowed',
+          'disabled:bg-(--ui-bg) disabled:text-(--ui-text) disabled:cursor-not-allowed',
           hasValidationError ? 'border-(--ui-danger) focus:ring-(--ui-danger) focus:border-(--ui-danger)' : 'ui-border'
         ]"
         @click="toggleCalendar"
@@ -385,7 +386,7 @@ onBeforeUnmount(() => {
       <button
         v-if="clearable && displayValue && !disabled"
         type="button"
-        class="absolute right-9 top-1/2 -translate-y-1/2 p-1 hover:bg-(----ui-bg) rounded transition-colors"
+        class="absolute right-9 top-1/2 -translate-y-1/2 p-1 hover:bg-(--ui-bg) rounded transition-colors"
         aria-label="Clear date"
         @click.stop="clearDate"
       >
@@ -426,7 +427,7 @@ onBeforeUnmount(() => {
           <div class="flex items-center justify-between mb-3">
             <button
               type="button"
-              class="p-1.5 rounded hover:bg-(----ui-bg) transition-colors"
+              class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
               aria-label="Previous Month"
               @click="prevMonth"
             >
@@ -451,7 +452,7 @@ onBeforeUnmount(() => {
 
             <button
               type="button"
-              class="p-1.5 rounded hover:bg-(----ui-bg) transition-colors"
+              class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
               aria-label="Next Month"
               @click="nextMonth"
             >
@@ -502,7 +503,7 @@ onBeforeUnmount(() => {
               :class="[
                 'w-8 h-8 rounded text-xs font-medium transition-colors',
                 isToday(day) && !isSelected(day) ? 'ui-primary-soft ui-primary ring-1 ring-(--ui-primary)' : '',
-                isSelected(day) ? 'ui-primary-bg ui-text hover:bg-(--ui-primary)' : 'ui-text hover:bg-(----ui-bg)',
+                isSelected(day) ? 'ui-primary-bg ui-text hover:bg-(--ui-primary)' : 'ui-text hover:bg-(--ui-bg)',
                 isDateDisabled(day) ? 'ui-text cursor-not-allowed hover:bg-transparent line-through' : 'cursor-pointer'
               ]"
               @click="selectDate(day)"

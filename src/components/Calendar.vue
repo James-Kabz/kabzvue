@@ -1,3 +1,219 @@
+<script setup>
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+
+const props = defineProps({
+  id: String,
+  modelValue: [String, Date],
+  disabled: Boolean,
+  required: Boolean,
+  min: [String, Date],
+  max: [String, Date],
+  placeholder: {
+    type: String,
+    default: 'Select date'
+  },
+  format: {
+    type: String,
+    default: 'MM/DD/YYYY'
+  },
+  clearable: {
+    type: Boolean,
+    default: true
+  },
+  showToday: {
+    type: Boolean,
+    default: true
+  },
+  calendarPosition: {
+    type: String,
+    default: 'left-0'
+  },
+  ariaDescribedby: String
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const isOpen = ref(false)
+const today = new Date()
+const currentMonth = ref(today.getMonth())
+const currentYear = ref(today.getFullYear())
+const selectedDate = ref(null)
+
+const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+
+const monthName = computed(() =>
+  new Date(currentYear.value, currentMonth.value).toLocaleString('default', {
+    month: 'long'
+  })
+)
+
+const daysInMonth = computed(() => {
+  return new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+})
+
+const firstDayOfMonth = computed(() => {
+  return new Date(currentYear.value, currentMonth.value, 1).getDay()
+})
+
+const leadingDays = computed(() => {
+  const prevMonthDays = new Date(currentYear.value, currentMonth.value, 0).getDate()
+  const count = firstDayOfMonth.value
+  return Array.from({ length: count }, (_, i) => prevMonthDays - count + i + 1)
+})
+
+const trailingDays = computed(() => {
+  const totalCells = leadingDays.value.length + daysInMonth.value
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7)
+  return Array.from({ length: remaining }, (_, i) => i + 1)
+})
+
+const displayValue = computed(() => {
+  if (!selectedDate.value) return ''
+  return formatDate(selectedDate.value)
+})
+
+function formatDate(date) {
+  if (!date) return ''
+  const d = new Date(date)
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  const year = d.getFullYear()
+  
+  return props.format
+    .replace('MM', month)
+    .replace('DD', day)
+    .replace('YYYY', year)
+}
+
+function parseDate(value) {
+  if (!value) return null
+  if (value instanceof Date) return value
+
+  if (typeof value === 'string') {
+    const parts = value.split('-')
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10)
+      const month = parseInt(parts[1], 10) - 1
+      const day = parseInt(parts[2], 10)
+      return new Date(year, month, day)
+    }
+  }
+  
+  // Try to parse string date
+  const date = new Date(value)
+  return isNaN(date.getTime()) ? null : date
+}
+
+
+function isSelected(day) {
+  if (!selectedDate.value) return false
+  const date = new Date(selectedDate.value)
+  return (
+    date.getDate() === day &&
+    date.getMonth() === currentMonth.value &&
+    date.getFullYear() === currentYear.value
+  )
+}
+
+function isDateDisabled(day) {
+  const date = new Date(currentYear.value, currentMonth.value, day)
+  
+  if (props.min) {
+    const minDate = parseDate(props.min)
+    if (minDate && date < minDate) return true
+  }
+  
+  if (props.max) {
+    const maxDate = parseDate(props.max)
+    if (maxDate && date > maxDate) return true
+  }
+  
+  return false
+}
+
+function toggleCalendar() {
+  if (props.disabled) return
+  isOpen.value = !isOpen.value
+}
+
+function closeCalendar() {
+  isOpen.value = false
+}
+
+function prevMonth() {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11
+    currentYear.value--
+  } else {
+    currentMonth.value--
+  }
+}
+
+function nextMonth() {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0
+    currentYear.value++
+  } else {
+    currentMonth.value++
+  }
+}
+
+function selectDate(day) {
+  if (isDateDisabled(day)) return
+
+  const date = new Date(currentYear.value, currentMonth.value, day)
+  selectedDate.value = date
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const dayString = String(date.getDate()).padStart(2, '0')
+
+  emit('update:modelValue', `${year}-${month}-${dayString}`)
+
+  isOpen.value = false
+}
+
+function selectToday() {
+  currentMonth.value = today.getMonth()
+  currentYear.value = today.getFullYear()
+  selectDate(today.getDate())
+}
+
+function clearDate() {
+  selectedDate.value = null
+  emit('update:modelValue', '')
+}
+
+// Watch for external changes
+watch(() => props.modelValue, (newVal) => {
+  if (newVal) {
+    const date = parseDate(newVal)
+    if (date) {
+      selectedDate.value = date
+      currentMonth.value = date.getMonth()
+      currentYear.value = date.getFullYear()
+    }
+  } else {
+    selectedDate.value = null
+  }
+}, { immediate: true })
+
+// Handle Escape key to close calendar
+function handleEscape(e) {
+  if (e.key === 'Escape' && isOpen.value) {
+    closeCalendar()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleEscape)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleEscape)
+})
+</script>
+
 <template>
   <div class="relative w-full">
     <!-- Input Field -->
@@ -11,7 +227,7 @@
         :placeholder="placeholder"
         :required="required"
         :aria-describedby="ariaDescribedby"
-        class="w-full px-3 py-2 pr-10 border ui-border-strong  rounded-md bg-(----ui-bg)  ui-text placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary) cursor-pointer disabled:bg-(--ui-surface) disabled:text-(--ui-text) disabled:cursor-not-allowed"
+        class="w-full px-3 py-2 pr-10 border ui-border-strong  rounded-md bg-(--ui-bg)  ui-text placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary) cursor-pointer disabled:bg-(--ui-surface) disabled:text-(--ui-text) disabled:cursor-not-allowed"
         @click="toggleCalendar"
       >
       
@@ -191,209 +407,3 @@
     />
   </div>
 </template>
-
-<script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-
-const props = defineProps({
-  id: String,
-  modelValue: [String, Date],
-  disabled: Boolean,
-  required: Boolean,
-  min: [String, Date],
-  max: [String, Date],
-  placeholder: {
-    type: String,
-    default: 'Select date'
-  },
-  format: {
-    type: String,
-    default: 'MM/DD/YYYY'
-  },
-  clearable: {
-    type: Boolean,
-    default: true
-  },
-  showToday: {
-    type: Boolean,
-    default: true
-  },
-  calendarPosition: {
-    type: String,
-    default: 'left-0'
-  },
-  ariaDescribedby: String
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const isOpen = ref(false)
-const today = new Date()
-const currentMonth = ref(today.getMonth())
-const currentYear = ref(today.getFullYear())
-const selectedDate = ref(null)
-
-const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-
-const monthName = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleString('default', {
-    month: 'long'
-  })
-)
-
-const daysInMonth = computed(() => {
-  return new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
-})
-
-const firstDayOfMonth = computed(() => {
-  return new Date(currentYear.value, currentMonth.value, 1).getDay()
-})
-
-const leadingDays = computed(() => {
-  const prevMonthDays = new Date(currentYear.value, currentMonth.value, 0).getDate()
-  const count = firstDayOfMonth.value
-  return Array.from({ length: count }, (_, i) => prevMonthDays - count + i + 1)
-})
-
-const trailingDays = computed(() => {
-  const totalCells = leadingDays.value.length + daysInMonth.value
-  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7)
-  return Array.from({ length: remaining }, (_, i) => i + 1)
-})
-
-const displayValue = computed(() => {
-  if (!selectedDate.value) return ''
-  return formatDate(selectedDate.value)
-})
-
-function formatDate(date) {
-  if (!date) return ''
-  const d = new Date(date)
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  const year = d.getFullYear()
-  
-  return props.format
-    .replace('MM', month)
-    .replace('DD', day)
-    .replace('YYYY', year)
-}
-
-function parseDate(value) {
-  if (!value) return null
-  if (value instanceof Date) return value
-  
-  // Try to parse string date
-  const date = new Date(value)
-  return isNaN(date.getTime()) ? null : date
-}
-
-
-function isSelected(day) {
-  if (!selectedDate.value) return false
-  const date = new Date(selectedDate.value)
-  return (
-    date.getDate() === day &&
-    date.getMonth() === currentMonth.value &&
-    date.getFullYear() === currentYear.value
-  )
-}
-
-function isDateDisabled(day) {
-  const date = new Date(currentYear.value, currentMonth.value, day)
-  
-  if (props.min) {
-    const minDate = parseDate(props.min)
-    if (minDate && date < minDate) return true
-  }
-  
-  if (props.max) {
-    const maxDate = parseDate(props.max)
-    if (maxDate && date > maxDate) return true
-  }
-  
-  return false
-}
-
-function toggleCalendar() {
-  if (props.disabled) return
-  isOpen.value = !isOpen.value
-}
-
-function closeCalendar() {
-  isOpen.value = false
-}
-
-function prevMonth() {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else {
-    currentMonth.value--
-  }
-}
-
-function nextMonth() {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else {
-    currentMonth.value++
-  }
-}
-
-function selectDate(day) {
-  if (isDateDisabled(day)) return
-
-  const date = new Date(currentYear.value, currentMonth.value, day)
-  selectedDate.value = date
-
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const dayString = String(date.getDate()).padStart(2, '0')
-
-  emit('update:modelValue', `${year}-${month}-${dayString}`)
-
-  isOpen.value = false
-}
-
-function selectToday() {
-  currentMonth.value = today.getMonth()
-  currentYear.value = today.getFullYear()
-  selectDate(today.getDate())
-}
-
-function clearDate() {
-  selectedDate.value = null
-  emit('update:modelValue', '')
-}
-
-// Watch for external changes
-watch(() => props.modelValue, (newVal) => {
-  if (newVal) {
-    const date = parseDate(newVal)
-    if (date) {
-      selectedDate.value = date
-      currentMonth.value = date.getMonth()
-      currentYear.value = date.getFullYear()
-    }
-  } else {
-    selectedDate.value = null
-  }
-}, { immediate: true })
-
-// Handle Escape key to close calendar
-function handleEscape(e) {
-  if (e.key === 'Escape' && isOpen.value) {
-    closeCalendar()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleEscape)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleEscape)
-})
-</script>
