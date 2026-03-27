@@ -3,17 +3,17 @@
     v-if="showPagination || $slots.footer"
     :class="footerClasses"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <!-- Selection Info -->
       <div
         v-if="selectable && selectedCount > 0"
-        class="text-sm ui-text"
+        class="text-sm ui-text text-center lg:text-left"
       >
         {{ selectedCount }} of {{ total }} selected
       </div>
       <div
         v-else
-        class="text-sm ui-text"
+        class="text-sm ui-text text-center lg:text-left"
       >
         Showing {{ startItem }} to {{ endItem }} of {{ total }} entries
       </div>
@@ -21,7 +21,7 @@
       <!-- Custom Footer Slot -->
       <div
         v-if="$slots.footer"
-        class="flex items-center gap-4"
+        class="flex items-center justify-center gap-4 lg:justify-start"
       >
         <slot name="footer" />
       </div>
@@ -29,10 +29,10 @@
       <!-- Pagination Controls -->
       <div
         v-if="showPagination"
-        class="flex items-center gap-4"
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:justify-end"
       >
         <!-- Page Size Selector -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center justify-center gap-2 sm:justify-start">
           <Label
             for="pageSize"
             :class="labelClasses"
@@ -54,11 +54,11 @@
         </div>
 
         <!-- Page Navigation -->
-        <div class="flex items-center gap-1">
+        <div class="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
           <!-- First Page -->
           <button
             :disabled="currentPage === 1"
-            :class="getPageButtonClasses(false, currentPage === 1)"
+            :class="[getPageButtonClasses(false, currentPage === 1), 'hidden sm:inline-flex']"
             title="First page"
             @click="$emit('update:currentPage', 1)"
           >
@@ -100,7 +100,7 @@
           </button>
 
           <!-- Page Numbers -->
-          <div class="flex items-center gap-1 ui-border-strong ">
+          <div class="hidden md:flex items-center gap-1 ui-border-strong">
             <button
               v-for="page in visiblePages"
               :key="page"
@@ -136,7 +136,7 @@
           <!-- Last Page -->
           <button
             :disabled="currentPage === totalPages"
-            :class="getPageButtonClasses(false, currentPage === totalPages)"
+            :class="[getPageButtonClasses(false, currentPage === totalPages), 'hidden sm:inline-flex']"
             title="Last page"
             @click="$emit('update:currentPage', totalPages)"
           >
@@ -157,7 +157,7 @@
         </div>
 
         <!-- Page Info -->
-        <div class="text-sm ui-text ml-4">
+        <div class="text-sm ui-text text-center sm:text-left sm:ml-2">
           Page {{ currentPage }} of {{ totalPages }}
         </div>
       </div>
@@ -225,7 +225,7 @@ const props = defineProps({
 defineEmits(['update:currentPage', 'update:pageSize'])
 
 // CVA variants
-const footerVariants = cva('border-t ui-border-strong ', {
+const footerVariants = cva('border-t ui-border-strong rounded-2xl', {
   variants: {
     variant: {
       default: 'bg-(--ui-bg) ',
