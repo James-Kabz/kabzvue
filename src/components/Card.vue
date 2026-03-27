@@ -8,8 +8,7 @@
     :role="clickable ? 'button' : undefined"
     :tabindex="clickable && !disabled ? 0 : undefined"
     @click="handleClick"
-    @keydown.enter="handleKeydown"
-    @keydown.space.prevent="handleKeydown"
+    @keydown="handleKeydown"
   >
     <!-- Loading Overlay -->
     <div
@@ -164,6 +163,19 @@ const props = defineProps({
 
 const emit = defineEmits(['click'])
 
+const textControlRoles = new Set(['textbox', 'searchbox', 'combobox', 'spinbutton'])
+
+const isInteractiveTarget = (target) => {
+  if (!(target instanceof Element)) return false
+
+  if (target.closest('input, textarea, select, button, a, [contenteditable], [contenteditable="true"]')) {
+    return true
+  }
+
+  const role = target.getAttribute('role')
+  return role ? textControlRoles.has(role) : false
+}
+
 const handleClick = (event) => {
   if (props.clickable && !props.disabled && !props.loading) {
     emit('click', event)
@@ -171,9 +183,13 @@ const handleClick = (event) => {
 }
 
 const handleKeydown = (event) => {
-  if (props.clickable && !props.disabled && !props.loading) {
-    emit('click', event)
-  }
+  if (!props.clickable || props.disabled || props.loading) return
+  if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar') return
+  if (isInteractiveTarget(event.target)) return
+  if (event.currentTarget !== event.target) return
+
+  event.preventDefault()
+  handleClick(event)
 }
 
 /* --- Computed Classes --- */

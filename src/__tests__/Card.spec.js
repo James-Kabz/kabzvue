@@ -66,6 +66,48 @@ describe('Card', () => {
     expect(wrapper.emitted('click')).toHaveLength(1)
   })
 
+  it('activates clickable card with Enter and Space when card has focus', async () => {
+    const wrapper = mount(Card, {
+      props: { clickable: true },
+      attachTo: document.body
+    })
+
+    wrapper.element.focus()
+    expect(document.activeElement).toBe(wrapper.element)
+
+    await wrapper.trigger('keydown', { key: 'Enter' })
+    await wrapper.trigger('keydown', { key: ' ' })
+
+    expect(wrapper.emitted('click')).toHaveLength(2)
+    wrapper.unmount()
+  })
+
+  it('does not block Space in nested input', async () => {
+    const wrapper = mount(Card, {
+      props: { clickable: true },
+      slots: {
+        default: '<input data-testid="nested-input" value="hello">'
+      }
+    })
+
+    const nestedInput = wrapper.get('[data-testid="nested-input"]')
+    const spaceEvent = new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      cancelable: true
+    })
+
+    const notCanceled = nestedInput.element.dispatchEvent(spaceEvent)
+    if (notCanceled && !spaceEvent.defaultPrevented) {
+      nestedInput.element.value += ' '
+      await nestedInput.trigger('input')
+    }
+
+    expect(spaceEvent.defaultPrevented).toBe(false)
+    expect(nestedInput.element.value).toBe('hello ')
+    expect(wrapper.emitted('click')).toBeUndefined()
+  })
+
   it('applies loading state', () => {
     const wrapper = mount(Card, {
       props: { loading: true }
