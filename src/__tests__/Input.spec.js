@@ -42,6 +42,13 @@ describe('Input', () => {
     expect(wrapper.find('input').attributes('type')).toBe('email')
   })
 
+  it('supports time type', () => {
+    const wrapper = mount(Input, {
+      props: { type: 'time' }
+    })
+    expect(wrapper.find('input').attributes('type')).toBe('time')
+  })
+
   it('displays error state', () => {
     const wrapper = mount(Input, {
       props: { variant: 'error' }

@@ -67,7 +67,7 @@ const props = defineProps({
   type: {
     type: String,
     default: 'text',
-    validator: (value) => ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'date', 'color', 'file'].includes(value)
+    validator: (value) => ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'date', 'time', 'color', 'file'].includes(value)
   },
   placeholder: {
     type: String,
@@ -206,4 +206,4 @@ defineExpose({
   blur: () => inputRef.value?.blur(),
   select: () => inputRef.value?.select()
 })
-</script> this too 
+</script>
