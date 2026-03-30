@@ -37,7 +37,12 @@ const searchQuery = ref('')
 const searchInput = ref(null)
 const filteredOptions = ref([...props.options])
 const buttonRef = ref(null)
+const dropdownRef = ref(null)
 const dropdownStyle = ref({})
+
+const VIEWPORT_PADDING = 12
+const DROPDOWN_GAP = 4
+const MAX_DROPDOWN_HEIGHT = 320
 
 const selectedLabels = computed(() => {
   return props.options
@@ -45,45 +50,57 @@ const selectedLabels = computed(() => {
     .map(option => option.label)
 })
 
+const closeDropdown = () => {
+  isOpen.value = false
+  searchQuery.value = ''
+  filteredOptions.value = [...props.options]
+}
+
 const updateDropdownPosition = () => {
-  if (!buttonRef.value) return
+  if (!buttonRef.value || !isOpen.value) return
 
   const rect = buttonRef.value.getBoundingClientRect()
+  const viewportWidth = window.innerWidth
   const viewportHeight = window.innerHeight
-  const spaceBelow = viewportHeight - rect.bottom
-  const dropdownHeight = 320 // approximate max height of dropdown
+  const availableBelow = Math.max(0, viewportHeight - rect.bottom - DROPDOWN_GAP - VIEWPORT_PADDING)
+  const availableAbove = Math.max(0, rect.top - DROPDOWN_GAP - VIEWPORT_PADDING)
+  const openAbove = availableAbove > availableBelow
+  const availableHeight = openAbove ? availableAbove : availableBelow
+  const maxHeight = Math.min(MAX_DROPDOWN_HEIGHT, availableHeight)
 
-  // Position above if there's not enough space below
-  if (spaceBelow < dropdownHeight && rect.top > dropdownHeight) {
-    dropdownStyle.value = {
-      position: 'fixed',
-      bottom: `${viewportHeight - rect.top + 4}px`,
-      left: `${rect.left}px`,
-      width: `${rect.width}px`,
-      zIndex: 9999
-    }
-  } else {
-    dropdownStyle.value = {
-      position: 'fixed',
-      top: `${rect.bottom + 4}px`,
-      left: `${rect.left}px`,
-      width: `${rect.width}px`,
-      zIndex: 9999
-    }
+  const maxWidth = Math.max(0, viewportWidth - VIEWPORT_PADDING * 2)
+  const width = Math.min(rect.width, maxWidth)
+  let left = rect.left
+
+  if (left + width > viewportWidth - VIEWPORT_PADDING) {
+    left = viewportWidth - VIEWPORT_PADDING - width
+  }
+  if (left < VIEWPORT_PADDING) {
+    left = VIEWPORT_PADDING
+  }
+
+  dropdownStyle.value = {
+    position: 'fixed',
+    left: `${left}px`,
+    width: `${width}px`,
+    maxHeight: `${maxHeight}px`,
+    zIndex: 9999,
+    ...(openAbove
+      ? { bottom: `${viewportHeight - rect.top + DROPDOWN_GAP}px` }
+      : { top: `${rect.bottom + DROPDOWN_GAP}px` })
   }
 }
 
 const toggleDropdown = () => {
   if (!props.disabled) {
-    isOpen.value = !isOpen.value
     if (isOpen.value) {
-      updateDropdownPosition()
+      closeDropdown()
+    } else {
+      isOpen.value = true
       nextTick(() => {
+        updateDropdownPosition()
         searchInput.value?.focus()
       })
-    } else {
-      searchQuery.value = ''
-      filteredOptions.value = [...props.options]
     }
   }
 }
@@ -96,6 +113,9 @@ const toggleOption = (value) => {
     newValue = [...props.modelValue, value]
   }
   emit('update:modelValue', newValue)
+  nextTick(() => {
+    updateDropdownPosition()
+  })
 }
 
 const filterOptions = () => {
@@ -111,9 +131,7 @@ const filterOptions = () => {
 
 const handleKeydown = (event) => {
   if (event.key === 'Escape') {
-    isOpen.value = false
-    searchQuery.value = ''
-    filteredOptions.value = [...props.options]
+    closeDropdown()
   }
 }
 
@@ -121,10 +139,14 @@ const handleKeydown = (event) => {
 const handleClickOutside = (event) => {
   if (!buttonRef.value) return
   const target = event.target
-  if (target && !buttonRef.value.contains(target) && !target.closest('[data-multiselect-dropdown]')) {
-    isOpen.value = false
-    searchQuery.value = ''
-    filteredOptions.value = [...props.options]
+
+  if (!target) return
+
+  const isInsideDropdown = dropdownRef.value && dropdownRef.value.contains(target)
+  const isInsideButton = buttonRef.value.contains(target)
+
+  if (!isInsideDropdown && !isInsideButton) {
+    closeDropdown()
   }
 }
 
@@ -144,6 +166,22 @@ onUnmounted(() => {
 watch(() => props.options, (newOptions) => {
   filteredOptions.value = [...newOptions]
 }, { immediate: true })
+
+watch(() => props.modelValue, () => {
+  if (isOpen.value) {
+    nextTick(() => {
+      updateDropdownPosition()
+    })
+  }
+})
+
+watch(filteredOptions, () => {
+  if (isOpen.value) {
+    nextTick(() => {
+      updateDropdownPosition()
+    })
+  }
+})
 
 watch(isOpen, (open) => {
   if (open) {
@@ -211,9 +249,10 @@ watch(isOpen, (open) => {
       >
         <div
           v-if="isOpen"
+          ref="dropdownRef"
           :style="dropdownStyle"
           data-multiselect-dropdown
-          class="shadow-lg max-h-72 rounded-md text-base ring-1 ring-(----ui-bg) ring-opacity-5 overflow-hidden focus:outline-none ui-surface"
+          class="shadow-lg rounded-md text-base ring-1 ring-(--ui-border-strong) ring-opacity-5 overflow-hidden focus:outline-none ui-surface flex flex-col"
         >
           <!-- Search input -->
           <div class="px-3 py-2.5 border-b ui-border-strong  ui-surface-muted">
@@ -231,7 +270,7 @@ watch(isOpen, (open) => {
           <!-- Options list -->
           <div
             v-if="filteredOptions.length > 0"
-            class="max-h-52 overflow-y-auto py-1"
+            class="overflow-y-auto py-1 flex-1"
           >
             <button
               v-for="option in filteredOptions"

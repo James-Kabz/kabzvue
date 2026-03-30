@@ -204,6 +204,7 @@ This document provides comprehensive usage examples and API reference for all Vu
 ```js
 import { createApp } from 'vue'
 import VueUI from 'kabzvue'
+import 'kabzvue/css'
 import App from './App.vue'
 
 const app = createApp(App)
