@@ -31,9 +31,9 @@ jobs:
         if [ "$BRANCH" = "docs/usage-update" ]; then
           echo "docs_only=true" >> "$GITHUB_OUTPUT"
           echo "reason=docs branch (docs/usage-update)" >> "$GITHUB_OUTPUT"
-        elif echo "$MESSAGE" | grep -Eiq '(^docs(\(|:|!|[[:space:]])|\bdocs\b)'; then
+        elif echo "$MESSAGE" | grep -Eiq '^docs(\(|:|!|[[:space:]])'; then
           echo "docs_only=true" >> "$GITHUB_OUTPUT"
-          echo "reason=docs commit message detected" >> "$GITHUB_OUTPUT"
+          echo "reason=conventional docs commit detected" >> "$GITHUB_OUTPUT"
         else
           echo "docs_only=false" >> "$GITHUB_OUTPUT"
           echo "reason=standard ci/release path" >> "$GITHUB_OUTPUT"
