@@ -34,6 +34,10 @@ const props = defineProps({
         type: Boolean,
         default: true
     },
+    minLabelPercentage: {
+        type: Number,
+        default: 3
+    },
     showPercentages: {
         type: Boolean,
         default: true
@@ -107,6 +111,20 @@ const hasValidData = computed(() => {
     return props.data.length > 0 && totalValue.value > 0
 })
 
+const legendItemsPerRow = 2
+const legendVerticalSpacing = 24
+
+const legendRowCount = computed(() => {
+    if (!props.showLegend || props.legendPosition !== 'bottom') return 0
+    return Math.max(1, Math.ceil(slices.value.length / legendItemsPerRow))
+})
+
+const legendBlockHeight = computed(() => (
+    props.showLegend && props.legendPosition === 'bottom'
+        ? (legendRowCount.value * legendVerticalSpacing) + 8
+        : 0
+))
+
 const centerX = computed(() => {
     return props.showLegend && props.legendPosition === 'right'
         ? props.width / 3
@@ -114,21 +132,15 @@ const centerX = computed(() => {
 })
 
 const centerY = computed(() => {
-    const legendHeight = props.showLegend && props.legendPosition === 'bottom'
-        ? Math.ceil(props.data.length / 2) * 25
-        : 0
-    return (props.height - legendHeight) / 2
+    return (props.height - legendBlockHeight.value) / 2
 })
 
 const radius = computed(() => {
-    const legendHeight = props.showLegend && props.legendPosition === 'bottom'
-        ? Math.ceil(props.data.length / 2) * 25
-        : 0
-    const availableHeight = props.height - legendHeight
+    const availableHeight = props.height - legendBlockHeight.value
     const availableWidth = props.showLegend && props.legendPosition === 'right'
         ? props.width * 0.6
         : props.width
-    return Math.min(availableWidth, availableHeight) / 2 - 40
+    return Math.max(12, Math.min(availableWidth, availableHeight) / 2 - 40)
 })
 
 const innerRadius = computed(() => {
@@ -180,6 +192,10 @@ const slices = computed(() => {
     }).filter(slice => slice.value > 0)
 })
 
+const valueLabelSlices = computed(() => (
+    slices.value.filter((slice) => Number(slice.percentage) >= props.minLabelPercentage)
+))
+
 // Methods
 const createArcPath = (cx, cy, r, innerR, startAngle, endAngle) => {
     const x1 = cx + r * Math.cos(startAngle)
@@ -209,7 +225,7 @@ const getLegendX = (index) => {
     if (props.legendPosition === 'right') {
         return props.width * 0.65
     }
-    const itemsPerRow = 2
+    const itemsPerRow = legendItemsPerRow
     const col = index % itemsPerRow
     return props.width / 4 + col * (props.width / 2)
 }
@@ -218,10 +234,10 @@ const getLegendY = (index) => {
     if (props.legendPosition === 'right') {
         return 40 + index * 25
     }
-    const itemsPerRow = 2
+    const itemsPerRow = legendItemsPerRow
     const row = Math.floor(index / itemsPerRow)
-    const legendHeight = Math.ceil(props.data.length / 2) * 25
-    return props.height - legendHeight + 20 + row * 25
+    const legendTop = props.height - legendBlockHeight.value + 6
+    return legendTop + row * legendVerticalSpacing
 }
 
 const handleMouseEnter = (event, slice, index) => {
@@ -298,7 +314,7 @@ const handleSliceClick = (slice, index) => {
       :width="width"
       :height="height"
       :viewBox="`0 0 ${width} ${height}`"
-      class="overflow-visible"
+      class="block mx-auto overflow-visible"
     >
       <!-- Pie slices -->
       <g>
@@ -350,7 +366,7 @@ const handleSliceClick = (slice, index) => {
       <!-- Value labels on slices -->
       <g v-if="showValues">
         <text
-          v-for="(slice, index) in slices"
+          v-for="(slice, index) in valueLabelSlices"
           :key="`value-${index}`"
           :x="slice.labelX"
           :y="slice.labelY"
