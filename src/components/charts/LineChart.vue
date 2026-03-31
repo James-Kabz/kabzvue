@@ -60,12 +60,14 @@
         <text
           v-for="(label, index) in labels"
           :key="`xlabel-${index}`"
+          v-show="shouldRenderXAxisLabel(index)"
           :x="getPointX(index)"
-          :y="height - padding.bottom + 20"
+          :y="xAxisLabelY"
           :class="axisLabelClasses"
-          text-anchor="middle"
+          :text-anchor="xAxisLabelAnchor"
+          :transform="getXAxisLabelTransform(index)"
         >
-          {{ label }}
+          {{ formatXAxisLabel(label) }}
         </text>
       </g>
 
@@ -192,6 +194,26 @@ const props = defineProps({
     type: String,
     default: 'fill-(--ui-text) text-xs font-medium'
   },
+  autoSkipXAxisLabels: {
+    type: Boolean,
+    default: true
+  },
+  minLabelSpacing: {
+    type: Number,
+    default: 72
+  },
+  maxLabelLength: {
+    type: Number,
+    default: 16
+  },
+  rotateLabelsWhenDense: {
+    type: Boolean,
+    default: true
+  },
+  labelRotationDegrees: {
+    type: Number,
+    default: -35
+  },
   tooltipBackground: {
     type: String,
     default: '#1f2937'
@@ -221,9 +243,18 @@ const tooltip = ref({
   content: ''
 })
 
+const normalizedWidth = computed(() => {
+  const numericWidth = Number(props.width)
+  return Number.isFinite(numericWidth) ? numericWidth : 400
+})
+
 // Computed properties
 const maxDataValue = computed(() => {
-  return props.maxValue || Math.max(...props.data)
+  if (props.maxValue && props.maxValue > 0) return props.maxValue
+
+  const numericValues = props.data.map((value) => Number(value) || 0)
+  const detectedMax = Math.max(0, ...numericValues)
+  return detectedMax > 0 ? detectedMax : 1
 })
 
 const dataPoints = computed(() => {
@@ -270,10 +301,34 @@ const yTicks = computed(() => {
   return ticks
 })
 
+const availableWidth = computed(() => {
+  return normalizedWidth.value - props.padding.left - props.padding.right
+})
+
+const xAxisLabelStep = computed(() => {
+  if (!props.autoSkipXAxisLabels) return 1
+  if (!props.labels.length) return 1
+
+  const maxVisibleLabels = Math.max(1, Math.floor(availableWidth.value / Math.max(1, props.minLabelSpacing)))
+  return Math.max(1, Math.ceil(props.labels.length / maxVisibleLabels))
+})
+
+const shouldRotateXAxisLabels = computed(() => {
+  if (!props.rotateLabelsWhenDense) return false
+  return xAxisLabelStep.value > 1
+})
+
+const xAxisLabelY = computed(() => {
+  return props.height - props.padding.bottom + (shouldRotateXAxisLabels.value ? 28 : 20)
+})
+
+const xAxisLabelAnchor = computed(() => {
+  return shouldRotateXAxisLabels.value ? 'end' : 'middle'
+})
+
 // Methods
 const getPointX = (index) => {
-  const availableWidth = props.width - props.padding.left - props.padding.right
-  const spacing = availableWidth / (props.data.length - 1 || 1)
+  const spacing = availableWidth.value / (props.data.length - 1 || 1)
   return props.padding.left + index * spacing
 }
 
@@ -307,5 +362,26 @@ const handleMouseEnter = (event, value, index) => {
 
 const handleMouseLeave = () => {
   tooltip.value.visible = false
+}
+
+const shouldRenderXAxisLabel = (index) => {
+  if (!props.autoSkipXAxisLabels) return true
+  if (props.labels.length <= 2) return true
+  return index % xAxisLabelStep.value === 0 || index === props.labels.length - 1
+}
+
+const formatXAxisLabel = (label) => {
+  const text = String(label ?? '')
+  if (!text) return ''
+  if (!props.maxLabelLength || props.maxLabelLength <= 0) return text
+  if (text.length <= props.maxLabelLength) return text
+  return `${text.slice(0, Math.max(1, props.maxLabelLength - 1))}…`
+}
+
+const getXAxisLabelTransform = (index) => {
+  if (!shouldRotateXAxisLabels.value) return undefined
+  const x = getPointX(index)
+  const y = xAxisLabelY.value
+  return `rotate(${props.labelRotationDegrees} ${x} ${y})`
 }
 </script>

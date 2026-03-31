@@ -64,6 +64,7 @@ import Calendar from "./components/Calendar.vue"
 import Graph from "./components/Graph.vue"
 import BarChart from "./components/charts/BarChart.vue"
 import LineChart from "./components/charts/LineChart.vue"
+import PieChart from "./components/charts/PieChart.vue"
 import GraphFilters from "./components/GraphFilters.vue"
 import DataTable from "./components/DataTable.vue"
 import DataTableHeader from "./components/DataTableHeader.vue"
@@ -160,6 +161,7 @@ const components = {
   TabPanel,
   BarChart,
   LineChart,
+  PieChart,
   StackedBarChart,
   GraphFilters,
   Accordion,
@@ -350,6 +352,7 @@ export {
   BarChart,
   GraphFilters,
   LineChart,
+  PieChart,
   StackedBarChart,
   Stepper,
   StepperItem,
