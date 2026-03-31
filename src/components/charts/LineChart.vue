@@ -4,7 +4,7 @@
       :width="width"
       :height="height"
       :viewBox="`0 0 ${width} ${height}`"
-      class="overflow-visible"
+      class="block mx-auto overflow-visible"
     >
       <!-- Grid lines -->
       <g v-if="showGrid">
@@ -42,7 +42,7 @@
           :stroke="lineColor"
           :stroke-width="2"
           :class="pointClasses"
-          @mouseenter="handleMouseEnter($event, point.value, index)"
+          @mouseenter="handleMouseEnter(point, index)"
           @mouseleave="handleMouseLeave"
         />
       </g>
@@ -88,8 +88,8 @@
       <!-- Tooltip -->
       <g v-if="tooltip.visible">
         <rect
-          :x="tooltip.x - tooltip.width / 2"
-          :y="tooltip.y - tooltip.height - 10"
+          :x="tooltipBoxX"
+          :y="tooltipBoxY"
           :width="tooltip.width"
           :height="tooltip.height"
           :fill="tooltipBackground"
@@ -98,10 +98,11 @@
           rx="4"
         />
         <text
-          :x="tooltip.x"
-          :y="tooltip.y - tooltip.height / 2 - 2"
+          :x="tooltipTextX"
+          :y="tooltipTextY"
           :class="tooltipTextClasses"
           text-anchor="middle"
+          dominant-baseline="middle"
         >
           {{ tooltip.content }}
         </text>
@@ -224,7 +225,7 @@ const props = defineProps({
   },
   tooltipTextClasses: {
     type: String,
-    default: 'fill-(--ui-surface) text-xs font-medium'
+    default: 'fill-white text-xs font-semibold'
   },
   maxValue: {
     type: Number,
@@ -326,6 +327,22 @@ const xAxisLabelAnchor = computed(() => {
   return shouldRotateXAxisLabels.value ? 'end' : 'middle'
 })
 
+const tooltipBoxX = computed(() => {
+  const minX = props.padding.left
+  const maxX = normalizedWidth.value - props.padding.right - tooltip.value.width
+  const targetX = tooltip.value.x - tooltip.value.width / 2
+  return Math.min(Math.max(targetX, minX), Math.max(minX, maxX))
+})
+
+const tooltipBoxY = computed(() => {
+  const targetY = tooltip.value.y - tooltip.value.height - 10
+  const minY = props.padding.top + 4
+  return Math.max(targetY, minY)
+})
+
+const tooltipTextX = computed(() => tooltipBoxX.value + tooltip.value.width / 2)
+const tooltipTextY = computed(() => tooltipBoxY.value + tooltip.value.height / 2 + 0.5)
+
 // Methods
 const getPointX = (index) => {
   const spacing = availableWidth.value / (props.data.length - 1 || 1)
@@ -344,20 +361,23 @@ const getYAxisLabel = (tick) => {
   return Math.round(value)
 }
 
-const handleMouseEnter = (event, value, index) => {
-  const rect = event.target.getBoundingClientRect()
+const handleMouseEnter = (point, index) => {
   const label = props.labels[index] || `Point ${index + 1}`
+  const value = Number(point.value)
+  const displayValue = Number.isFinite(value) ? value.toLocaleString() : String(point.value ?? 0)
+  const content = `${label}: ${displayValue}`
+  const width = Math.min(280, Math.max(120, content.length * 7.2 + 20))
 
   tooltip.value = {
     visible: true,
-    x: rect.left + rect.width / 2,
-    y: rect.top,
-    width: 80,
-    height: 24,
-    content: `${label}: ${value}`
+    x: Number(point.x) || 0,
+    y: Number(point.y) || 0,
+    width,
+    height: 28,
+    content
   }
 
-  emit('point-hover', { value, index, label })
+  emit('point-hover', { value: point.value, index, label })
 }
 
 const handleMouseLeave = () => {

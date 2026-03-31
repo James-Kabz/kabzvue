@@ -102,21 +102,31 @@ const tooltip = ref({
 })
 
 // Computed properties
+const normalizedData = computed(() => (
+    Array.isArray(props.data)
+        ? props.data.map((value) => Number(value) || 0)
+        : []
+))
+
 const totalValue = computed(() => {
-    const sum = props.data.reduce((sum, value) => sum + (value || 0), 0)
+    const sum = normalizedData.value.reduce((sum, value) => sum + value, 0)
     return sum || 0
 })
 
 const hasValidData = computed(() => {
-    return props.data.length > 0 && totalValue.value > 0
+    return normalizedData.value.length > 0 && totalValue.value > 0
 })
 
 const legendItemsPerRow = 2
 const legendVerticalSpacing = 24
 
+const visibleSliceCount = computed(() => (
+    normalizedData.value.filter((value) => value > 0).length
+))
+
 const legendRowCount = computed(() => {
     if (!props.showLegend || props.legendPosition !== 'bottom') return 0
-    return Math.max(1, Math.ceil(slices.value.length / legendItemsPerRow))
+    return Math.max(1, Math.ceil(visibleSliceCount.value / legendItemsPerRow))
 })
 
 const legendBlockHeight = computed(() => (
@@ -153,8 +163,8 @@ const slices = computed(() => {
     const total = totalValue.value
     let currentAngle = -Math.PI / 2
 
-    return props.data.map((value, index) => {
-        const safeValue = value || 0
+    return normalizedData.value.map((value, index) => {
+        const safeValue = value
         const percentage = ((safeValue / total) * 100).toFixed(1)
         const sliceAngle = (safeValue / total) * 2 * Math.PI
         const endAngle = currentAngle + sliceAngle
