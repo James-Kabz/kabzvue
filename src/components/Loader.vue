@@ -153,8 +153,8 @@ const props = defineProps({
     default: 'color-mix(in oklab, var(--ui-surface), transparent 8%)'
   },
   blur: {
-    type: [Boolean, Number, String],
-    default: false
+    type: [Number, String],
+    default: 0
   },
   text: {
     type: String,
@@ -176,21 +176,14 @@ const props = defineProps({
 })
 
 const blurValue = computed(() => {
-  if (props.blur === false || props.blur === null || props.blur === undefined) return '0px'
-  if (props.blur === true) return 'var(--blur-2xs, 2px)'
+  if (props.blur === null || props.blur === undefined || props.blur === '') return '0px'
   if (typeof props.blur === 'number') return `${props.blur}px`
 
-  const normalized = String(props.blur).trim()
-  if (!normalized) return '0px'
+  const value = props.blur.trim()
+  if (!value) return '0px'
+  if (/^-?\d*\.?\d+$/.test(value)) return `${value}px`
 
-  if (/^(2xs|xs|sm|md|lg|xl|2xl|3xl|4xl|modal)$/.test(normalized)) {
-    return `var(--blur-${normalized})`
-  }
-
-  const parsed = Number(normalized)
-  if (Number.isFinite(parsed)) return `${parsed}px`
-
-  return normalized
+  return value
 })
 </script>
 
