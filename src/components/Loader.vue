@@ -70,7 +70,7 @@ const blurValue = computed(() => {
       'loader',
       `loader--${type}`,
       `loader--${size}`,
-      overlay ? 'loader--overlay' : '',
+      overlay && !fullscreen ? 'loader--overlay' : '',
       fullscreen ? 'loader--fullscreen' : ''
     ]"
     :style="{
@@ -81,7 +81,7 @@ const blurValue = computed(() => {
   >
     <!-- Optional backdrop -->
     <div
-      v-if="overlay"
+      v-if="overlay || fullscreen"
       class="loader__backdrop"
     />
 
@@ -189,56 +189,53 @@ const blurValue = computed(() => {
 
 <style scoped>
 .loader {
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  width: 100%;
 }
 
 .loader--overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: absolute;
+  inset: 0;
   z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .loader--fullscreen {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  min-height: 100svh;
   z-index: 9999;
-  background-color: var(--loader-bg);
-  backdrop-filter: blur(var(--loader-blur));
-  -webkit-backdrop-filter: blur(var(--loader-blur));
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .loader__backdrop {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: var(--loader-bg);
   backdrop-filter: blur(var(--loader-blur));
   -webkit-backdrop-filter: blur(var(--loader-blur));
 }
 
 .loader__container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: min(calc(100vw - 32px), 360px);
+  padding: 12px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: min(calc(100vw - 24px), 360px);
-  padding-inline: 12px;
-  box-sizing: border-box;
 }
 
 .loader__text {
@@ -591,30 +588,9 @@ const blurValue = computed(() => {
 }
 
 @media (max-width: 640px) {
-  .loader--overlay,
-  .loader--fullscreen {
-    padding: 16px;
-    box-sizing: border-box;
-  }
-
   .loader__container {
-    max-width: min(calc(100vw - 24px), 300px);
-    gap: 10px;
-    padding-inline: 8px;
-  }
-
-  .loader--large .loader__container {
-    transform: scale(0.9);
-    transform-origin: center;
-  }
-
-  .loader--xl .loader__container {
-    transform: scale(0.8);
-    transform-origin: center;
-  }
-
-  .loader__text {
-    font-size: 13px;
+    max-width: min(calc(100vw - 24px), 320px);
+    padding: 10px;
   }
 }
 
