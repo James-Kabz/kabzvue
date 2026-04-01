@@ -177,13 +177,20 @@ const props = defineProps({
 
 const blurValue = computed(() => {
   if (props.blur === false || props.blur === null || props.blur === undefined) return '0px'
-  if (props.blur === true) return '4px'
+  if (props.blur === true) return 'var(--blur-2xs, 2px)'
   if (typeof props.blur === 'number') return `${props.blur}px`
 
-  const parsed = Number(props.blur)
+  const normalized = String(props.blur).trim()
+  if (!normalized) return '0px'
+
+  if (/^(2xs|xs|sm|md|lg|xl|2xl|3xl|4xl|modal)$/.test(normalized)) {
+    return `var(--blur-${normalized})`
+  }
+
+  const parsed = Number(normalized)
   if (Number.isFinite(parsed)) return `${parsed}px`
 
-  return props.blur
+  return normalized
 })
 </script>
 
@@ -203,9 +210,6 @@ const blurValue = computed(() => {
   right: 0;
   bottom: 0;
   z-index: 9999;
-  background-color: var(--loader-bg);
-  backdrop-filter: blur(var(--loader-blur));
-  -webkit-backdrop-filter: blur(var(--loader-blur));
 }
 
 .loader--fullscreen {
