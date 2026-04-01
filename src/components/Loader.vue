@@ -139,7 +139,16 @@ const blurValue = computed(() => {
   align-items: center;
 }
 
-.loader--overlay,
+.loader--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 16px;
+}
+
 .loader--fullscreen {
   position: fixed;
   inset: 0;
@@ -153,7 +162,10 @@ const blurValue = computed(() => {
   box-sizing: border-box;
   overflow: hidden;
   padding:
-    max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
 }
 
 .loader__backdrop {
