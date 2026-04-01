@@ -59,8 +59,8 @@
       <g v-if="showXAxis">
         <text
           v-for="(label, index) in labels"
-          :key="`xlabel-${index}`"
           v-show="shouldRenderXAxisLabel(index)"
+          :key="`xlabel-${index}`"
           :x="getPointX(index)"
           :y="xAxisLabelY"
           :class="axisLabelClasses"

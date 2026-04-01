@@ -10,7 +10,8 @@
     ]"
     :style="{
       '--loader-color': color,
-      '--loader-bg': backgroundColor
+      '--loader-bg': backgroundColor,
+      '--loader-blur': blurValue
     }"
   >
     <!-- Optional backdrop -->
@@ -122,8 +123,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 // Define component props
-defineProps({
+const props = defineProps({
   loading: {
     type: Boolean,
     default: true
@@ -149,6 +152,10 @@ defineProps({
     type: String,
     default: 'color-mix(in oklab, var(--ui-surface), transparent 8%)'
   },
+  blur: {
+    type: [Boolean, Number, String],
+    default: false
+  },
   text: {
     type: String,
     default: ''
@@ -167,6 +174,17 @@ defineProps({
     default: false
   }
 })
+
+const blurValue = computed(() => {
+  if (props.blur === false || props.blur === null || props.blur === undefined) return '0px'
+  if (props.blur === true) return '4px'
+  if (typeof props.blur === 'number') return `${props.blur}px`
+
+  const parsed = Number(props.blur)
+  if (Number.isFinite(parsed)) return `${parsed}px`
+
+  return props.blur
+})
 </script>
 
 <style scoped>
@@ -175,6 +193,7 @@ defineProps({
   justify-content: center;
   align-items: center;
   position: relative;
+  width: 100%;
 }
 
 .loader--overlay {
@@ -185,6 +204,8 @@ defineProps({
   bottom: 0;
   z-index: 9999;
   background-color: var(--loader-bg);
+  backdrop-filter: blur(var(--loader-blur));
+  -webkit-backdrop-filter: blur(var(--loader-blur));
 }
 
 .loader--fullscreen {
@@ -195,6 +216,8 @@ defineProps({
   bottom: 0;
   z-index: 9999;
   background-color: var(--loader-bg);
+  backdrop-filter: blur(var(--loader-blur));
+  -webkit-backdrop-filter: blur(var(--loader-blur));
 }
 
 .loader__backdrop {
@@ -204,6 +227,8 @@ defineProps({
   right: 0;
   bottom: 0;
   background-color: var(--loader-bg);
+  backdrop-filter: blur(var(--loader-blur));
+  -webkit-backdrop-filter: blur(var(--loader-blur));
 }
 
 .loader__container {
@@ -213,6 +238,10 @@ defineProps({
   gap: 12px;
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: min(calc(100vw - 24px), 360px);
+  padding-inline: 12px;
+  box-sizing: border-box;
 }
 
 .loader__text {
@@ -220,6 +249,8 @@ defineProps({
   color: var(--ui-text);
   font-weight: 500;
   text-align: center;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .loader__text--top {
@@ -560,6 +591,34 @@ defineProps({
 .loader--xl .loader__spinner {
   width: 56px;
   height: 56px;
+}
+
+@media (max-width: 640px) {
+  .loader--overlay,
+  .loader--fullscreen {
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .loader__container {
+    max-width: min(calc(100vw - 24px), 300px);
+    gap: 10px;
+    padding-inline: 8px;
+  }
+
+  .loader--large .loader__container {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+
+  .loader--xl .loader__container {
+    transform: scale(0.8);
+    transform-origin: center;
+  }
+
+  .loader__text {
+    font-size: 13px;
+  }
 }
 
 /* Animations */

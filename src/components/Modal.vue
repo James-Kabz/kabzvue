@@ -97,18 +97,34 @@ onUnmounted(() => {
 
 <template>
   <Teleport to="body">
-    <Transition enter-active-class="transition-opacity duration-300" enter-from-class="opacity-0"
-      enter-to-class="opacity-100" leave-active-class="transition-opacity duration-300" leave-from-class="opacity-100"
-      leave-to-class="opacity-0">
-      <div v-if="modelValue" class="fixed inset-0 z-9999 backdrop-blur-2xs flex items-center justify-center"
-        :class="{ 'pointer-events-none': resizable }" @click="handleBackdropClick">
+    <Transition
+      enter-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-300"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-9999 backdrop-blur-2xs flex items-center justify-center"
+        :class="{ 'pointer-events-none': resizable }"
+        @click="handleBackdropClick"
+      >
         <div
           :class="cn(modalVariants({ size }), props.class, resizable ? 'resize overflow-hidden pointer-events-auto relative' : '')"
-          :style="resizable ? 'min-width: 400px; min-height: 700px; resize: both;' : ''">
-          <button v-if="showClose" aria-label="Close"
+          :style="resizable ? 'min-width: 400px; min-height: 700px; resize: both;' : ''"
+        >
+          <button
+            v-if="showClose"
+            aria-label="Close"
             class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            @click="closeModal">
-            <Icon icon="x" class="h-4 w-4" />
+            @click="closeModal"
+          >
+            <Icon
+              icon="x"
+              class="h-4 w-4"
+            />
             <span class="sr-only">Close</span>
           </button>
 
