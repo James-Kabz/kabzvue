@@ -1,3 +1,68 @@
+<script setup>
+import { computed } from 'vue'
+
+// Define component props
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: true
+  },
+  type: {
+    type: String,
+    default: 'spin',
+    validator: (value) => [
+      'spin', 'pulse', 'bounce', 'ripple',
+      'bars', 'dots', 'ring', 'spinner-text'
+    ].includes(value)
+  },
+  size: {
+    type: String,
+    default: 'medium',
+    validator: (value) => ['small', 'medium', 'large', 'xl'].includes(value)
+  },
+  color: {
+    type: String,
+    default: 'var(--ui-primary)'
+  },
+  backgroundColor: {
+    type: String,
+    default: 'color-mix(in oklab, var(--ui-surface), transparent 8%)'
+  },
+  blur: {
+    type: [Number, String],
+    default: 0
+  },
+  text: {
+    type: String,
+    default: ''
+  },
+  textPosition: {
+    type: String,
+    default: 'bottom',
+    validator: (value) => ['top', 'bottom'].includes(value)
+  },
+  overlay: {
+    type: Boolean,
+    default: false
+  },
+  fullscreen: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const blurValue = computed(() => {
+  if (props.blur === null || props.blur === undefined || props.blur === '') return '0px'
+  if (typeof props.blur === 'number') return `${props.blur}px`
+
+  const value = props.blur.trim()
+  if (!value) return '0px'
+  if (/^-?\d*\.?\d+$/.test(value)) return `${value}px`
+
+  return value
+})
+</script>
+
 <template>
   <div
     v-if="loading"
@@ -121,71 +186,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from 'vue'
-
-// Define component props
-const props = defineProps({
-  loading: {
-    type: Boolean,
-    default: true
-  },
-  type: {
-    type: String,
-    default: 'spin',
-    validator: (value) => [
-      'spin', 'pulse', 'bounce', 'ripple',
-      'bars', 'dots', 'ring', 'spinner-text'
-    ].includes(value)
-  },
-  size: {
-    type: String,
-    default: 'medium',
-    validator: (value) => ['small', 'medium', 'large', 'xl'].includes(value)
-  },
-  color: {
-    type: String,
-    default: 'var(--ui-primary)'
-  },
-  backgroundColor: {
-    type: String,
-    default: 'color-mix(in oklab, var(--ui-surface), transparent 8%)'
-  },
-  blur: {
-    type: [Number, String],
-    default: 0
-  },
-  text: {
-    type: String,
-    default: ''
-  },
-  textPosition: {
-    type: String,
-    default: 'bottom',
-    validator: (value) => ['top', 'bottom'].includes(value)
-  },
-  overlay: {
-    type: Boolean,
-    default: false
-  },
-  fullscreen: {
-    type: Boolean,
-    default: false
-  }
-})
-
-const blurValue = computed(() => {
-  if (props.blur === null || props.blur === undefined || props.blur === '') return '0px'
-  if (typeof props.blur === 'number') return `${props.blur}px`
-
-  const value = props.blur.trim()
-  if (!value) return '0px'
-  if (/^-?\d*\.?\d+$/.test(value)) return `${value}px`
-
-  return value
-})
-</script>
 
 <style scoped>
 .loader {
