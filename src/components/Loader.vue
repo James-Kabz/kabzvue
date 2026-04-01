@@ -45,6 +45,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  positionMode: {
+    type: String,
+    default: 'fixed',
+    validator: (value) => ['fixed', 'absolute'].includes(value)
+  },
   fullscreen: {
     type: Boolean,
     default: false
@@ -70,7 +75,7 @@ const blurValue = computed(() => {
       'loader',
       `loader--${type}`,
       `loader--${size}`,
-      overlay && !fullscreen ? 'loader--overlay' : '',
+      overlay && !fullscreen ? (positionMode === 'absolute' ? 'loader--overlay-absolute' : 'loader--overlay') : '',
       fullscreen ? 'loader--fullscreen' : ''
     ]"
     :style="{
@@ -196,25 +201,33 @@ const blurValue = computed(() => {
   align-items: center;
 }
 
-.loader--overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 9999;
-  display: grid;
-  place-items: center;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
+.loader--overlay,
 .loader--fullscreen {
   position: fixed;
   inset: 0;
-  min-height: 100svh;
   z-index: 9999;
+  width: 100vw;
+  min-height: 100svh;
   display: grid;
   place-items: center;
-  padding: 16px;
   box-sizing: border-box;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.loader--overlay-absolute {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 16px;
 }
 
 .loader__backdrop {
@@ -229,8 +242,9 @@ const blurValue = computed(() => {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: min(calc(100vw - 32px), 360px);
-  padding: 12px;
+  max-width: min(360px, calc(100vw - 32px));
+  max-height: calc(100svh - 32px);
+  overflow: auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -588,9 +602,9 @@ const blurValue = computed(() => {
 }
 
 @media (max-width: 640px) {
-  .loader__container {
-    max-width: min(calc(100vw - 24px), 320px);
-    padding: 10px;
+  .loader--large .loader__container,
+  .loader--xl .loader__container {
+    transform: none;
   }
 }
 
