@@ -45,11 +45,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  positionMode: {
-    type: String,
-    default: 'fixed',
-    validator: (value) => ['fixed', 'absolute'].includes(value)
-  },
   fullscreen: {
     type: Boolean,
     default: false
@@ -75,7 +70,7 @@ const blurValue = computed(() => {
       'loader',
       `loader--${type}`,
       `loader--${size}`,
-      overlay && !fullscreen ? (positionMode === 'absolute' ? 'loader--overlay-absolute' : 'loader--overlay') : '',
+      overlay && !fullscreen ? 'loader--overlay' : '',
       fullscreen ? 'loader--fullscreen' : ''
     ]"
     :style="{
@@ -206,28 +201,19 @@ const blurValue = computed(() => {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  width: 100vw;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100vh;
   min-height: 100svh;
   display: grid;
   place-items: center;
   box-sizing: border-box;
+  overflow: hidden;
   padding:
     max(16px, env(safe-area-inset-top))
     max(16px, env(safe-area-inset-right))
     max(16px, env(safe-area-inset-bottom))
     max(16px, env(safe-area-inset-left));
-}
-
-.loader--overlay-absolute {
-  position: absolute;
-  inset: 0;
-  z-index: 9999;
-  width: 100%;
-  min-height: 100%;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  padding: 16px;
 }
 
 .loader__backdrop {
@@ -243,6 +229,9 @@ const blurValue = computed(() => {
   z-index: 1;
   width: 100%;
   max-width: min(360px, calc(100vw - 32px));
+  max-width: min(360px, calc(100dvw - 32px));
+  max-width: min(360px, calc(100svw - 32px));
+  max-height: calc(100dvh - 32px);
   max-height: calc(100svh - 32px);
   overflow: auto;
   box-sizing: border-box;
@@ -602,6 +591,82 @@ const blurValue = computed(() => {
 }
 
 @media (max-width: 640px) {
+  .loader__container {
+    max-width: min(300px, calc(100vw - 24px));
+    max-width: min(300px, calc(100dvw - 24px));
+    max-width: min(300px, calc(100svw - 24px));
+    gap: 10px;
+  }
+
+  .loader__text {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .loader--large .loader__text,
+  .loader--xl .loader__text {
+    font-size: 14px;
+  }
+
+  .loader--large .loader__spin,
+  .loader--xl .loader__spin {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+  }
+
+  .loader--large .loader__pulse,
+  .loader--xl .loader__pulse {
+    width: 48px;
+    height: 48px;
+  }
+
+  .loader--large .loader__bounce-dot,
+  .loader--xl .loader__bounce-dot {
+    width: 14px;
+    height: 14px;
+  }
+
+  .loader--large .loader__ripple,
+  .loader--xl .loader__ripple {
+    width: 72px;
+    height: 72px;
+  }
+
+  .loader--large .loader__ripple-ring,
+  .loader--xl .loader__ripple-ring {
+    width: 72px;
+    height: 72px;
+    border-width: 3px;
+  }
+
+  .loader--large .loader__bar,
+  .loader--xl .loader__bar {
+    width: 4px;
+    height: 28px;
+  }
+
+  .loader--large .loader__dot,
+  .loader--xl .loader__dot {
+    width: 14px;
+    height: 14px;
+  }
+
+  .loader--large .loader__ring-track,
+  .loader--large .loader__ring-fill,
+  .loader--xl .loader__ring-track,
+  .loader--xl .loader__ring-fill {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+  }
+
+  .loader--large .loader__spinner,
+  .loader--xl .loader__spinner {
+    width: 40px;
+    height: 40px;
+  }
+
   .loader--large .loader__container,
   .loader--xl .loader__container {
     transform: none;
