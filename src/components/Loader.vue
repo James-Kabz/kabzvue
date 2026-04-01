@@ -18,7 +18,7 @@ const props = defineProps({
   size: {
     type: String,
     default: 'medium',
-    validator: (value) => ['small', 'medium', 'large', 'xl'].includes(value)
+    validator: (value) => ['small', 'medium', 'large', 'xl', '2xl', '3xl'].includes(value)
   },
   color: {
     type: String,
@@ -227,6 +227,14 @@ const blurValue = computed(() => {
   gap: 20px;
 }
 
+.loader--2xl .loader__container {
+  gap: 24px;
+}
+
+.loader--3xl .loader__container {
+  gap: 28px;
+}
+
 .loader--small .loader__text {
   font-size: 12px;
 }
@@ -241,6 +249,14 @@ const blurValue = computed(() => {
 
 .loader--xl .loader__text {
   font-size: 18px;
+}
+
+.loader--2xl .loader__text {
+  font-size: 20px;
+}
+
+.loader--3xl .loader__text {
+  font-size: 22px;
 }
 
 /* Spin Loader */
@@ -275,6 +291,18 @@ const blurValue = computed(() => {
   border-width: 6px;
 }
 
+.loader--2xl .loader__spin {
+  width: 88px;
+  height: 88px;
+  border-width: 7px;
+}
+
+.loader--3xl .loader__spin {
+  width: 104px;
+  height: 104px;
+  border-width: 8px;
+}
+
 /* Pulse Loader */
 .loader__pulse {
   background-color: var(--loader-color);
@@ -300,6 +328,16 @@ const blurValue = computed(() => {
 .loader--xl .loader__pulse {
   width: 72px;
   height: 72px;
+}
+
+.loader--2xl .loader__pulse {
+  width: 88px;
+  height: 88px;
+}
+
+.loader--3xl .loader__pulse {
+  width: 104px;
+  height: 104px;
 }
 
 /* Bounce Loader */
@@ -333,6 +371,16 @@ const blurValue = computed(() => {
 .loader--xl .loader__bounce-dot {
   width: 20px;
   height: 20px;
+}
+
+.loader--2xl .loader__bounce-dot {
+  width: 24px;
+  height: 24px;
+}
+
+.loader--3xl .loader__bounce-dot {
+  width: 28px;
+  height: 28px;
 }
 
 /* Ripple Loader */
@@ -370,6 +418,16 @@ const blurValue = computed(() => {
   height: 100px;
 }
 
+.loader--2xl .loader__ripple {
+  width: 120px;
+  height: 120px;
+}
+
+.loader--3xl .loader__ripple {
+  width: 140px;
+  height: 140px;
+}
+
 .loader--small .loader__ripple-ring {
   width: 40px;
   height: 40px;
@@ -392,6 +450,18 @@ const blurValue = computed(() => {
   width: 100px;
   height: 100px;
   border-width: 5px;
+}
+
+.loader--2xl .loader__ripple-ring {
+  width: 120px;
+  height: 120px;
+  border-width: 6px;
+}
+
+.loader--3xl .loader__ripple-ring {
+  width: 140px;
+  height: 140px;
+  border-width: 7px;
 }
 
 /* Bars Loader */
@@ -427,6 +497,16 @@ const blurValue = computed(() => {
   height: 40px;
 }
 
+.loader--2xl .loader__bar {
+  width: 7px;
+  height: 48px;
+}
+
+.loader--3xl .loader__bar {
+  width: 8px;
+  height: 56px;
+}
+
 /* Dots Loader */
 .loader__dots {
   display: flex;
@@ -457,6 +537,16 @@ const blurValue = computed(() => {
 .loader--xl .loader__dot {
   width: 20px;
   height: 20px;
+}
+
+.loader--2xl .loader__dot {
+  width: 24px;
+  height: 24px;
+}
+
+.loader--3xl .loader__dot {
+  width: 28px;
+  height: 28px;
 }
 
 /* Ring Loader */
@@ -507,6 +597,20 @@ const blurValue = computed(() => {
   border-width: 6px;
 }
 
+.loader--2xl .loader__ring-track,
+.loader--2xl .loader__ring-fill {
+  width: 88px;
+  height: 88px;
+  border-width: 7px;
+}
+
+.loader--3xl .loader__ring-track,
+.loader--3xl .loader__ring-fill {
+  width: 104px;
+  height: 104px;
+  border-width: 8px;
+}
+
 /* Spinner with text */
 .loader__spinner-text {
   display: flex;
@@ -542,6 +646,18 @@ const blurValue = computed(() => {
   height: 56px;
 }
 
+.loader--2xl .loader__spinner {
+  width: 68px;
+  height: 68px;
+  border-width: 4px;
+}
+
+.loader--3xl .loader__spinner {
+  width: 80px;
+  height: 80px;
+  border-width: 5px;
+}
+
 @media (max-width: 640px) {
   .loader__container {
     max-width: min(300px, calc(100vw - 24px));
@@ -556,50 +672,66 @@ const blurValue = computed(() => {
   }
 
   .loader--large .loader__text,
-  .loader--xl .loader__text {
+  .loader--xl .loader__text,
+  .loader--2xl .loader__text,
+  .loader--3xl .loader__text {
     font-size: 14px;
   }
 
   .loader--large .loader__spin,
-  .loader--xl .loader__spin {
+  .loader--xl .loader__spin,
+  .loader--2xl .loader__spin,
+  .loader--3xl .loader__spin {
     width: 48px;
     height: 48px;
     border-width: 4px;
   }
 
   .loader--large .loader__pulse,
-  .loader--xl .loader__pulse {
+  .loader--xl .loader__pulse,
+  .loader--2xl .loader__pulse,
+  .loader--3xl .loader__pulse {
     width: 48px;
     height: 48px;
   }
 
   .loader--large .loader__bounce-dot,
-  .loader--xl .loader__bounce-dot {
+  .loader--xl .loader__bounce-dot,
+  .loader--2xl .loader__bounce-dot,
+  .loader--3xl .loader__bounce-dot {
     width: 14px;
     height: 14px;
   }
 
   .loader--large .loader__ripple,
-  .loader--xl .loader__ripple {
+  .loader--xl .loader__ripple,
+  .loader--2xl .loader__ripple,
+  .loader--3xl .loader__ripple {
     width: 72px;
     height: 72px;
   }
 
   .loader--large .loader__ripple-ring,
-  .loader--xl .loader__ripple-ring {
+  .loader--xl .loader__ripple-ring,
+  .loader--2xl .loader__ripple-ring,
+  .loader--3xl .loader__ripple-ring {
     width: 72px;
     height: 72px;
     border-width: 3px;
   }
 
   .loader--large .loader__bar,
-  .loader--xl .loader__bar {
+  .loader--xl .loader__bar,
+  .loader--2xl .loader__bar,
+  .loader--3xl .loader__bar {
     width: 4px;
     height: 28px;
   }
 
   .loader--large .loader__dot,
-  .loader--xl .loader__dot {
+  .loader--xl .loader__dot,
+  .loader--2xl .loader__dot,
+  .loader--3xl .loader__dot {
     width: 14px;
     height: 14px;
   }
@@ -607,20 +739,28 @@ const blurValue = computed(() => {
   .loader--large .loader__ring-track,
   .loader--large .loader__ring-fill,
   .loader--xl .loader__ring-track,
-  .loader--xl .loader__ring-fill {
+  .loader--xl .loader__ring-fill,
+  .loader--2xl .loader__ring-track,
+  .loader--2xl .loader__ring-fill,
+  .loader--3xl .loader__ring-track,
+  .loader--3xl .loader__ring-fill {
     width: 48px;
     height: 48px;
     border-width: 4px;
   }
 
   .loader--large .loader__spinner,
-  .loader--xl .loader__spinner {
+  .loader--xl .loader__spinner,
+  .loader--2xl .loader__spinner,
+  .loader--3xl .loader__spinner {
     width: 40px;
     height: 40px;
   }
 
   .loader--large .loader__container,
-  .loader--xl .loader__container {
+  .loader--xl .loader__container,
+  .loader--2xl .loader__container,
+  .loader--3xl .loader__container {
     transform: none;
   }
 }
