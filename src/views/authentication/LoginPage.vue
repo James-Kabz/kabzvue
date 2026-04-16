@@ -56,7 +56,7 @@ const onSubmit = async ({ formData }) => {
     toast.info('Sign in successful!', {
       description: `Welcome back ${payload.email}`,
     })
-  } catch (error) {
+  } catch {
     toast.error('Sign in failed', {
       description: 'Please check your credentials and try again.',
     })
