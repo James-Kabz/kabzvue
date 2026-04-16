@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
             variant="body-md"
             class="mt-2 text-xs font-light leading-none text-white sm:text-[14px]"
           >
-        
+            {{ appVersion }}
           </Typography>
 
           <div
