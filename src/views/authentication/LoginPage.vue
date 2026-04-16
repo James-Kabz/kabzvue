@@ -82,7 +82,7 @@ const onSubmit = async ({ formData }) => {
     <div class="pt-2 text-right">
       <Link
         href="/auth/forgot-password"
-        class="text-[13px] font-medium text-[#de3247] hover:text-[#c92d3f]"
+        class="text-[13px]"
       >
         Forgot Password ?
       </Link>
