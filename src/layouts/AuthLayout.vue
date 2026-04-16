@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
               <img
                 :src="logoUrl"
                 alt="App logo"
-                class="h-12 w-auto max-w-[180px] object-contain sm:h-32"
+                class="h-16 w-auto max-w-[220px] object-contain sm:h-36"
               >
               <img
                 src="/logo.png"
@@ -137,35 +137,33 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div
-          v-if="showFooter"
-          class="mt-5 text-center text-white"
-        >
-          <Typography
-            variant="body-md"
-            class="text-xs font-light leading-none text-white sm:text-[14px]"
+        <div class="mt-4 px-1 text-right">
+          <div
+            v-if="$slots.links"
+            class="text-right"
           >
-            {{ appVersion }}
-          </Typography>
-          <Typography
-            variant="body-md"
-            class="mt-2 text-sm font-light leading-none text-white sm:text-[16px]"
-          >
-            &copy; {{ copyright }}
-          </Typography>
-          <Typography
-            variant="body-sm"
-            class="mt-1 text-sm font-light leading-none text-white sm:text-[14px]"
-          >
-            (2011 - {{ currentYear }})
-          </Typography>
-        </div>
+            <slot name="links" />
+          </div>
 
-        <div
-          v-if="$slots.links"
-          class="mt-4 text-center"
-        >
-          <slot name="links" />
+          <Typography
+            v-if="showFooter"
+            variant="body-md"
+            class="mt-2 text-xs font-light leading-none text-white sm:text-[14px]"
+          >
+        
+          </Typography>
+
+          <div
+            v-if="showFooter"
+            class="mt-3 text-right text-white"
+          >
+            <Typography
+              variant="body-md"
+              class="text-sm font-light leading-none text-white sm:text-[16px]"
+            >
+              &copy; {{ copyright }} (2011 - {{ currentYear }})
+            </Typography>
+          </div>
         </div>
       </section>
     </div>
