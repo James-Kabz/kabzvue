@@ -39,21 +39,30 @@ const loginFields = computed(() => [
 ])
 
 const onSubmit = async ({ formData }) => {
+  if (isLoading.value) return
+
+  const payload = {
+    email: formData.email?.trim() ?? '',
+    password: formData.password ?? '',
+    companyCode: formData.companyCode?.trim() ?? ''
+  }
+
   isLoading.value = true
 
-  console.log('Form submitted:', {
-    email: formData.email,
-    password: formData.password,
-    companyCode: formData.companyCode
-  })
+  try {
+    // Placeholder for real auth request
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
-  await new Promise(resolve => setTimeout(resolve, 2000))
-
-  toast.info('Sign in successful!', {
-    description: `Welcome back ${formData.email}`,
-  })
-
-  isLoading.value = false
+    toast.info('Sign in successful!', {
+      description: `Welcome back ${payload.email}`,
+    })
+  } catch (error) {
+    toast.error('Sign in failed', {
+      description: 'Please check your credentials and try again.',
+    })
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -70,7 +79,7 @@ const onSubmit = async ({ formData }) => {
       @submit="onSubmit"
     />
 
-    <div class="pt-2 text-center">
+    <div class="pt-2 text-right">
       <Link
         href="/auth/forgot-password"
         class="text-[13px] font-medium text-[#de3247] hover:text-[#c92d3f]"

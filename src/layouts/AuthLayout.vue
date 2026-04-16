@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
         </Typography>
       </section>
 
-      <section class="ml-auto w-full max-w-[390px]">
+      <section class="ml-auto w-full max-w-[460px]">
         <div class="overflow-hidden rounded-sm ui-surface">
           <div class="px-1 sm:pt-2">
             <div class="flex items-start justify-between gap-2">
@@ -130,6 +130,25 @@ onBeforeUnmount(() => {
           </div>
 
           <div
+            v-if="$slots.links || showFooter"
+            class="px-5 pb-4 sm:px-6 sm:pb-5"
+          >
+            <div
+              v-if="$slots.links"
+              class="text-right"
+            >
+              <slot name="links" />
+            </div>
+            <Typography
+              v-if="showFooter"
+              variant="body-md"
+              class="mt-2 text-right text-xs font-light leading-none text-[#5f6a74] sm:text-[14px]"
+            >
+              {{ appVersion }}
+            </Typography>
+          </div>
+
+          <div
             v-if="$slots['card-footer']"
             class="px-6 pb-6 sm:px-8 sm:pb-8"
           >
@@ -137,34 +156,13 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="mt-4 px-1 text-right">
-          <div
-            v-if="$slots.links"
-            class="text-right"
-          >
-            <slot name="links" />
-          </div>
-
-          <Typography
-            v-if="showFooter"
-            variant="body-md"
-            class="mt-2 text-xs font-light leading-none text-white sm:text-[14px]"
-          >
-            {{ appVersion }}
-          </Typography>
-
-          <div
-            v-if="showFooter"
-            class="mt-3 text-right text-white"
-          >
-            <Typography
-              variant="body-md"
-              class="text-sm font-light leading-none text-white sm:text-[16px]"
-            >
-              &copy; {{ copyright }} (2011 - {{ currentYear }})
-            </Typography>
-          </div>
-        </div>
+        <Typography
+          v-if="showFooter"
+          variant="body-md"
+          class="mt-3 text-center text-sm font-light leading-none text-white sm:text-[16px]"
+        >
+          &copy; {{ copyright }} 2011 - {{ currentYear }}
+        </Typography>
       </section>
     </div>
   </div>
