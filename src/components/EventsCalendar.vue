@@ -23,6 +23,18 @@ export default {
       type: String,
       default: 'default',
       validator: (value) => ['xs', 'compact', 'default', 'large', 'full'].includes(value)
+    },
+    height: {
+      type: String,
+      default: '100%'
+    },
+    minHeight: {
+      type: String,
+      default: '420px'
+    },
+    maxHeight: {
+      type: String,
+      default: ''
     }
   },
   emits: ['select-date', 'select-event'],
@@ -40,6 +52,13 @@ export default {
     }
   },
   computed: {
+    containerStyles() {
+      return {
+        height: this.height || undefined,
+        minHeight: this.minHeight || undefined,
+        maxHeight: this.maxHeight || undefined
+      }
+    },
     sizePreset() {
       const presets = {
         xs: {
@@ -253,7 +272,10 @@ export default {
 </script>
 
 <template>
-  <div :class="['flex flex-col h-full ui-surface border ui-border rounded-xl overflow-hidden shadow-sm', sizePreset.rootTextClass]">
+  <div
+    :style="containerStyles"
+    :class="['flex flex-col h-full ui-surface border ui-border rounded-xl overflow-hidden shadow-sm', sizePreset.rootTextClass]"
+  >
     <!-- ── Toolbar ── -->
     <div :class="['flex items-center justify-between border-b ui-border ui-surface shrink-0', sizePreset.toolbarPaddingClass]">
       <div class="flex items-center gap-2">
