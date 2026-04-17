@@ -66,6 +66,18 @@ export default {
         pending: { label: 'Pending', class: 'ui-warning-soft ui-warning' }
       })
     },
+    drawerAccentMap: {
+      type: Object,
+      default: () => ({
+        complied: 'bg-(--ui-success)',
+        complete: 'bg-(--ui-success)',
+        partial: 'bg-(--ui-info)',
+        in_progress: 'bg-(--ui-info)',
+        pending: 'bg-(--ui-warning)',
+        overdue: 'bg-(--ui-danger)',
+        open: 'bg-(--ui-danger)'
+      })
+    },
     showViewMoreDetails: {
       type: Boolean,
       default: true
@@ -77,6 +89,26 @@ export default {
         download: true,
         delete: false
       })
+    },
+    drawerFieldGridCols: {
+      type: [Number, String],
+      default: 1
+    },
+    drawerHeaderCardClass: {
+      type: String,
+      default: 'rounded-xl border ui-border bg-(--ui-surface-muted) p-4'
+    },
+    drawerSectionCardClass: {
+      type: String,
+      default: 'rounded-lg border ui-border bg-(--ui-surface) p-3'
+    },
+    drawerViewDetailsButtonClass: {
+      type: String,
+      default: 'inline-flex items-center rounded-md bg-(--ui-primary) px-3 py-1.5 text-xs font-medium text-(--ui-text-inverse) hover:opacity-90 transition-opacity'
+    },
+    drawerEmptyDocumentsClass: {
+      type: String,
+      default: 'text-sm ui-text-muted'
     }
   },
   emits: [
@@ -230,6 +262,12 @@ export default {
           }))
         }
       })
+    },
+    drawerFieldGridClass() {
+      const cols = Math.max(1, Math.min(Number(this.drawerFieldGridCols) || 1, 3))
+      if (cols === 1) return 'grid-cols-1'
+      if (cols === 2) return 'grid-cols-1 md:grid-cols-2'
+      return 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
     }
   },
   methods: {
@@ -282,9 +320,32 @@ export default {
       if (field?.showWhenEmpty) return true
       return value != null && value !== ''
     },
+    getDrawerFieldColSpanClass(field) {
+      const gridCols = Math.max(1, Math.min(Number(this.drawerFieldGridCols) || 1, 3))
+      const raw = Number(field?.colSpan || 1)
+      const colSpan = Math.max(1, Math.min(raw, gridCols))
+      if (gridCols === 1 || colSpan === 1) return 'col-span-1'
+      if (gridCols === 2) return colSpan === 2 ? 'md:col-span-2' : 'md:col-span-1'
+      if (colSpan === 3) return 'xl:col-span-3'
+      if (colSpan === 2) return 'md:col-span-2 xl:col-span-2'
+      return 'md:col-span-1 xl:col-span-1'
+    },
     getDrawerStatus(status) {
       const normalized = String(status || 'pending').toLowerCase()
-      return this.drawerStatusMap[normalized] || this.drawerStatusMap.pending
+      if (this.drawerStatusMap[normalized]) return this.drawerStatusMap[normalized]
+      return {
+        label: normalized
+          .split(/[_\s-]+/)
+          .filter(Boolean)
+          .map(token => token.charAt(0).toUpperCase() + token.slice(1))
+          .join(' ') || 'Pending',
+        class: 'ui-surface-soft ui-text-muted'
+      }
+    },
+    getDrawerAccentClass(event) {
+      const normalized = String(event?.status || 'pending').toLowerCase()
+      if (this.drawerAccentMap[normalized]) return this.drawerAccentMap[normalized]
+      return this.getColorStripClass(event?.color)
     },
     getSelectedEventDetails() {
       if (!this.selectedEvent) return {}
@@ -758,10 +819,10 @@ export default {
             v-if="selectedEvent"
             class="h-full overflow-y-auto p-4 space-y-4"
           >
-            <div class="rounded-xl border ui-border bg-(--ui-surface-muted) p-4">
+            <div :class="drawerHeaderCardClass">
               <div
                 class="mb-2 h-1 w-full rounded-full"
-                :class="getColorStripClass(selectedEvent.color)"
+                :class="getDrawerAccentClass(selectedEvent)"
               />
               <h4 class="text-lg font-bold leading-tight ui-text wrap-break-word">
                 {{ selectedEvent.title }}
@@ -771,7 +832,7 @@ export default {
                 class="mt-3"
               >
                 <button
-                  class="inline-flex items-center rounded-md bg-(--ui-primary) px-3 py-1.5 text-xs font-medium text-(--ui-text-inverse) hover:opacity-90 transition-opacity"
+                  :class="drawerViewDetailsButtonClass"
                   @click="handleViewMoreDetails"
                 >
                   View full details
@@ -792,18 +853,19 @@ export default {
             </div>
 
             <div
-              class="grid grid-cols-1 gap-3"
+              class="grid gap-3"
+              :class="drawerFieldGridClass"
             >
               <div
                 v-for="(field, idx) in drawerDetailFields"
                 v-show="shouldShowDrawerField(field)"
                 :key="`${(field.path || (field.paths || []).join('|'))}-${idx}`"
-                class="rounded-lg border ui-border bg-(--ui-surface) p-3"
+                :class="[drawerSectionCardClass, getDrawerFieldColSpanClass(field), field.cardClass]"
               >
-                <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
+                <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft" :class="field.labelClass">
                   {{ field.label }}
                 </p>
-                <p class="mt-1 text-sm ui-text">
+                <p class="mt-1 text-sm ui-text" :class="field.valueClass">
                   {{ formatDrawerFieldValue(field, getDrawerFieldValue(field)) }}
                 </p>
               </div>
@@ -811,7 +873,7 @@ export default {
 
             <div
               v-if="selectedEvent.description"
-              class="rounded-lg border ui-border bg-(--ui-surface) p-3"
+              :class="drawerSectionCardClass"
             >
               <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
                 Description
@@ -823,7 +885,7 @@ export default {
 
             <div
               v-if="getSelectedEventDetails().remarks"
-              class="rounded-lg border ui-border bg-(--ui-surface) p-3"
+              :class="drawerSectionCardClass"
             >
               <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
                 Compliance Remarks
@@ -835,7 +897,7 @@ export default {
 
             <div
               v-if="getSelectedEventDetails()"
-              class="rounded-lg border ui-border bg-(--ui-surface) p-3"
+              :class="drawerSectionCardClass"
             >
               <div class="mb-2 flex items-center justify-between">
                 <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
@@ -848,7 +910,7 @@ export default {
 
               <p
                 v-if="!getSelectedEventDocuments().length"
-                class="text-sm ui-text-muted"
+                :class="drawerEmptyDocumentsClass"
               >
                 No documents uploaded
               </p>
