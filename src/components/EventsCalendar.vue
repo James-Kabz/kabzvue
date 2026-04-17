@@ -55,14 +55,8 @@ export default {
       default: () => ([
         { label: 'Date', path: 'date', type: 'date' },
         { label: 'End Date', path: 'end_date', type: 'date' },
-        { label: 'Code', paths: ['details.code', 'compliance.code'] },
-        { label: 'Company', paths: ['details.company_name', 'compliance.company_name'] },
-        { label: 'Regulatory Body', paths: ['details.body', 'compliance.body'] },
-        { label: 'Body Code', paths: ['details.body_code', 'compliance.body_code'] },
-        { label: 'Serial Number', paths: ['details.serial_number', 'compliance.serial_number'] },
-        { label: 'Frequency', paths: ['details.frequency', 'compliance.frequency'] },
-        { label: 'Due Date', paths: ['details.compliance_date', 'compliance.compliance_date'], type: 'date' },
-        { label: 'Complied Date', paths: ['details.complied_date', 'compliance.complied_date'], type: 'date' }
+        { label: 'Code', path: 'details.code' },
+        { label: 'Company', path: 'details.company_name' }
       ])
     },
     drawerStatusMap: {
@@ -71,9 +65,29 @@ export default {
         complied: { label: 'Complied', class: 'ui-success-soft ui-success' },
         pending: { label: 'Pending', class: 'ui-warning-soft ui-warning' }
       })
+    },
+    showViewMoreDetails: {
+      type: Boolean,
+      default: true
+    },
+    drawerDocumentActions: {
+      type: Object,
+      default: () => ({
+        view: true,
+        download: true,
+        delete: false
+      })
     }
   },
-  emits: ['select-date', 'select-event'],
+  emits: [
+    'select-date',
+    'select-event',
+    'close-event-details',
+    'view-more-details',
+    'document-view',
+    'document-download',
+    'document-delete'
+  ],
   data() {
     return {
       currentDate: new Date(),
@@ -274,17 +288,30 @@ export default {
     },
     getSelectedEventDetails() {
       if (!this.selectedEvent) return {}
-      return this.selectedEvent.details || this.selectedEvent.compliance || {}
+      return (
+        this.selectedEvent.details ||
+        this.selectedEvent.related_record ||
+        this.selectedEvent.relatedRecord ||
+        this.selectedEvent.compliance ||
+        {}
+      )
     },
     getSelectedEventDocuments() {
       const details = this.getSelectedEventDetails()
+      const moduleData = this.selectedEvent?.module_data || this.selectedEvent?.moduleData || {}
+      const relatedRecord = this.selectedEvent?.related_record || this.selectedEvent?.relatedRecord || {}
+
       if (Array.isArray(details.documents)) return details.documents
       if (Array.isArray(details.compliance_documents)) return details.compliance_documents
+      if (Array.isArray(relatedRecord.compliance_documents)) return relatedRecord.compliance_documents
+      if (Array.isArray(moduleData.documents)) return moduleData.documents
       return []
     },
     getSelectedEventDocumentsCount() {
       const details = this.getSelectedEventDetails()
+      const relatedRecord = this.selectedEvent?.related_record || this.selectedEvent?.relatedRecord || {}
       if (details.documents_count != null) return details.documents_count
+      if (relatedRecord.documents_count != null) return relatedRecord.documents_count
       return this.getSelectedEventDocuments().length
     },
     formatFileSize(bytes) {
@@ -339,6 +366,23 @@ export default {
     },
     closeEvent() {
       this.selectedEvent = null
+      this.$emit('close-event-details')
+    },
+    handleViewMoreDetails() {
+      if (!this.selectedEvent) return
+      this.$emit('view-more-details', this.selectedEvent)
+    },
+    handleDocumentView(doc) {
+      if (!doc) return
+      this.$emit('document-view', { doc, event: this.selectedEvent })
+    },
+    handleDocumentDownload(doc) {
+      if (!doc) return
+      this.$emit('document-download', { doc, event: this.selectedEvent })
+    },
+    handleDocumentDelete(doc) {
+      if (!doc) return
+      this.$emit('document-delete', { doc, event: this.selectedEvent })
     },
     getEventColorClass(color) {
       const colorMap = {
@@ -723,6 +767,18 @@ export default {
                 {{ selectedEvent.title }}
               </h4>
               <div
+                v-if="showViewMoreDetails"
+                class="mt-3"
+              >
+                <button
+                  class="inline-flex items-center rounded-md bg-(--ui-primary) px-3 py-1.5 text-xs font-medium text-(--ui-text-inverse) hover:opacity-90 transition-opacity"
+                  @click="handleViewMoreDetails"
+                >
+                  View full details
+                  <Icon icon="arrow-right" class="ml-1 w-3 h-3" />
+                </button>
+              </div>
+              <div
                 v-if="selectedEvent.status"
                 class="mt-3"
               >
@@ -741,7 +797,7 @@ export default {
               <div
                 v-for="(field, idx) in drawerDetailFields"
                 v-show="shouldShowDrawerField(field)"
-                :key="`${field.path}-${idx}`"
+                :key="`${(field.path || (field.paths || []).join('|'))}-${idx}`"
                 class="rounded-lg border ui-border bg-(--ui-surface) p-3"
               >
                 <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
@@ -812,6 +868,29 @@ export default {
                   <p class="text-xs ui-text-muted">
                     {{ formatFileSize(doc.file_size || doc.size || 0) }}
                   </p>
+                  <div class="mt-2 flex gap-2">
+                    <button
+                      v-if="drawerDocumentActions.view"
+                      class="rounded-md border ui-border px-2 py-1 text-xs ui-text hover:bg-(--ui-surface)"
+                      @click="handleDocumentView(doc)"
+                    >
+                      View
+                    </button>
+                    <button
+                      v-if="drawerDocumentActions.download"
+                      class="rounded-md border ui-border px-2 py-1 text-xs ui-text hover:bg-(--ui-surface)"
+                      @click="handleDocumentDownload(doc)"
+                    >
+                      Download
+                    </button>
+                    <button
+                      v-if="drawerDocumentActions.delete"
+                      class="rounded-md border border-(--ui-danger) px-2 py-1 text-xs text-(--ui-danger) hover:bg-(--ui-danger-soft)"
+                      @click="handleDocumentDelete(doc)"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
