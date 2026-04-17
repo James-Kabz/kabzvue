@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted } from 'vue'
 import Typography from '../components/Typography.vue'
 import Divider from '../components/Divider.vue'
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     default: 'Login to your account:'
@@ -47,6 +47,11 @@ defineProps({
 })
 
 const currentYear = computed(() => new Date().getFullYear())
+const displayVersion = computed(() => {
+  const version = String(props.appVersion ?? '').trim()
+  if (!version) return 'v0.0.0'
+  return version.toLowerCase().startsWith('v') ? version : `v${version}`
+})
 
 onMounted(() => {
   document.documentElement.classList.add('auth-page')
@@ -144,7 +149,7 @@ onBeforeUnmount(() => {
               variant="body-md"
               class="mt-2 text-right text-xs font-light leading-none text-[#5f6a74] sm:text-[14px]"
             >
-              {{ appVersion }}
+              {{ displayVersion }}
             </Typography>
           </div>
 

@@ -137,6 +137,24 @@
         >
           <slot name="actions" />
         </div>
+
+        <!-- Search input (right-most control) -->
+        <div
+          v-if="showSearch"
+          class="relative"
+        >
+          <font-awesome-icon
+            icon="search"
+            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ui-text-soft"
+          />
+          <input
+            :value="searchQuery"
+            type="text"
+            :placeholder="searchPlaceholder"
+            :class="searchInputClasses"
+            @input="$emit('update:search-query', $event.target.value)"
+          >
+        </div>
       </div>
     </div>
   </div>
@@ -210,6 +228,9 @@ const props = defineProps({
   showDensityToggle: { type: Boolean, default: true },
   showColumnToggle: { type: Boolean, default: true },
   showRefresh: { type: Boolean, default: true },
+  showSearch: { type: Boolean, default: true },
+  searchQuery: { type: String, default: '' },
+  searchPlaceholder: { type: String, default: 'Search...' },
   isRefreshing: { type: Boolean, default: false },
   density: {
     type: String,
@@ -230,7 +251,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['bulk-action', 'update:density', 'toggle-column', 'refresh'])
+const emit = defineEmits(['bulk-action', 'update:density', 'toggle-column', 'refresh', 'update:search-query'])
 
 // Refs
 const showColumnMenu = ref(false)
@@ -343,6 +364,10 @@ const checkboxClasses = computed(() =>
 
 const labelClasses = computed(() => 
   'text-sm ui-text flex-1 select-none'
+)
+
+const searchInputClasses = computed(() =>
+  'w-72 pl-9 pr-3 py-2 text-sm border ui-border-strong rounded-md ui-surface ui-text placeholder:text-(--ui-text-muted) focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all'
 )
 
 // Click outside handler

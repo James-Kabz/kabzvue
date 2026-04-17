@@ -64,66 +64,123 @@ const blurValue = computed(() => {
 </script>
 
 <template>
-  <div v-if="loading" :class="[
-    'loader',
-    `loader--${type}`,
-    `loader--${size}`,
-    overlay && !fullscreen ? 'loader--overlay' : '',
-    fullscreen ? 'loader--fullscreen' : ''
-  ]" :style="{
+  <div
+    v-if="loading"
+    :class="[
+      'loader',
+      `loader--${type}`,
+      `loader--${size}`,
+      overlay && !fullscreen ? 'loader--overlay' : '',
+      fullscreen ? 'loader--fullscreen' : ''
+    ]"
+    :style="{
       '--loader-color': color,
       '--loader-bg': backgroundColor,
       '--loader-blur': blurValue
-    }">
+    }"
+  >
     <!-- Optional backdrop -->
-    <div v-if="overlay || fullscreen" class="loader__backdrop" />
+    <div
+      v-if="overlay || fullscreen"
+      class="loader__backdrop"
+    />
 
     <!-- Loader container -->
     <div class="loader__container">
       <!-- Text above loader -->
-      <div v-if="text && textPosition === 'top'" class="loader__text loader__text--top">
+      <div
+        v-if="text && textPosition === 'top'"
+        class="loader__text loader__text--top"
+      >
         {{ text }}
       </div>
 
       <!-- Spin Loader -->
-      <div v-if="type === 'spin'" class="loader__spin" />
+      <div
+        v-if="type === 'spin'"
+        class="loader__spin"
+      />
 
       <!-- Pulse Loader -->
-      <div v-else-if="type === 'pulse'" class="loader__pulse" />
+      <div
+        v-else-if="type === 'pulse'"
+        class="loader__pulse"
+      />
 
       <!-- Bounce Loader -->
-      <div v-else-if="type === 'bounce'" class="loader__bounce">
-        <div v-for="i in 3" :key="i" class="loader__bounce-dot" :style="{ animationDelay: `${(i - 1) * 0.1}s` }" />
+      <div
+        v-else-if="type === 'bounce'"
+        class="loader__bounce"
+      >
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="loader__bounce-dot"
+          :style="{ animationDelay: `${(i - 1) * 0.1}s` }"
+        />
       </div>
 
       <!-- Ripple Loader -->
-      <div v-else-if="type === 'ripple'" class="loader__ripple">
-        <div v-for="i in 2" :key="i" class="loader__ripple-ring" :style="{ animationDelay: `${(i - 1) * 0.5}s` }" />
+      <div
+        v-else-if="type === 'ripple'"
+        class="loader__ripple"
+      >
+        <div
+          v-for="i in 2"
+          :key="i"
+          class="loader__ripple-ring"
+          :style="{ animationDelay: `${(i - 1) * 0.5}s` }"
+        />
       </div>
 
       <!-- Bars Loader -->
-      <div v-else-if="type === 'bars'" class="loader__bars">
-        <div v-for="i in 5" :key="i" class="loader__bar" :style="{ animationDelay: `${(i - 1) * 0.1}s` }" />
+      <div
+        v-else-if="type === 'bars'"
+        class="loader__bars"
+      >
+        <div
+          v-for="i in 5"
+          :key="i"
+          class="loader__bar"
+          :style="{ animationDelay: `${(i - 1) * 0.1}s` }"
+        />
       </div>
 
       <!-- Dots Loader -->
-      <div v-else-if="type === 'dots'" class="loader__dots">
-        <div v-for="i in 3" :key="i" class="loader__dot" :style="{ animationDelay: `${(i - 1) * 0.16}s` }" />
+      <div
+        v-else-if="type === 'dots'"
+        class="loader__dots"
+      >
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="loader__dot"
+          :style="{ animationDelay: `${(i - 1) * 0.16}s` }"
+        />
       </div>
 
       <!-- Ring Loader -->
-      <div v-else-if="type === 'ring'" class="loader__ring">
+      <div
+        v-else-if="type === 'ring'"
+        class="loader__ring"
+      >
         <div class="loader__ring-track" />
         <div class="loader__ring-fill" />
       </div>
 
       <!-- Spinner with text -->
-      <div v-else-if="type === 'spinner-text'" class="loader__spinner-text">
+      <div
+        v-else-if="type === 'spinner-text'"
+        class="loader__spinner-text"
+      >
         <div class="loader__spinner" />
       </div>
 
       <!-- Text below loader -->
-      <div v-if="text && textPosition === 'bottom'" class="loader__text loader__text--bottom">
+      <div
+        v-if="text && textPosition === 'bottom'"
+        class="loader__text loader__text--bottom"
+      >
         {{ text }}
       </div>
     </div>

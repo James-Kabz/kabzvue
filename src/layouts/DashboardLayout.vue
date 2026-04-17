@@ -179,6 +179,27 @@ const resolvedCurrentCompanyLogo = computed(() => {
   return resolveEntityLogo(resolvedCurrentCompany.value) || resolveEntityLogo(resolvedCompanies.value[0]) || ''
 })
 
+const resolvedAppLogoUrl = computed(() => {
+  return props.user?.logoUrl || props.user?.appLogo || '/applogo.png'
+})
+
+const locationTrail = computed(() => {
+  const base = 'eBoard'
+  const path = String(currentRoute.value || '').replace(/^\/+|\/+$/g, '')
+  if (!path) return base
+
+  const segments = path
+    .split('/')
+    .filter(Boolean)
+    .map((segment) =>
+      segment
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    )
+
+  return [base, ...segments].join(' / ')
+})
+
 // Methods
 const handleMobileSidebarToggle = () => {
   mobileOpen.value = !mobileOpen.value
@@ -274,6 +295,7 @@ defineExpose({
       :company-logo="resolvedCompanyLogo"
       :current-company-logo="resolvedCurrentCompanyLogo"
       :companies="resolvedCompanies"
+      :logo-url="resolvedAppLogoUrl"
       :show-search="false"
       :settings-menu-items="managementSettingsItems"
       :settings-badge-count="managementSettingsItems.filter(item => item?.route).length"
@@ -288,10 +310,13 @@ defineExpose({
 
     <!-- Main Content -->
     <main
-      class="transition-all duration-300 ease-in-out pt-16 min-h-screen"
+      class="transition-all duration-300 ease-in-out pt-22 min-h-screen"
       :style="{ marginLeft: sidebarRef?.contentMarginLeft + 'px' }"
     >
       <div class="p-6">
+        <p class="mb-4 text-sm ui-text-muted">
+          <span class="font-semibold ui-text">You are here:</span> {{ locationTrail }}
+        </p>
         <router-view />
       </div>
     </main>

@@ -198,7 +198,6 @@ export default {
 
 <template>
   <div class="flex flex-col h-full ui-surface border ui-border rounded-xl overflow-hidden shadow-sm text-sm">
-
     <!-- ── Toolbar ── -->
     <div class="flex items-center justify-between px-4 py-2.5 border-b ui-border ui-surface shrink-0">
       <div class="flex items-center gap-2">
@@ -213,20 +212,42 @@ export default {
             class="w-7 h-7 flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors"
             @click="previousPeriod"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <button
             class="w-7 h-7 flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors"
             @click="nextPeriod"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>
-        <h2 class="text-base font-semibold ui-text min-w-[150px]">{{ displayTitle }}</h2>
+        <h2 class="text-base font-semibold ui-text min-w-[150px]">
+          {{ displayTitle }}
+        </h2>
       </div>
 
       <!-- View switcher — segmented pill -->
@@ -246,9 +267,11 @@ export default {
     <!-- ── Body ── -->
     <div class="flex flex-1 overflow-hidden">
       <div class="flex flex-col flex-1 overflow-hidden min-w-0">
-
         <!-- ══ Year view ══ -->
-        <div v-if="viewMode === 'year'" class="flex-1 overflow-y-auto p-4">
+        <div
+          v-if="viewMode === 'year'"
+          class="flex-1 overflow-y-auto p-4"
+        >
           <div class="grid grid-cols-3 gap-4">
             <div
               v-for="month in yearViewMonths"
@@ -257,7 +280,9 @@ export default {
               @click="selectMonthFromYear(month.index)"
             >
               <div class="px-3 py-2 bg-(--ui-surface-muted) border-b ui-border">
-                <h3 class="text-xs font-semibold ui-text">{{ month.name }}</h3>
+                <h3 class="text-xs font-semibold ui-text">
+                  {{ month.name }}
+                </h3>
               </div>
               <div class="p-2 ui-surface">
                 <div class="grid grid-cols-7 mb-1">
@@ -332,7 +357,10 @@ export default {
                 >
                   {{ event.title }}
                 </div>
-                <div v-if="day.events.length > 3" class="text-[10px] ui-text-soft pl-1">
+                <div
+                  v-if="day.events.length > 3"
+                  class="text-[10px] ui-text-soft pl-1"
+                >
                   +{{ day.events.length - 3 }} more
                 </div>
               </div>
@@ -342,7 +370,10 @@ export default {
 
         <!-- ══ Week view ══ -->
         <template v-if="viewMode === 'week'">
-          <div class="grid border-b ui-border shrink-0 ui-surface" style="grid-template-columns: 52px repeat(7, 1fr)">
+          <div
+            class="grid border-b ui-border shrink-0 ui-surface"
+            style="grid-template-columns: 52px repeat(7, 1fr)"
+          >
             <div class="border-r ui-border" />
             <div
               v-for="day in weekViewDays"
@@ -350,7 +381,9 @@ export default {
               class="py-2 text-center border-r ui-border last:border-r-0"
               :class="day.isToday ? 'bg-(--ui-primary-soft)' : ''"
             >
-              <div class="text-[10px] font-semibold ui-text-soft uppercase tracking-wider">{{ day.dayName }}</div>
+              <div class="text-[10px] font-semibold ui-text-soft uppercase tracking-wider">
+                {{ day.dayName }}
+              </div>
               <div
                 class="mx-auto mt-1 w-7 h-7 flex items-center justify-center rounded-full text-sm font-medium"
                 :class="day.isToday ? 'bg-(--ui-primary) text-(--ui-text-inverse)' : 'ui-text'"
@@ -360,8 +393,13 @@ export default {
             </div>
           </div>
 
-          <div class="grid border-b ui-border bg-(--ui-surface-muted) shrink-0" style="grid-template-columns: 52px repeat(7, 1fr)">
-            <div class="border-r ui-border px-1 py-1 text-[10px] ui-text-soft text-right flex items-center justify-end">All day</div>
+          <div
+            class="grid border-b ui-border bg-(--ui-surface-muted) shrink-0"
+            style="grid-template-columns: 52px repeat(7, 1fr)"
+          >
+            <div class="border-r ui-border px-1 py-1 text-[10px] ui-text-soft text-right flex items-center justify-end">
+              All day
+            </div>
             <div
               v-for="day in weekViewDays"
               :key="'ad-' + day.date"
@@ -380,8 +418,14 @@ export default {
           </div>
 
           <div class="flex-1 overflow-y-auto">
-            <div class="grid" style="grid-template-columns: 52px repeat(7, 1fr)">
-              <template v-for="slot in timeSlots" :key="slot.time">
+            <div
+              class="grid"
+              style="grid-template-columns: 52px repeat(7, 1fr)"
+            >
+              <template
+                v-for="slot in timeSlots"
+                :key="slot.time"
+              >
                 <div class="h-14 border-b border-r border-(--ui-border) px-1.5 pt-1 text-[10px] ui-text-soft text-right leading-none">
                   {{ slot.display }}
                 </div>
@@ -413,13 +457,21 @@ export default {
             :class="dayViewDate.isToday ? 'bg-(--ui-primary-soft)' : 'ui-surface'"
           >
             <span class="text-xs font-semibold uppercase tracking-wider ui-text-soft">{{ dayViewDate.dayName }}</span>
-            <span class="text-2xl font-light" :class="dayViewDate.isToday ? 'ui-primary' : 'ui-text'">
+            <span
+              class="text-2xl font-light"
+              :class="dayViewDate.isToday ? 'ui-primary' : 'ui-text'"
+            >
               {{ dayViewDate.dayNumber }}
             </span>
           </div>
 
-          <div v-if="getAllDayEvents(dayViewDate.events).length" class="flex border-b ui-border bg-(--ui-surface-muted) shrink-0">
-            <div class="w-[52px] border-r ui-border px-1.5 py-1 text-[10px] ui-text-soft text-right flex items-center justify-end shrink-0">All day</div>
+          <div
+            v-if="getAllDayEvents(dayViewDate.events).length"
+            class="flex border-b ui-border bg-(--ui-surface-muted) shrink-0"
+          >
+            <div class="w-[52px] border-r ui-border px-1.5 py-1 text-[10px] ui-text-soft text-right flex items-center justify-end shrink-0">
+              All day
+            </div>
             <div class="flex-1 p-1 flex flex-col gap-0.5">
               <div
                 v-for="event in getAllDayEvents(dayViewDate.events)"
@@ -434,8 +486,14 @@ export default {
           </div>
 
           <div class="flex-1 overflow-y-auto">
-            <div class="grid" style="grid-template-columns: 52px 1fr">
-              <template v-for="slot in timeSlots" :key="slot.time">
+            <div
+              class="grid"
+              style="grid-template-columns: 52px 1fr"
+            >
+              <template
+                v-for="slot in timeSlots"
+                :key="slot.time"
+              >
                 <div class="h-14 border-b border-r border-(--ui-border) px-1.5 pt-1 text-[10px] ui-text-soft text-right leading-none">
                   {{ slot.display }}
                 </div>
@@ -451,41 +509,67 @@ export default {
                     @click="selectEvent(event, dayViewDate)"
                   >
                     <span class="font-semibold mr-1">{{ event.time }}</span>{{ event.title }}
-                    <div v-if="event.description" class="text-[10px] opacity-75 mt-0.5 truncate">{{ event.description }}</div>
+                    <div
+                      v-if="event.description"
+                      class="text-[10px] opacity-75 mt-0.5 truncate"
+                    >
+                      {{ event.description }}
+                    </div>
                   </div>
                 </div>
               </template>
             </div>
           </div>
         </template>
-
       </div>
 
       <!-- ── Sidebar ── -->
-      <slot name="sidebar" :selected-event="selectedEvent" :close-event="closeEvent">
+      <slot
+        name="sidebar"
+        :selected-event="selectedEvent"
+        :close-event="closeEvent"
+      >
         <transition
           enter-active-class="transition-all duration-200 ease-out"
           leave-active-class="transition-all duration-200 ease-in"
           enter-from-class="opacity-0 translate-x-4"
           leave-to-class="opacity-0 translate-x-4"
         >
-          <div v-if="selectedEvent" class="w-64 shrink-0 border-l ui-border bg-(--ui-surface-muted) flex flex-col overflow-hidden">
+          <div
+            v-if="selectedEvent"
+            class="w-64 shrink-0 border-l ui-border bg-(--ui-surface-muted) flex flex-col overflow-hidden"
+          >
             <div class="flex items-center justify-between px-4 py-3 border-b ui-border">
               <span class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">Event details</span>
               <button
                 class="w-6 h-6 flex items-center justify-center rounded ui-text-soft hover:bg-(--ui-surface-soft) hover:text-(--ui-text) transition-colors"
                 @click="closeEvent"
               >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             <div class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
-              <div class="h-0.5 w-full rounded-full" :class="getColorStripClass(selectedEvent.color)" />
+              <div
+                class="h-0.5 w-full rounded-full"
+                :class="getColorStripClass(selectedEvent.color)"
+              />
 
-              <h3 class="text-sm font-semibold ui-text leading-snug">{{ selectedEvent.title }}</h3>
+              <h3 class="text-sm font-semibold ui-text leading-snug">
+                {{ selectedEvent.title }}
+              </h3>
 
               <div v-if="selectedEvent.status">
                 <span
@@ -498,28 +582,85 @@ export default {
 
               <div class="flex flex-col gap-1.5">
                 <div class="flex items-center gap-2 text-xs ui-text-muted">
-                  <svg class="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  <svg
+                    class="w-3.5 h-3.5 shrink-0 opacity-60"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                    /><line
+                      x1="16"
+                      y1="2"
+                      x2="16"
+                      y2="6"
+                    /><line
+                      x1="8"
+                      y1="2"
+                      x2="8"
+                      y2="6"
+                    /><line
+                      x1="3"
+                      y1="10"
+                      x2="21"
+                      y2="10"
+                    />
                   </svg>
                   {{ formatEventDate(selectedEvent.date, 'full') }}
                 </div>
                 <div class="flex items-center gap-2 text-xs ui-text-muted">
-                  <svg class="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  <svg
+                    class="w-3.5 h-3.5 shrink-0 opacity-60"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                    /><polyline points="12 6 12 12 16 14" />
                   </svg>
                   {{ selectedEvent.time }}
                 </div>
               </div>
 
-              <div v-if="selectedEvent.description" class="pt-3 border-t ui-border">
-                <p class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">Description</p>
-                <p class="text-xs ui-text-muted leading-relaxed">{{ selectedEvent.description }}</p>
+              <div
+                v-if="selectedEvent.description"
+                class="pt-3 border-t ui-border"
+              >
+                <p class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">
+                  Description
+                </p>
+                <p class="text-xs ui-text-muted leading-relaxed">
+                  {{ selectedEvent.description }}
+                </p>
               </div>
 
-              <div v-if="selectedEvent.compliance" class="pt-3 border-t ui-border flex flex-col gap-2">
-                <p class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">Compliance</p>
-                <p v-if="selectedEvent.compliance.remarks" class="text-xs ui-text-muted">{{ selectedEvent.compliance.remarks }}</p>
-                <p v-if="selectedEvent.compliance.compliance_documents?.length" class="text-xs ui-text-muted">
+              <div
+                v-if="selectedEvent.compliance"
+                class="pt-3 border-t ui-border flex flex-col gap-2"
+              >
+                <p class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">
+                  Compliance
+                </p>
+                <p
+                  v-if="selectedEvent.compliance.remarks"
+                  class="text-xs ui-text-muted"
+                >
+                  {{ selectedEvent.compliance.remarks }}
+                </p>
+                <p
+                  v-if="selectedEvent.compliance.compliance_documents?.length"
+                  class="text-xs ui-text-muted"
+                >
                   {{ selectedEvent.compliance.compliance_documents.length }} document(s) attached
                 </p>
               </div>
@@ -527,7 +668,6 @@ export default {
           </div>
         </transition>
       </slot>
-
     </div>
   </div>
 </template>

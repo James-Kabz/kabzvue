@@ -13,7 +13,7 @@ const props = defineProps({
   profileMenuItems: { type: Array, required: true },
   mobileOpen: { type: Boolean, default: false },
   currentCompany: { type: Object, default: null },
-  companyLogo: { type: String, default: '' },
+  companyLogo: { type: String, default: 'dist/logo.png' },
   currentCompanyLogo: { type: String, default: '' },
   companyLogos: { type: Object, default: () => ({}) },
   companies: { type: Array, default: () => [] },
@@ -24,6 +24,7 @@ const props = defineProps({
   showCompanyInfo: { type: Boolean, default: true },
   showUserDetails: { type: Boolean, default: true },
   showHeaderLogo: { type: Boolean, default: true },
+  logoUrl: { type: String, default: 'dist/applogo.png' },
   headerLogo: { type: String, default: 'dist/logo.png' },
   searchPlaceholder: { type: String, default: 'Search...' },
   notificationsTitle: { type: String, default: 'Notifications' },
@@ -139,38 +140,6 @@ const sourceCurrentCompany = computed(() => props.currentCompany)
 const sourceCompanies = computed(() => (Array.isArray(props.companies) ? props.companies : []))
 const normalizedCurrentCompany = computed(() => normalizeCompany(sourceCurrentCompany.value))
 const normalizedCompanies = computed(() => sourceCompanies.value.map(normalizeCompany).filter(Boolean))
-
-const userRoleNames = computed(() => {
-  if (props.userRoleDisplayOverride) return props.userRoleDisplayOverride
-
-  const roles = []
-
-  if (props.activeRoles?.length > 0) {
-    roles.push(...props.activeRoles.map(role => (typeof role === 'string' ? role : role.name)))
-  }
-
-  if (roles.length === 0 && props.user?.roles?.length > 0) {
-    roles.push(...props.user.roles.map(role => (typeof role === 'string' ? role : role.name)))
-  }
-
-  if (roles.length === 0 && normalizedCurrentCompany.value?.__role) {
-    roles.push(normalizedCurrentCompany.value.__role)
-  }
-
-  if (roles.length === 0) return 'Member'
-
-  return roles
-    .map(role => role.charAt(0).toUpperCase() + role.slice(1).replace(/-/g, ' '))
-    .join(', ')
-})
-
-const formattedActiveRoles = computed(() => {
-  if (!props.activeRoles || props.activeRoles.length === 0) return ''
-  return props.activeRoles
-    .map(role => (typeof role === 'string' ? role : role.name))
-    .map(role => role.charAt(0).toUpperCase() + role.slice(1).replace(/-/g, ' '))
-    .join(', ')
-})
 
 const toggleNotifications = () => {
   showNotificationsDropdown.value = !showNotificationsDropdown.value
@@ -339,7 +308,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
     )"
     :style="{ left: '0' }"
   >
-    <div class="flex items-center justify-between h-16 sm:h-18 px-3 sm:px-4 md:px-6">
+    <div class="relative flex items-center justify-between h-20 sm:h-24 px-3 sm:px-4 md:px-6">
       <!-- Left side - Company & Page Info -->
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
         <!-- Mobile Sidebar Toggle - Moved to far left -->
@@ -354,73 +323,45 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           />
         </button>
 
-        <!-- Company Logo (Software Provider) -->
+        <!-- Logged-in Company Logo -->
         <div
-          v-if="companyLogo && showHeaderLogo"
+          v-if="resolvedCurrentCompanyLogo"
           class="shrink-0"
         >
           <img
-            :src="companyLogo"
+            :src="resolvedCurrentCompanyLogo"
             alt="Company logo"
-            class="w-9 h-9 sm:w-11 sm:h-11 object-contain rounded-xl bg-(--ui-surface) p-1 border ui-border-strong shadow-md"
+            class="h-16 sm:h-30 md:h-30 w-auto object-contain"
           >
         </div>
 
         <!-- Divider -->
         <div
-          v-if="companyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
-          class="h-6 sm:h-8 w-px ui-border-strong-bg shrink-0 hidden sm:block"
+          v-if="resolvedCurrentCompanyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
+          class="h-5 sm:h-18 w-px ui-border-strong-bg shrink-0 hidden sm:block"
         />
 
         <!-- Company Info Card - Simplified for mobile -->
         <div
           v-if="resolvedShowCompanyInfo && normalizedCurrentCompany"
-          class="shrink-0 ui-surface border ui-border-strong px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-(--ui-surface-muted) transition-colors max-w-44 sm:max-w-md"
+          class="shrink-0 ui-surface border ui-border-strong px-1 sm:px-1 py-1 sm:py-3 rounded-lg shadow-sm flex items-center gap-1 relative hover:bg-(--ui-surface-muted) transition-colors max-w-36 sm:max-w-52"
         >
-          <!-- Company Logo - Smaller on all screens -->
-          <div
-            v-if="resolvedCurrentCompanyLogo"
-            class="shrink-0"
-          >
-            <div class="relative">
-              <img
-                :src="resolvedCurrentCompanyLogo"
-                :alt="`${normalizedCurrentCompany.__name} ${entityLabelLower} logo`"
-                class="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-lg ui-bg p-1 border-2 border-(--ui-primary-soft) shadow-md"
-              >
-              <!-- Online indicator - smaller -->
-              <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 ui-success-bg border-2 ui-border-surface rounded-full" />
-            </div>
-          </div>
-
           <!-- Company Details with Switcher -->
           <button
             v-if="normalizedCompanies.length > 1"
-            class="flex items-center gap-2 sm:gap-3 w-52 sm:w-60 cursor-pointer hover:bg-[color:color-mix(in oklab, var(--ui-surface-muted), transparent 35%)] rounded-md px-1.5 py-1 transition-all group"
+            class="flex items-center gap-1.5 sm:gap-2 w-32 sm:w-40 cursor-pointer hover:bg-[color:color-mix(in oklab, var(--ui-surface-muted), transparent 35%)] rounded-md px-1 py-0.5 transition-all group"
             @click="toggleCompanyDropdown"
           >
             <div class="flex-1 min-w-0">
               <p
-                class="text-sm font-semibold ui-text truncate group-hover:text-(--ui-primary) leading-tight"
+                class="text-xs sm:text-xl font-semibold ui-text truncate group-hover:text-(--ui-primary) leading-tight"
               >
                 {{ normalizedCurrentCompany.__name }}
               </p>
-              <div class="flex items-center gap-1.5">
-                <Icon
-                  icon="user"
-                  class="w-3.5 h-3.5 ui-primary shrink-0"
-                />
-                <p
-                  v-if="formattedActiveRoles"
-                  class="text-xs sm:text-sm ui-primary truncate font-medium leading-tight"
-                >
-                  {{ formattedActiveRoles }}
-                </p>
-              </div>
             </div>
             <Icon
               icon="chevron-down"
-              class="w-4 h-4 ui-primary shrink-0 group-hover:text-(--ui-primary) transition-transform"
+              class="w-3.5 h-3.5 ui-primary shrink-0 group-hover:text-(--ui-primary) transition-transform"
               :class="{ 'rotate-180': showCompanyDropdown }"
             />
           </button>
@@ -430,21 +371,9 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             v-else
             class="min-w-0 flex-1"
           >
-            <p class="text-xs font-bold ui-primary truncate max-w-[100px] sm:max-w-40 leading-tight">
+            <p class="text-xs sm:text-sm font-semibold ui-text truncate max-w-[88px] sm:max-w-32 leading-tight">
               {{ normalizedCurrentCompany.__name }}
             </p>
-            <div class="flex items-center gap-1 mt-0.5">
-              <Icon
-                icon="user"
-                class="w-2.5 h-2.5 ui-primary shrink-0"
-              />
-              <p
-                v-if="formattedActiveRoles"
-                class="text-[10px] sm:text-xs ui-primary truncate font-medium leading-tight"
-              >
-                {{ formattedActiveRoles }}
-              </p>
-            </div>
           </div>
 
           <!-- Company Dropdown - Same as before but positioned better -->
@@ -524,19 +453,17 @@ watch(searchQuery, (newValue) => emit('search', newValue))
             </div>
           </transition>
         </div>
+      </div>
 
-        <!-- Breadcrumb - Hidden on mobile -->
-        <nav
-          v-if="showBreadcrumb"
-          class="hidden lg:flex items-center gap-2 text-sm truncate"
+      <div
+        v-if="showHeaderLogo && (logoUrl || headerLogo)"
+        class="pointer-events-none absolute left-1/2 -translate-x-1/2"
+      >
+        <img
+          :src="logoUrl || headerLogo"
+          alt="App logo"
+          class="h-16 sm:h-40 md:h-40 mt-4 w-auto object-contain"
         >
-          <span class="ui-text-muted truncate">{{ currentSection }}</span>
-          <Icon
-            icon="chevron-right"
-            class="w-3.5 h-3.5 ui-text-soft shrink-0"
-          />
-          <span class="ui-text font-semibold truncate">{{ currentPage }}</span>
-        </nav>
       </div>
 
       <!-- Right side - Actions -->
@@ -859,24 +786,21 @@ watch(searchQuery, (newValue) => emit('search', newValue))
         <!-- Profile Dropdown -->
         <div class="relative">
           <button
-            class="shrink-0 ui-surface border ui-border-strong px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 sm:gap-3 relative hover:bg-(--ui-surface-muted) transition-colors max-w-44 sm:max-w-md"
+            class="shrink-0 ui-surface border ui-border-strong px-2.5 sm:px-3 py-1.5 sm:py-3 rounded-xl shadow-sm flex items-center gap-2 sm:gap-3 relative hover:bg-(--ui-surface-muted) transition-colors max-w-44 sm:max-w-md"
             @click="toggleProfile"
           >
             <div
               class="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center transition-colors shadow-sm"
             >
-              <span class="ui-primary text-xs sm:text-sm font-semibold">{{ userInitials }}</span>
+              <span class="ui-primary text-xs sm:text-lg font-semibold">{{ userInitials }}</span>
             </div>
             <!-- Hide details on mobile or when showUserDetails is false -->
             <div
               v-if="showUserDetails"
               class="hidden md:block text-left max-w-40 min-w-0"
             >
-              <p class="text-sm font-bold ui-text truncate leading-tight">
+              <p class="text-lg font-bold ui-text truncate leading-tight">
                 {{ user.name }}
-              </p>
-              <p class="text-sm ui-primary font-bold truncate leading-tight">
-                {{ userRoleNames }}
               </p>
             </div>
             <Icon

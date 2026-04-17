@@ -176,6 +176,7 @@ const handleAddUser = ({ formData }) => {
           :show-date-filter="false"
           :show-export="true"
           :show-add="true"
+          :show-search="false"
           :add-button="addButtonConfig"
           search-placeholder="Search users"
           @export="() => {}"
@@ -193,8 +194,12 @@ const handleAddUser = ({ formData }) => {
           :show-density-toggle="true"
           :show-column-toggle="false"
           :show-refresh="false"
+          :show-search="true"
+          :search-query="searchQuery"
+          search-placeholder="Search users"
           :show-table-info="true"
           @update:density="(value) => (density = value)"
+          @update:search-query="(value) => (searchQuery = value)"
           @toggle-column="handleToggleColumn"
         />
 

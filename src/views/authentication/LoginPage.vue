@@ -79,7 +79,7 @@ const onSubmit = async ({ formData }) => {
       @submit="onSubmit"
     />
 
-    <div class="pt-2 text-right">
+    <div class="flex justify-end pt-2">
       <Link
         href="/auth/forgot-password"
         class="text-[13px]"

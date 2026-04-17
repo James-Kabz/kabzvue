@@ -52,7 +52,6 @@ const isMobile = ref(false)
 const submenuOpen = ref(false)
 const currentSubmenu = ref(null)
 const searchQuery = ref('')
-const submenuPosition = ref({ top: 0, left: 0 })
 
 // Computed
 const isMobileOpen = computed(() => props.mobileOpen)
@@ -93,6 +92,12 @@ const contentMarginLeft = computed(() => {
   return props.sidebarWidth
 })
 
+const submenuDrawerStyle = computed(() => ({
+  left: `${props.sidebarWidth}px`,
+  width: '16rem',
+  maxWidth: `calc(100vw - ${props.sidebarWidth}px)`
+}))
+
 // Methods
 const handleNavigation = (item) => {
   emit('navigate', item)
@@ -115,21 +120,11 @@ const hasSubItems = (item) => {
   return item.subItems && item.subItems.length > 0
 }
 
-const handleSubmenuClick = (item, event) => {
-  const target = event?.currentTarget
-
+const handleSubmenuClick = (item) => {
   if (!submenuOpen.value || currentSubmenu.value?.name !== item.name) {
     currentSubmenu.value = item
     submenuOpen.value = true
     searchQuery.value = '' // Reset search when opening submenu
-
-    if (!isMobile.value && target) {
-      const rect = target.getBoundingClientRect()
-      submenuPosition.value = {
-        top: Math.max(15, rect.top - 60),
-        left: rect.right + 17
-      }
-    }
   } else {
     closeSubmenu()
   }
@@ -290,7 +285,7 @@ defineExpose({
 
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4">
+      <nav class="flex-1 overflow-y-auto overflow-x-hidden mt-8 p-3 sm:p-4">
         <div class="space-y-2">
           <template
             v-for="item in navigationItems"
@@ -360,7 +355,7 @@ defineExpose({
                       ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
                       : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
                   )"
-                  @click="handleSubmenuClick(item, $event)"
+                  @click="handleSubmenuClick(item)"
                 >
                   <!-- Icon Container -->
                   <div
@@ -412,23 +407,24 @@ defineExpose({
 
       <!-- Shared Submenu Dropdown -->
       <transition
-        enter-active-class="transition-all duration-200 ease-out"
-        leave-active-class="transition-all duration-150 ease-in"
-        enter-from-class="opacity-0 translate-y-1 scale-95"
-        enter-to-class="opacity-100 translate-y-0 scale-100"
-        leave-from-class="opacity-100 translate-y-0 scale-100"
-        leave-to-class="opacity-0 translate-y-1 scale-95"
+        enter-active-class="transition-transform duration-250 ease-out"
+        leave-active-class="transition-transform duration-200 ease-in"
+        enter-from-class="translate-x-full"
+        enter-to-class="translate-x-0"
+        leave-from-class="translate-x-0"
+        leave-to-class="translate-x-full"
       >
         <div
-          v-if="submenuOpen && currentSubmenu"
+          v-if="submenuOpen && currentSubmenu && (!isMobile || isMobileOpen)"
           data-submenu-dropdown
           :class="cn(
-            'ui-surface border ui-border-strong shadow-2xl rounded-xl overflow-hidden z-50',
-            isMobile
-              ? 'fixed left-4 right-4 bottom-4'
-              : 'fixed w-64'
+            'ui-surface border ui-border-strong shadow-2xl overflow-hidden z-50 fixed border-l rounded-none'
           )"
-          :style="isMobile ? undefined : { top: `${submenuPosition.top}px`, left: `${submenuPosition.left}px` }"
+          :style="{
+            ...submenuDrawerStyle,
+            top: isMobile ? '0' : '4rem',
+            height: isMobile ? '100vh' : 'calc(100vh - 4rem)'
+          }"
         >
           <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
             <p class="text-sm font-semibold ui-text">
@@ -507,21 +503,5 @@ defineExpose({
         </div>
       </transition>
     </aside>
-
-    <!-- Overlay for mobile submenus -->
-    <transition
-      enter-active-class="transition-opacity duration-300"
-      leave-active-class="transition-opacity duration-300"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div
-        v-if="submenuOpen && isMobile"
-        class="fixed inset-0 z-30 bg-black/20"
-        @click="closeAllMenus"
-      />
-    </transition>
   </div>
 </template>
