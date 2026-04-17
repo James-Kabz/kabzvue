@@ -11,11 +11,13 @@ import {
   getYear
 } from '../helpers/calendarHelper.js'
 import Icon from './Icon.vue'
+import RightDrawer from './RightDrawer.vue'
 
 export default {
   name: 'EventsCalendar',
   components: {
-    Icon
+    Icon,
+    RightDrawer
   },
   props: {
     events: {
@@ -38,6 +40,11 @@ export default {
     maxHeight: {
       type: String,
       default: ''
+    },
+    drawerSize: {
+      type: String,
+      default: 'lg',
+      validator: (value) => ['sm', 'md', 'lg', 'xl', 'full'].includes(value)
     }
   },
   emits: ['select-date', 'select-event'],
@@ -116,6 +123,14 @@ export default {
         }
       }
       return presets[this.size] || presets.default
+    },
+    isDrawerOpen: {
+      get() {
+        return !!this.selectedEvent
+      },
+      set(value) {
+        if (!value) this.closeEvent()
+      }
     },
     displayTitle() {
       if (this.viewMode === 'year') {
@@ -607,103 +622,88 @@ export default {
         :selected-event="selectedEvent"
         :close-event="closeEvent"
       >
-        <transition
-          enter-active-class="transition-all duration-200 ease-out"
-          leave-active-class="transition-all duration-200 ease-in"
-          enter-from-class="opacity-0 translate-x-4"
-          leave-to-class="opacity-0 translate-x-4"
+        <RightDrawer
+          v-model="isDrawerOpen"
+          title="Event details"
+          :size="drawerSize"
+          @close="closeEvent"
         >
           <div
             v-if="selectedEvent"
-            :class="[sizePreset.sidebarWidthClass, 'shrink-0 border-l ui-border ui-surface flex flex-col overflow-hidden']"
+            class="h-full overflow-y-auto p-4 space-y-4"
           >
-            <div class="flex items-center justify-between px-4 py-3 border-b ui-border ui-surface-muted/60">
-              <span class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">Event details</span>
-              <button
-                class="w-7 h-7 flex items-center justify-center rounded-md ui-text-soft hover:bg-(--ui-surface-soft) hover:text-(--ui-text) transition-colors"
-                @click="closeEvent"
+            <div
+              class="h-1 w-14 rounded-full"
+              :class="getColorStripClass(selectedEvent.color)"
+            />
+
+            <h3 class="text-base font-semibold ui-text leading-tight wrap-break-word">
+              {{ selectedEvent.title }}
+            </h3>
+
+            <div v-if="selectedEvent.status">
+              <span
+                class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border"
+                :class="selectedEvent.status === 'complied' ? 'ui-success-soft ui-success' : 'ui-warning-soft ui-warning'"
               >
-                <Icon
-                  icon="x"
-                  class="w-3.5 h-3.5"
-                />
-              </button>
+                {{ selectedEvent.status === 'complied' ? '✓ Complied' : '⏱ Pending' }}
+              </span>
             </div>
 
-            <div class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-              <div
-                class="h-1 w-14 rounded-full"
-                :class="getColorStripClass(selectedEvent.color)"
-              />
-
-              <h3 class="text-base font-semibold ui-text leading-tight wrap-break-word">
-                {{ selectedEvent.title }}
-              </h3>
-
-              <div v-if="selectedEvent.status">
-                <span
-                  class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border"
-                  :class="selectedEvent.status === 'complied' ? 'ui-success-soft ui-success' : 'ui-warning-soft ui-warning'"
-                >
-                  {{ selectedEvent.status === 'complied' ? '✓ Complied' : '⏱ Pending' }}
-                </span>
+            <div class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2.5">
+              <div class="text-[10px] uppercase tracking-wider ui-text-soft font-semibold">
+                Schedule
               </div>
-
-              <div class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2.5">
-                <div class="text-[10px] uppercase tracking-wider ui-text-soft font-semibold">
-                  Schedule
-                </div>
-                <div class="flex items-start gap-2 text-sm ui-text">
-                  <Icon
-                    icon="calendar-days"
-                    class="w-3.5 h-3.5 shrink-0 opacity-60"
-                  />
-                  {{ formatConsistentDate(selectedEvent.date) }}
-                </div>
-                <div class="flex items-start gap-2 text-sm ui-text">
-                  <Icon
-                    icon="clock"
-                    class="w-3.5 h-3.5 shrink-0 opacity-60"
-                  />
-                  {{ selectedEvent.time || 'All day' }}
-                </div>
+              <div class="flex items-start gap-2 text-sm ui-text">
+                <Icon
+                  icon="calendar-days"
+                  class="w-3.5 h-3.5 shrink-0 opacity-60"
+                />
+                {{ formatConsistentDate(selectedEvent.date) }}
               </div>
+              <div class="flex items-start gap-2 text-sm ui-text">
+                <Icon
+                  icon="clock"
+                  class="w-3.5 h-3.5 shrink-0 opacity-60"
+                />
+                {{ selectedEvent.time || 'All day' }}
+              </div>
+            </div>
 
-              <div
-                v-if="selectedEvent.description"
-                class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3"
+            <div
+              v-if="selectedEvent.description"
+              class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3"
+            >
+              <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">
+                Description
+              </p>
+              <p class="text-sm ui-text leading-relaxed">
+                {{ selectedEvent.description }}
+              </p>
+            </div>
+
+            <div
+              v-if="selectedEvent.compliance"
+              class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2"
+            >
+              <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft">
+                Compliance
+              </p>
+              <p
+                v-if="selectedEvent.compliance.remarks"
+                class="text-sm ui-text"
               >
-                <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">
-                  Description
-                </p>
-                <p class="text-sm ui-text leading-relaxed">
-                  {{ selectedEvent.description }}
-                </p>
-              </div>
-
-              <div
-                v-if="selectedEvent.compliance"
-                class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2"
+                {{ selectedEvent.compliance.remarks }}
+              </p>
+              <p
+                v-if="selectedEvent.compliance.compliance_documents?.length"
+                class="text-sm ui-text-muted"
               >
-                <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft">
-                  Compliance
-                </p>
-                <p
-                  v-if="selectedEvent.compliance.remarks"
-                  class="text-sm ui-text"
-                >
-                  {{ selectedEvent.compliance.remarks }}
-                </p>
-                <p
-                  v-if="selectedEvent.compliance.compliance_documents?.length"
-                  class="text-sm ui-text-muted"
-                >
-                  {{ selectedEvent.compliance.compliance_documents.length }} document(s) attached
-                </p>
-              </div>
+                {{ selectedEvent.compliance.compliance_documents.length }} document(s) attached
+              </p>
             </div>
           </div>
-        </transition>
+        </RightDrawer>
       </slot>
     </div>
   </div>
