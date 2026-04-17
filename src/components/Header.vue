@@ -331,7 +331,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           <img
             :src="resolvedCurrentCompanyLogo"
             alt="Company logo"
-            class="h-16 sm:h-30 md:h-30 w-auto object-contain"
+            class="h-16 sm:h-30 md:h-30 w-auto object-contain rounded-md"
           >
         </div>
 
