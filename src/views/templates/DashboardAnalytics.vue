@@ -19,10 +19,10 @@ const chartSources = [
 ]
 
 const weeklyLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-const weeklyScore = [32, 38, 28, 44, 49, 52, 47]
+const weeklyScore = [34, 41, 37, 46, 53, 58, 55]
 
-const barLabels = ['APAC', 'EMEA', 'LATAM', 'NA']
-const barData = [12, 19, 9, 22]
+const barLabels = ['APAC', 'EMEA', 'LATAM', 'NA', 'MEA']
+const barData = [14, 22, 11, 27, 9]
 
 const trendSummary = computed(() => {
   const recent = weeklyScore[weeklyScore.length - 1]
@@ -132,6 +132,7 @@ const trendSummary = computed(() => {
             :labels="weeklyLabels"
             :width="520"
             :height="280"
+            value-suffix="%"
           />
         </Graph>
 
@@ -143,6 +144,8 @@ const trendSummary = computed(() => {
           <BarChart
             :data="barData"
             :labels="barLabels"
+            series-label="Escalations"
+            value-suffix=""
             :width="520"
             :height="280"
           />

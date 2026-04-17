@@ -106,17 +106,20 @@ const filteredRows = computed(() => {
 })
 
 const revenueChart = {
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
   datasets: [{
-    data: [22, 25, 19, 30, 42, 38],
+    label: 'Revenue Growth %',
+    data: [18, 24, 21, 29, 36, 41, 39, 47],
     borderColor: 'var(--ui-primary)'
   }]
 }
 
 const pipelineChart = {
-  labels: ['Qualified', 'Proposal', 'Review', 'Won'],
+  labels: ['Qualified', 'Proposal', 'Review', 'Negotiation', 'Won'],
   datasets: [{
-    data: [18, 12, 8, 6]
+    label: 'Deals by Stage',
+    data: [28, 21, 16, 11, 8],
+    backgroundColor: ['#2563eb', '#0ea5e9', '#14b8a6', '#22c55e', '#f59e0b']
   }]
 }
 </script>
@@ -179,6 +182,7 @@ const pipelineChart = {
           icon="chart-line"
           chart-type="line"
           :chart-data="revenueChart"
+          :chart-options="{ valueSuffix: '%' }"
           :customization-options="[
             { id: 'points', label: 'Show Points', default: true },
             { id: 'fillArea', label: 'Fill Area', default: true }
@@ -191,7 +195,7 @@ const pipelineChart = {
           chart-type="bar"
           :chart-data="pipelineChart"
           :customization-options="[
-            { id: 'legend', label: 'Show Legend', default: false },
+            { id: 'legend', label: 'Show Legend', default: true },
             { id: 'grid', label: 'Show Grid', default: true }
           ]"
         />

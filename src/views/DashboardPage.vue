@@ -2,6 +2,8 @@
 import { ref, computed, inject } from 'vue'
 import Icon from '../components/Icon.vue'
 import Card from '../components/Card.vue'
+import LineChart from '../components/charts/LineChart.vue'
+import BarChart from '../components/charts/BarChart.vue'
 
 // Layout reference
 const layoutRef = ref(null)
@@ -79,6 +81,12 @@ const recentActivities = ref([
     time: '2 hours ago'
   }
 ])
+
+const revenueLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
+const revenueData = [18, 24, 21, 29, 35, 42, 39, 47]
+
+const userActivityLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const userActivityData = [120, 145, 132, 168, 176, 154, 162]
 
 // Computed properties to track layout state
 const sidebarCollapsed = computed(() => layoutRef.value?.sidebarCollapsed || false)
@@ -198,26 +206,16 @@ const getStatusColor = (status) => {
           </select>
         </div>
         <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center">
-          <div class="text-center">
-            <div class="w-16 h-16 ui-primary-soft rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg
-                class="w-8 h-8 ui-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-            </div>
-            <p class="ui-text">
-              Chart component would go here
-            </p>
-          </div>
+          <LineChart
+            :data="revenueData"
+            :labels="revenueLabels"
+            :width="560"
+            :height="260"
+            line-color="var(--ui-primary)"
+            value-suffix="%"
+            x-axis-label="Month"
+            y-axis-label="Revenue Growth %"
+          />
         </div>
       </Card>
 
@@ -233,26 +231,17 @@ const getStatusColor = (status) => {
           </div>
         </div>
         <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center">
-          <div class="text-center">
-            <div class="w-16 h-16 ui-success-soft rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg
-                class="w-8 h-8 ui-success"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-            </div>
-            <p class="ui-text">
-              Activity chart would go here
-            </p>
-          </div>
+          <BarChart
+            :data="userActivityData"
+            :labels="userActivityLabels"
+            :width="560"
+            :height="260"
+            :colors="['#22c55e', '#34d399', '#4ade80', '#86efac', '#16a34a', '#15803d', '#166534']"
+            series-label="Active Users"
+            value-suffix=""
+            x-axis-label="Day"
+            y-axis-label="Users"
+          />
         </div>
       </Card>
     </div>

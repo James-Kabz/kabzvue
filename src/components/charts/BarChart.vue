@@ -61,6 +61,22 @@ const props = defineProps({
   yAxisLabel: {
     type: String,
     default: ''
+  },
+  showValues: {
+    type: Boolean,
+    default: true
+  },
+  valueSuffix: {
+    type: String,
+    default: ''
+  },
+  showLegend: {
+    type: Boolean,
+    default: true
+  },
+  seriesLabel: {
+    type: String,
+    default: ''
   }
 })
 
@@ -127,8 +143,21 @@ const getBarColor = (index) => {
 
 const getYAxisLabel = (tick) => {
   const value = ((props.height - props.padding.bottom - tick) / chartHeight.value) * maxDataValue.value
-  return Math.round(value)
+  return formatValue(Math.round(value))
 }
+
+const resolvedValueSuffix = computed(() => {
+  if (props.valueSuffix) return props.valueSuffix
+  if (String(props.yAxisLabel || '').includes('%')) return '%'
+  if (props.maxValue === 100) return '%'
+  return ''
+})
+
+const formatValue = (value) => `${value}${resolvedValueSuffix.value}`
+
+const resolvedSeriesLabel = computed(() => {
+  return props.seriesLabel || props.yAxisLabel || 'Series'
+})
 
 const handleMouseEnter = (event, value, index) => {
   const label = props.labels[index] || `Item ${index + 1}`
@@ -157,6 +186,20 @@ const handleBarClick = (value, index) => {
 
 <template>
   <div class="ui-surface w-full h-full relative">
+    <div
+      v-if="showLegend"
+      class="absolute top-3 left-3 z-10 ui-surface border ui-border-strong rounded-md px-2 py-1.5"
+    >
+      <div class="flex items-center gap-2">
+        <span
+          class="w-2.5 h-2.5 rounded-sm"
+          :style="{ backgroundColor: getBarColor(0) }"
+        />
+        <span class="text-xs font-semibold ui-text">
+          {{ resolvedSeriesLabel }}
+        </span>
+      </div>
+    </div>
     <svg
       :width="width"
       :height="height"
@@ -204,35 +247,48 @@ const handleBarClick = (value, index) => {
       </defs>
 
       <g>
-        <rect
+        <g
           v-for="(value, index) in data"
-          :key="`bar-${index}`"
-          :x="getBarX(index)"
-          :y="getBarY(value)"
-          :width="barWidth"
-          :height="getBarHeight(value)"
-          :fill="`url(#barGradient-${index})`"
-          :class="barClasses"
-          rx="4"
-          @mouseenter="handleMouseEnter($event, value, index)"
-          @mouseleave="handleMouseLeave"
-          @click="handleBarClick(value, index)"
+          :key="`bar-group-${index}`"
         >
-          <animate
-            attributeName="height"
-            :from="0"
-            :to="getBarHeight(value)"
-            dur="0.8s"
-            fill="freeze"
-          />
-          <animate
-            attributeName="y"
-            :from="padding.top + chartHeight"
-            :to="getBarY(value)"
-            dur="0.8s"
-            fill="freeze"
-          />
-        </rect>
+          <rect
+            :x="getBarX(index)"
+            :y="getBarY(value)"
+            :width="barWidth"
+            :height="getBarHeight(value)"
+            :fill="`url(#barGradient-${index})`"
+            :class="barClasses"
+            rx="4"
+            @mouseenter="handleMouseEnter($event, value, index)"
+            @mouseleave="handleMouseLeave"
+            @click="handleBarClick(value, index)"
+          >
+            <animate
+              attributeName="height"
+              :from="0"
+              :to="getBarHeight(value)"
+              dur="0.8s"
+              fill="freeze"
+            />
+            <animate
+              attributeName="y"
+              :from="padding.top + chartHeight"
+              :to="getBarY(value)"
+              dur="0.8s"
+              fill="freeze"
+            />
+          </rect>
+
+          <text
+            v-if="showValues"
+            :x="getBarX(index) + barWidth / 2"
+            :y="Math.max(getBarY(value) + 18, padding.top + 16)"
+            class="fill-white text-[10px] sm:text-xs font-semibold"
+            text-anchor="middle"
+          >
+            {{ formatValue(value) }}
+          </text>
+        </g>
       </g>
 
       <!-- X-axis labels -->
@@ -331,7 +387,7 @@ const handleBarClick = (value, index) => {
           </p>
         </div>
         <div class="ml-5">
-          <span class="text-2xl font-bold">{{ tooltip.value }}%</span>
+          <span class="text-2xl font-bold">{{ formatValue(tooltip.value) }}</span>
         </div>
         <!-- Tooltip arrow -->
         <div

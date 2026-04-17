@@ -42,6 +42,10 @@ const props = defineProps({
         type: Boolean,
         default: true
     },
+    valueSuffix: {
+        type: String,
+        default: ''
+    },
     showLegend: {
         type: Boolean,
         default: true
@@ -281,6 +285,8 @@ const handleSliceClick = (slice, index) => {
         percentage: slice.percentage
     })
 }
+
+const formatValue = (value) => `${value}${props.valueSuffix}`
 </script>
 
 <template>
@@ -360,7 +366,7 @@ const handleSliceClick = (slice, index) => {
           text-anchor="middle"
           dominant-baseline="middle"
         >
-          {{ totalValue }}
+          {{ formatValue(totalValue) }}
         </text>
         <text
           :x="centerX"
@@ -384,7 +390,7 @@ const handleSliceClick = (slice, index) => {
           text-anchor="middle"
           dominant-baseline="middle"
         >
-          {{ showPercentages ? `${slice.percentage}%` : slice.value }}
+          {{ showPercentages ? `${slice.percentage}%` : formatValue(slice.value) }}
         </text>
       </g>
 
@@ -436,8 +442,7 @@ const handleSliceClick = (slice, index) => {
           </p>
         </div>
         <div class="flex items-baseline gap-2 ml-5">
-          <span class="text-2xl font-bold">{{ tooltip.value }}</span>
-          <span class="text-xs ui-text">tasks</span>
+          <span class="text-2xl font-bold">{{ formatValue(tooltip.value) }}</span>
         </div>
         <div class="mt-1 ml-5">
           <span class="text-xs ui-text">{{ tooltip.percentage }}% of total</span>

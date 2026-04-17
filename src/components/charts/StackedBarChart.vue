@@ -66,6 +66,22 @@ const props = defineProps({
   yAxisLabel: {
     type: String,
     default: ''
+  },
+  showValues: {
+    type: Boolean,
+    default: true
+  },
+  valueSuffix: {
+    type: String,
+    default: ''
+  },
+  showLegend: {
+    type: Boolean,
+    default: true
+  },
+  legendLabels: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -144,12 +160,29 @@ const getBarColor = (barIndex) => {
 
 const getYAxisLabel = (tick) => {
   const value = ((props.height - props.padding.bottom - tick) / chartHeight.value) * props.maxValue
-  return Math.round(value)
+  return formatValue(Math.round(value))
 }
 
 const formatBarLabel = (key) => {
   return key.charAt(0).toUpperCase() + key.slice(1)
 }
+
+const resolvedValueSuffix = computed(() => {
+  if (props.valueSuffix) return props.valueSuffix
+  if (String(props.yAxisLabel || '').includes('%')) return '%'
+  if (props.maxValue === 100) return '%'
+  return ''
+})
+
+const formatValue = (value) => `${value}${resolvedValueSuffix.value}`
+
+const resolvedLegendItems = computed(() => {
+  return props.groupKeys.map((key, index) => ({
+    key,
+    color: getBarColor(index),
+    label: props.legendLabels[index] || formatBarLabel(key)
+  }))
+})
 
 const handleMouseEnter = (event, dataIndex, barIndex) => {
   const item = props.data[dataIndex]
@@ -187,6 +220,26 @@ const handleBarClick = (dataIndex, barIndex) => {
 
 <template>
   <div class="w-full h-full relative">
+    <div
+      v-if="showLegend"
+      class="absolute top-3 left-3 z-10 ui-surface border ui-border-strong rounded-md px-2.5 py-2"
+    >
+      <div class="flex items-center gap-3 flex-wrap">
+        <div
+          v-for="item in resolvedLegendItems"
+          :key="`legend-${item.key}`"
+          class="flex items-center gap-1.5"
+        >
+          <span
+            class="w-2.5 h-2.5 rounded-sm"
+            :style="{ backgroundColor: item.color }"
+          />
+          <span class="text-xs font-semibold ui-text">
+            {{ item.label }}
+          </span>
+        </div>
+      </div>
+    </div>
     <svg
       :width="width"
       :height="height"
@@ -270,6 +323,17 @@ const handleBarClick = (dataIndex, barIndex) => {
               fill="freeze"
             />
           </rect>
+          <text
+            v-for="(key, barIndex) in groupKeys"
+            v-if="showValues"
+            :key="`bar-value-${dataIndex}-${barIndex}`"
+            :x="getBarX(dataIndex, barIndex) + barWidth / 2"
+            :y="Math.max(getBarY(item[key] || 0) + 18, padding.top + 16)"
+            class="fill-white text-[10px] font-semibold"
+            text-anchor="middle"
+          >
+            {{ formatValue(item[key] || 0) }}
+          </text>
         </g>
       </g>
 
@@ -372,7 +436,7 @@ const handleBarClick = (dataIndex, barIndex) => {
           <p class="text-xs ui-text mb-1">
             {{ tooltip.barLabel }}
           </p>
-          <span class="text-2xl font-bold">{{ tooltip.value }}%</span>
+          <span class="text-2xl font-bold">{{ formatValue(tooltip.value) }}</span>
         </div>
         <!-- Tooltip arrow -->
         <div

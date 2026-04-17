@@ -174,6 +174,7 @@ const chartComponentProps = computed(() => {
     labels: chartLabels.slice(0, validData.length),
     width: chartWidth,
     height: chartHeight,
+    seriesLabel: props.chartData.datasets?.[0]?.label || props.title,
     ...props.chartOptions
   }
 

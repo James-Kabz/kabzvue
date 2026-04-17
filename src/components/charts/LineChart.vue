@@ -47,6 +47,20 @@
         />
       </g>
 
+      <!-- Value labels -->
+      <g v-if="showValues">
+        <text
+          v-for="(point, index) in dataPoints"
+          :key="`value-${index}`"
+          :x="point.x"
+          :y="point.y - 10"
+          class="fill-(--ui-text) text-[10px] font-semibold"
+          text-anchor="middle"
+        >
+          {{ formatValue(point.value) }}
+        </text>
+      </g>
+
       <!-- Area fill -->
       <path
         v-if="fillArea"
@@ -150,6 +164,14 @@ const props = defineProps({
   showPoints: {
     type: Boolean,
     default: true
+  },
+  showValues: {
+    type: Boolean,
+    default: true
+  },
+  valueSuffix: {
+    type: String,
+    default: ''
   },
   fillArea: {
     type: Boolean,
@@ -358,14 +380,16 @@ const getPointY = (value) => {
 const getYAxisLabel = (tick) => {
   const chartHeight = props.height - props.padding.top - props.padding.bottom
   const value = ((props.height - props.padding.bottom - tick) / chartHeight) * maxDataValue.value
-  return Math.round(value)
+  return formatValue(Math.round(value))
 }
+
+const formatValue = (value) => `${value}${props.valueSuffix}`
 
 const handleMouseEnter = (point, index) => {
   const label = props.labels[index] || `Point ${index + 1}`
   const value = Number(point.value)
   const displayValue = Number.isFinite(value) ? value.toLocaleString() : String(point.value ?? 0)
-  const content = `${label}: ${displayValue}`
+  const content = `${label}: ${formatValue(displayValue)}`
   const width = Math.min(280, Math.max(120, content.length * 7.2 + 20))
 
   tooltip.value = {
