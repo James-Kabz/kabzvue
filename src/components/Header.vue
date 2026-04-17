@@ -13,7 +13,7 @@ const props = defineProps({
   profileMenuItems: { type: Array, required: true },
   mobileOpen: { type: Boolean, default: false },
   currentCompany: { type: Object, default: null },
-  companyLogo: { type: String, default: 'dist/logo.png' },
+  companyLogo: { type: String, default: '/logo.png' },
   currentCompanyLogo: { type: String, default: '' },
   companyLogos: { type: Object, default: () => ({}) },
   companies: { type: Array, default: () => [] },
@@ -24,9 +24,9 @@ const props = defineProps({
   showCompanyInfo: { type: Boolean, default: true },
   showUserDetails: { type: Boolean, default: true },
   showHeaderLogo: { type: Boolean, default: true },
-  logoUrl: { type: String, default: 'dist/applogo.png' },
-  headerLogo: { type: String, default: 'dist/logo.png' },
-  companyLogoClass: { type: String, default: 'h-16 sm:h-32 md:h-32' },
+  logoUrl: { type: String, default: '/applogo.png' },
+  headerLogo: { type: String, default: '/logo.png' },
+  companyLogoClass: { type: String, default: 'h-16 sm:h-22 md:h-22' },
   searchPlaceholder: { type: String, default: 'Search...' },
   notificationsTitle: { type: String, default: 'Notifications' },
   companySwitcherTitle: { type: String, default: 'Switch Company' },
@@ -285,7 +285,10 @@ const getCompanyLogoUrl = (company) => {
 
 const resolvedCurrentCompanyLogo = computed(() => {
   if (props.currentCompanyLogo) return props.currentCompanyLogo
-  return getCompanyLogoUrl(normalizedCurrentCompany.value)
+  const mappedLogo = getCompanyLogoUrl(normalizedCurrentCompany.value)
+  if (mappedLogo) return mappedLogo
+  if (props.companyLogo) return props.companyLogo
+  return '/logo.png'
 })
 
 onMounted(() => {
@@ -330,9 +333,10 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           class="shrink-0"
         >
           <img
-            :src="resolvedCurrentCompanyLogo || 'dist/logo.png'"
+            :src="resolvedCurrentCompanyLogo || '/logo.png'"
             alt="Company logo"
             :class="cn(props.companyLogoClass, 'w-auto object-contain rounded-2xl')"
+            @error="(e) => { e.target.src = '/logo.png' }"
           >
         </div>
 
@@ -422,6 +426,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
                       :src="getCompanyLogoUrl(company)"
                       :alt="`${company.__name} ${entityLabelLower} logo`"
                       class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-lg ui-surface p-0.5 sm:p-1 border ui-border-strong group-hover:border-(--ui-primary-soft) transition-colors"
+                      @error="(e) => { e.target.src = '/logo.png' }"
                     >
                   </div>
                   <div
@@ -464,6 +469,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           :src="logoUrl || headerLogo"
           alt="App logo"
           class="h-16 sm:h-32 md:h-32 mt-4 w-auto object-contain"
+          @error="(e) => { e.target.src = '/applogo.png' }"
         >
       </div>
 

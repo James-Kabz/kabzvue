@@ -4,6 +4,7 @@ import Icon from '../components/Icon.vue'
 import Card from '../components/Card.vue'
 import LineChart from '../components/charts/LineChart.vue'
 import BarChart from '../components/charts/BarChart.vue'
+import StackedBarChart from '../components/charts/StackedBarChart.vue'
 
 // Layout reference
 const layoutRef = ref(null)
@@ -87,6 +88,14 @@ const revenueData = [18, 24, 21, 29, 35, 42, 39, 47]
 
 const userActivityLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const userActivityData = [120, 145, 132, 168, 176, 154, 162]
+const riskStatusLabels = ['Risk']
+const riskStatusData = [
+  {
+    open: 78,
+    inProgress: 0,
+    mitigated: 0
+  }
+]
 
 // Computed properties to track layout state
 const sidebarCollapsed = computed(() => layoutRef.value?.sidebarCollapsed || false)
@@ -245,6 +254,30 @@ const getStatusColor = (status) => {
         </div>
       </Card>
     </div>
+
+    <!-- Zero value demonstration -->
+    <Card variant="elevated">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold ui-text">
+          Risk Status (0% Visibility Demo)
+        </h3>
+        <span class="text-sm ui-text">Only one status has value</span>
+      </div>
+      <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center p-2">
+        <StackedBarChart
+          :data="riskStatusData"
+          :labels="riskStatusLabels"
+          :width="560"
+          :height="260"
+          :colors="['#ef4444', '#f59e0b', '#22c55e']"
+          :group-keys="['open', 'inProgress', 'mitigated']"
+          :legend-labels="['Open', 'In Progress', 'Mitigated']"
+          :max-value="100"
+          value-suffix="%"
+          y-axis-label="Percentage (%)"
+        />
+      </div>
+    </Card>
 
     <!-- Recent Activity Table -->
     <Card variant="elevated">
