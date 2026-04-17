@@ -55,8 +55,14 @@ export default {
       default: () => ([
         { label: 'Date', path: 'date', type: 'date' },
         { label: 'End Date', path: 'end_date', type: 'date' },
-        { label: 'Code', path: 'details.code' },
-        { label: 'Company', path: 'details.company_name' }
+        { label: 'Code', paths: ['details.code', 'compliance.code'] },
+        { label: 'Company', paths: ['details.company_name', 'compliance.company_name'] },
+        { label: 'Regulatory Body', paths: ['details.body', 'compliance.body'] },
+        { label: 'Body Code', paths: ['details.body_code', 'compliance.body_code'] },
+        { label: 'Serial Number', paths: ['details.serial_number', 'compliance.serial_number'] },
+        { label: 'Frequency', paths: ['details.frequency', 'compliance.frequency'] },
+        { label: 'Due Date', paths: ['details.compliance_date', 'compliance.compliance_date'], type: 'date' },
+        { label: 'Complied Date', paths: ['details.complied_date', 'compliance.complied_date'], type: 'date' }
       ])
     },
     drawerStatusMap: {
@@ -238,6 +244,19 @@ export default {
         .split('.')
         .reduce((acc, key) => (acc == null ? null : acc[key]), source)
     },
+    getDrawerFieldValue(field) {
+      if (!this.selectedEvent || !field) return null
+
+      if (Array.isArray(field.paths)) {
+        for (const candidate of field.paths) {
+          const value = this.getNestedValue(this.selectedEvent, candidate)
+          if (value != null && value !== '') return value
+        }
+        return null
+      }
+
+      return this.getNestedValue(this.selectedEvent, field.path)
+    },
     formatDrawerFieldValue(field, value) {
       if (value == null || value === '') return '-'
       if (field?.type === 'date') return this.formatConsistentDate(value)
@@ -245,7 +264,7 @@ export default {
     },
     shouldShowDrawerField(field) {
       if (!this.selectedEvent) return false
-      const value = this.getNestedValue(this.selectedEvent, field.path)
+      const value = this.getDrawerFieldValue(field)
       if (field?.showWhenEmpty) return true
       return value != null && value !== ''
     },
@@ -729,7 +748,7 @@ export default {
                   {{ field.label }}
                 </p>
                 <p class="mt-1 text-sm ui-text">
-                  {{ formatDrawerFieldValue(field, getNestedValue(selectedEvent, field.path)) }}
+                  {{ formatDrawerFieldValue(field, getDrawerFieldValue(field)) }}
                 </p>
               </div>
             </div>
