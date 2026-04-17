@@ -78,6 +78,7 @@ import Footer from "./components/Footer.vue"
 import Header from "./components/Header.vue"
 import ReusableFormModal from "./components/ReusableFormModal.vue"
 import ReusableForm from "./components/ReusableForm.vue"
+import RightDrawer from "./components/RightDrawer.vue"
 import Sidebar from "./components/Sidebar.vue"
 import Timeline from "./components/Timeline.vue"
 import TimelineItem from "./components/TimelineItem.vue"
@@ -180,6 +181,7 @@ const components = {
   Header,
   ReusableFormModal,
   ReusableForm,
+  RightDrawer,
   Sidebar,
   Timeline,
   TimelineItem,
@@ -374,6 +376,7 @@ export {
   Header,
   ReusableFormModal,
   ReusableForm,
+  RightDrawer,
   Sidebar,
   Timeline,
   TimelineItem,
