@@ -824,18 +824,16 @@ export default {
                 class="mb-2 h-1 w-full rounded-full"
                 :class="getDrawerAccentClass(selectedEvent)"
               />
-              <h4 class="text-lg font-bold leading-tight ui-text wrap-break-word">
-                {{ selectedEvent.title }}
-              </h4>
-              <div
-                v-if="showViewMoreDetails"
-                class="mt-3"
-              >
+              <div class="mt-2 flex items-start justify-between gap-3">
+                <h4 class="text-lg font-bold leading-tight ui-text wrap-break-word">
+                  {{ selectedEvent.title }}
+                </h4>
                 <button
+                  v-if="showViewMoreDetails"
                   :class="drawerViewDetailsButtonClass"
                   @click="handleViewMoreDetails"
                 >
-                  View full details
+                  Full details
                   <Icon icon="arrow-right" class="ml-1 w-3 h-3" />
                 </button>
               </div>
