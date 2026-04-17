@@ -310,7 +310,7 @@ defineExpose({
 
     <!-- Main Content -->
     <main
-      class="transition-all duration-300 ease-in-out pt-22 min-h-screen"
+      class="transition-all duration-300 ease-in-out pt-14 min-h-screen"
       :style="{ marginLeft: sidebarRef?.contentMarginLeft + 'px' }"
     >
       <div class="p-6">

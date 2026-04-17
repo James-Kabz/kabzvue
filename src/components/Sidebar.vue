@@ -285,7 +285,7 @@ defineExpose({
 
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto overflow-x-hidden mt-8 p-3 sm:p-4">
+      <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4">
         <div class="space-y-2">
           <template
             v-for="item in navigationItems"

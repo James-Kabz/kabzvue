@@ -26,7 +26,7 @@ const props = defineProps({
   showHeaderLogo: { type: Boolean, default: true },
   logoUrl: { type: String, default: 'dist/applogo.png' },
   headerLogo: { type: String, default: 'dist/logo.png' },
-  companyLogoClass: { type: String, default: 'h-16 sm:h-30 md:h-30' },
+  companyLogoClass: { type: String, default: 'h-16 sm:h-32 md:h-32' },
   searchPlaceholder: { type: String, default: 'Search...' },
   notificationsTitle: { type: String, default: 'Notifications' },
   companySwitcherTitle: { type: String, default: 'Switch Company' },
@@ -309,7 +309,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
     )"
     :style="{ left: '0' }"
   >
-    <div class="relative flex items-center justify-between h-20 sm:h-24 px-3 sm:px-4 md:px-6">
+    <div class="relative flex items-center justify-between h-20 sm:h-18 px-3 sm:px-4 md:px-6">
       <!-- Left side - Company & Page Info -->
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
         <!-- Mobile Sidebar Toggle - Moved to far left -->
@@ -330,7 +330,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           class="shrink-0"
         >
           <img
-            :src="resolvedCurrentCompanyLogo"
+            :src="resolvedCurrentCompanyLogo || 'dist/logo.png'"
             alt="Company logo"
             :class="cn(props.companyLogoClass, 'w-auto object-contain rounded-2xl')"
           >
@@ -463,7 +463,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
         <img
           :src="logoUrl || headerLogo"
           alt="App logo"
-          class="h-16 sm:h-40 md:h-40 mt-4 w-auto object-contain"
+          class="h-16 sm:h-32 md:h-32 mt-4 w-auto object-contain"
         >
       </div>
 

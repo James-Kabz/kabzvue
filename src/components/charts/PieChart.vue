@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const props = defineProps({
     data: {
@@ -15,12 +15,12 @@ const props = defineProps({
         default: () => ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
     },
     width: {
-        type: Number,
-        default: 400
+        type: [Number, String],
+        default: 'auto'
     },
     height: {
-        type: Number,
-        default: 300
+        type: [Number, String],
+        default: 'auto'
     },
     doughnut: {
         type: Boolean,
@@ -94,6 +94,21 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['slice-click', 'slice-hover'])
+const containerRef = ref(null)
+const containerSize = ref({ width: 0, height: 0 })
+let resizeObserver = null
+
+const resolvedWidth = computed(() => {
+    const explicit = Number(props.width)
+    if (Number.isFinite(explicit) && explicit > 0) return explicit
+    return containerSize.value.width > 0 ? containerSize.value.width : 400
+})
+
+const resolvedHeight = computed(() => {
+    const explicit = Number(props.height)
+    if (Number.isFinite(explicit) && explicit > 0) return explicit
+    return containerSize.value.height > 0 ? containerSize.value.height : 300
+})
 
 const tooltip = ref({
     visible: false,
@@ -141,19 +156,19 @@ const legendBlockHeight = computed(() => (
 
 const centerX = computed(() => {
     return props.showLegend && props.legendPosition === 'right'
-        ? props.width / 3
-        : props.width / 2
+        ? resolvedWidth.value / 3
+        : resolvedWidth.value / 2
 })
 
 const centerY = computed(() => {
-    return (props.height - legendBlockHeight.value) / 2
+    return (resolvedHeight.value - legendBlockHeight.value) / 2
 })
 
 const radius = computed(() => {
-    const availableHeight = props.height - legendBlockHeight.value
+    const availableHeight = resolvedHeight.value - legendBlockHeight.value
     const availableWidth = props.showLegend && props.legendPosition === 'right'
-        ? props.width * 0.6
-        : props.width
+        ? resolvedWidth.value * 0.6
+        : resolvedWidth.value
     return Math.max(12, Math.min(availableWidth, availableHeight) / 2 - 40)
 })
 
@@ -237,11 +252,11 @@ const getSliceColor = (index) => {
 
 const getLegendX = (index) => {
     if (props.legendPosition === 'right') {
-        return props.width * 0.65
+        return resolvedWidth.value * 0.65
     }
     const itemsPerRow = legendItemsPerRow
     const col = index % itemsPerRow
-    return props.width / 4 + col * (props.width / 2)
+    return resolvedWidth.value / 4 + col * (resolvedWidth.value / 2)
 }
 
 const getLegendY = (index) => {
@@ -250,7 +265,7 @@ const getLegendY = (index) => {
     }
     const itemsPerRow = legendItemsPerRow
     const row = Math.floor(index / itemsPerRow)
-    const legendTop = props.height - legendBlockHeight.value + 6
+    const legendTop = resolvedHeight.value - legendBlockHeight.value + 6
     return legendTop + row * legendVerticalSpacing
 }
 
@@ -287,10 +302,30 @@ const handleSliceClick = (slice, index) => {
 }
 
 const formatValue = (value) => `${value}${props.valueSuffix}`
+
+onMounted(() => {
+    resizeObserver = new ResizeObserver((entries) => {
+        const entry = entries[0]
+        if (!entry) return
+        const { width, height } = entry.contentRect
+        containerSize.value = {
+            width: Math.round(width),
+            height: Math.round(height)
+        }
+    })
+    if (containerRef.value) resizeObserver.observe(containerRef.value)
+})
+
+onBeforeUnmount(() => {
+    if (resizeObserver) resizeObserver.disconnect()
+})
 </script>
 
 <template>
-  <div class="ui-surface w-full h-full relative">
+  <div
+    ref="containerRef"
+    class="ui-surface w-full h-full relative"
+  >
     <!-- Empty State -->
     <div
       v-if="!hasValidData"
@@ -327,9 +362,9 @@ const formatValue = (value) => `${value}${props.valueSuffix}`
     <!-- Chart -->
     <svg
       v-else
-      :width="width"
-      :height="height"
-      :viewBox="`0 0 ${width} ${height}`"
+      :width="resolvedWidth"
+      :height="resolvedHeight"
+      :viewBox="`0 0 ${resolvedWidth} ${resolvedHeight}`"
       class="block mx-auto overflow-visible"
     >
       <!-- Pie slices -->

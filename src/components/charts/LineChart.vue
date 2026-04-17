@@ -1,9 +1,12 @@
 <template>
-  <div class="ui-surface w-full h-full">
+  <div
+    ref="containerRef"
+    class="ui-surface w-full h-full"
+  >
     <svg
-      :width="width"
-      :height="height"
-      :viewBox="`0 0 ${width} ${height}`"
+      :width="resolvedWidth"
+      :height="resolvedHeight"
+      :viewBox="`0 0 ${resolvedWidth} ${resolvedHeight}`"
       class="block mx-auto overflow-visible"
     >
       <!-- Grid lines -->
@@ -13,7 +16,7 @@
           :key="`grid-${tick}`"
           :x1="padding.left"
           :y1="tick"
-          :x2="width - padding.right"
+          :x2="resolvedWidth - padding.right"
           :y2="tick"
           :stroke="gridColor"
           stroke-width="1"
@@ -126,7 +129,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const props = defineProps({
   data: {
@@ -138,12 +141,12 @@ const props = defineProps({
     default: () => []
   },
   width: {
-    type: Number || String,
-    default: 400
+    type: [Number, String],
+    default: 'auto'
   },
   height: {
-    type: Number,
-    default: 300
+    type: [Number, String],
+    default: 'auto'
   },
   padding: {
     type: Object,
@@ -256,6 +259,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['point-click', 'point-hover'])
+const containerRef = ref(null)
+const containerSize = ref({ width: 0, height: 0 })
+let resizeObserver = null
 
 const tooltip = ref({
   visible: false,
@@ -266,9 +272,16 @@ const tooltip = ref({
   content: ''
 })
 
-const normalizedWidth = computed(() => {
+const resolvedWidth = computed(() => {
   const numericWidth = Number(props.width)
-  return Number.isFinite(numericWidth) ? numericWidth : 400
+  if (Number.isFinite(numericWidth) && numericWidth > 0) return numericWidth
+  return containerSize.value.width > 0 ? containerSize.value.width : 400
+})
+
+const resolvedHeight = computed(() => {
+  const numericHeight = Number(props.height)
+  if (Number.isFinite(numericHeight) && numericHeight > 0) return numericHeight
+  return containerSize.value.height > 0 ? containerSize.value.height : 300
 })
 
 // Computed properties
@@ -305,7 +318,7 @@ const areaPath = computed(() => {
     return `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
   }).join(' ')
 
-  const bottomY = props.height - props.padding.bottom
+  const bottomY = resolvedHeight.value - props.padding.bottom
   const bottomLine = `L ${dataPoints.value[dataPoints.value.length - 1].x} ${bottomY} L ${dataPoints.value[0].x} ${bottomY} Z`
 
   return line + ' ' + bottomLine
@@ -313,7 +326,7 @@ const areaPath = computed(() => {
 
 const yTicks = computed(() => {
   const ticks = []
-  const chartHeight = props.height - props.padding.top - props.padding.bottom
+  const chartHeight = resolvedHeight.value - props.padding.top - props.padding.bottom
   const numTicks = 5
 
   for (let i = 0; i <= numTicks; i++) {
@@ -325,7 +338,7 @@ const yTicks = computed(() => {
 })
 
 const availableWidth = computed(() => {
-  return normalizedWidth.value - props.padding.left - props.padding.right
+  return resolvedWidth.value - props.padding.left - props.padding.right
 })
 
 const xAxisLabelStep = computed(() => {
@@ -342,7 +355,7 @@ const shouldRotateXAxisLabels = computed(() => {
 })
 
 const xAxisLabelY = computed(() => {
-  return props.height - props.padding.bottom + (shouldRotateXAxisLabels.value ? 28 : 20)
+  return resolvedHeight.value - props.padding.bottom + (shouldRotateXAxisLabels.value ? 28 : 20)
 })
 
 const xAxisLabelAnchor = computed(() => {
@@ -351,7 +364,7 @@ const xAxisLabelAnchor = computed(() => {
 
 const tooltipBoxX = computed(() => {
   const minX = props.padding.left
-  const maxX = normalizedWidth.value - props.padding.right - tooltip.value.width
+  const maxX = resolvedWidth.value - props.padding.right - tooltip.value.width
   const targetX = tooltip.value.x - tooltip.value.width / 2
   return Math.min(Math.max(targetX, minX), Math.max(minX, maxX))
 })
@@ -372,14 +385,14 @@ const getPointX = (index) => {
 }
 
 const getPointY = (value) => {
-  const chartHeight = props.height - props.padding.top - props.padding.bottom
+  const chartHeight = resolvedHeight.value - props.padding.top - props.padding.bottom
   const scale = chartHeight / maxDataValue.value
   return props.padding.top + chartHeight - (value * scale)
 }
 
 const getYAxisLabel = (tick) => {
-  const chartHeight = props.height - props.padding.top - props.padding.bottom
-  const value = ((props.height - props.padding.bottom - tick) / chartHeight) * maxDataValue.value
+  const chartHeight = resolvedHeight.value - props.padding.top - props.padding.bottom
+  const value = ((resolvedHeight.value - props.padding.bottom - tick) / chartHeight) * maxDataValue.value
   return formatValue(Math.round(value))
 }
 
@@ -428,4 +441,21 @@ const getXAxisLabelTransform = (index) => {
   const y = xAxisLabelY.value
   return `rotate(${props.labelRotationDegrees} ${x} ${y})`
 }
+
+onMounted(() => {
+  resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0]
+    if (!entry) return
+    const { width, height } = entry.contentRect
+    containerSize.value = {
+      width: Math.round(width),
+      height: Math.round(height)
+    }
+  })
+  if (containerRef.value) resizeObserver.observe(containerRef.value)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+})
 </script>

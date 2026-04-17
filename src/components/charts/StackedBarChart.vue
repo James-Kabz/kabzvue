@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const props = defineProps({
   data: {
@@ -20,12 +20,12 @@ const props = defineProps({
     default: () => ['complied', 'uncomplied'] // Left to right order
   },
   width: {
-    type: Number,
-    default: 400
+    type: [Number, String],
+    default: 'auto'
   },
   height: {
-    type: Number,
-    default: 300
+    type: [Number, String],
+    default: 'auto'
   },
   padding: {
     type: Object,
@@ -86,6 +86,21 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['bar-click', 'bar-hover'])
+const containerRef = ref(null)
+const containerSize = ref({ width: 0, height: 0 })
+let resizeObserver = null
+
+const resolvedWidth = computed(() => {
+  const explicit = Number(props.width)
+  if (Number.isFinite(explicit) && explicit > 0) return explicit
+  return containerSize.value.width > 0 ? containerSize.value.width : 400
+})
+
+const resolvedHeight = computed(() => {
+  const explicit = Number(props.height)
+  if (Number.isFinite(explicit) && explicit > 0) return explicit
+  return containerSize.value.height > 0 ? containerSize.value.height : 300
+})
 
 const tooltip = ref({
   visible: false,
@@ -98,11 +113,11 @@ const tooltip = ref({
 })
 
 const chartHeight = computed(() => {
-  return props.height - props.padding.top - props.padding.bottom
+  return resolvedHeight.value - props.padding.top - props.padding.bottom
 })
 
 const chartWidth = computed(() => {
-  return props.width - props.padding.left - props.padding.right
+  return resolvedWidth.value - props.padding.left - props.padding.right
 })
 
 // Width for each group (all bars for one label)
@@ -158,8 +173,19 @@ const getBarColor = (barIndex) => {
   return props.colors[barIndex % props.colors.length]
 }
 
+const getBarValueLabelY = (value) => {
+  if ((Number(value) || 0) <= 0) return props.padding.top + chartHeight.value - 6
+  return Math.max(getBarY(value) + 18, props.padding.top + 16)
+}
+
+const getBarValueLabelClass = (value) => {
+  return (Number(value) || 0) <= 0
+    ? 'fill-(--ui-text) text-[10px] font-semibold'
+    : 'fill-white text-[10px] font-semibold'
+}
+
 const getYAxisLabel = (tick) => {
-  const value = ((props.height - props.padding.bottom - tick) / chartHeight.value) * props.maxValue
+  const value = ((resolvedHeight.value - props.padding.bottom - tick) / chartHeight.value) * props.maxValue
   return formatValue(Math.round(value))
 }
 
@@ -216,10 +242,30 @@ const handleBarClick = (dataIndex, barIndex) => {
 
   emit('bar-click', { dataIndex, barIndex, key, value, label })
 }
+
+onMounted(() => {
+  resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0]
+    if (!entry) return
+    const { width, height } = entry.contentRect
+    containerSize.value = {
+      width: Math.round(width),
+      height: Math.round(height)
+    }
+  })
+  if (containerRef.value) resizeObserver.observe(containerRef.value)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+})
 </script>
 
 <template>
-  <div class="w-full h-full relative">
+  <div
+    ref="containerRef"
+    class="w-full h-full relative"
+  >
     <div
       v-if="showLegend"
       class="absolute top-3 left-3 z-10 ui-surface border ui-border-strong rounded-md px-2.5 py-2"
@@ -241,9 +287,9 @@ const handleBarClick = (dataIndex, barIndex) => {
       </div>
     </div>
     <svg
-      :width="width"
-      :height="height"
-      :viewBox="`0 0 ${width} ${height}`"
+      :width="resolvedWidth"
+      :height="resolvedHeight"
+      :viewBox="`0 0 ${resolvedWidth} ${resolvedHeight}`"
       class="overflow-visible"
     >
       <!-- Grid lines -->
@@ -253,7 +299,7 @@ const handleBarClick = (dataIndex, barIndex) => {
           :key="`grid-${tick}`"
           :x1="padding.left"
           :y1="tick"
-          :x2="width - padding.right"
+          :x2="resolvedWidth - padding.right"
           :y2="tick"
           :stroke="gridColor"
           stroke-width="1"
@@ -328,8 +374,8 @@ const handleBarClick = (dataIndex, barIndex) => {
               v-for="(key, barIndex) in groupKeys"
               :key="`bar-value-${dataIndex}-${barIndex}`"
               :x="getBarX(dataIndex, barIndex) + barWidth / 2"
-              :y="Math.max(getBarY(item[key] || 0) + 18, padding.top + 16)"
-              class="fill-white text-[10px] font-semibold"
+              :y="getBarValueLabelY(item[key] || 0)"
+              :class="getBarValueLabelClass(item[key] || 0)"
               text-anchor="middle"
             >
               {{ formatValue(item[key] || 0) }}
@@ -344,7 +390,7 @@ const handleBarClick = (dataIndex, barIndex) => {
           v-for="(label, index) in labels"
           :key="`xlabel-${index}`"
           :x="getGroupX(index) + groupWidth / 2"
-          :y="height - padding.bottom + 20"
+          :y="resolvedHeight - padding.bottom + 20"
           :class="axisLabelClasses"
           text-anchor="middle"
         >
@@ -356,7 +402,7 @@ const handleBarClick = (dataIndex, barIndex) => {
       <g v-if="xAxisLabel">
         <text
           :x="padding.left + chartWidth / 2"
-          :y="height - 10"
+          :y="resolvedHeight - 10"
           class="fill-(--ui-text) text-sm font-semibold"
           text-anchor="middle"
         >
@@ -396,15 +442,15 @@ const handleBarClick = (dataIndex, barIndex) => {
         :x1="padding.left"
         :y1="padding.top"
         :x2="padding.left"
-        :y2="height - padding.bottom"
+        :y2="resolvedHeight - padding.bottom"
         stroke="#cbd5e1"
         stroke-width="2"
       />
       <line
         :x1="padding.left"
-        :y1="height - padding.bottom"
-        :x2="width - padding.right"
-        :y2="height - padding.bottom"
+        :y1="resolvedHeight - padding.bottom"
+        :x2="resolvedWidth - padding.right"
+        :y2="resolvedHeight - padding.bottom"
         stroke="#cbd5e1"
         stroke-width="2"
       />
