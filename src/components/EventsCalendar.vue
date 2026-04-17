@@ -45,6 +45,26 @@ export default {
       type: String,
       default: 'lg',
       validator: (value) => ['sm', 'md', 'lg', 'xl', 'full'].includes(value)
+    },
+    drawerTitle: {
+      type: String,
+      default: 'Compliance Details'
+    },
+    drawerDetailFields: {
+      type: Array,
+      default: () => ([
+        { label: 'Date', path: 'date', type: 'date' },
+        { label: 'End Date', path: 'end_date', type: 'date' },
+        { label: 'Code', path: 'details.code' },
+        { label: 'Company', path: 'details.company_name' }
+      ])
+    },
+    drawerStatusMap: {
+      type: Object,
+      default: () => ({
+        complied: { label: 'Complied', class: 'ui-success-soft ui-success' },
+        pending: { label: 'Pending', class: 'ui-warning-soft ui-warning' }
+      })
     }
   },
   emits: ['select-date', 'select-event'],
@@ -211,6 +231,49 @@ export default {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
       const day = String(date.getDate()).padStart(2, '0')
       return `${day}-${months[date.getMonth()]}-${date.getFullYear()}`
+    },
+    getNestedValue(source, path) {
+      if (!source || !path) return null
+      return String(path)
+        .split('.')
+        .reduce((acc, key) => (acc == null ? null : acc[key]), source)
+    },
+    formatDrawerFieldValue(field, value) {
+      if (value == null || value === '') return '-'
+      if (field?.type === 'date') return this.formatConsistentDate(value)
+      return value
+    },
+    shouldShowDrawerField(field) {
+      if (!this.selectedEvent) return false
+      const value = this.getNestedValue(this.selectedEvent, field.path)
+      if (field?.showWhenEmpty) return true
+      return value != null && value !== ''
+    },
+    getDrawerStatus(status) {
+      const normalized = String(status || 'pending').toLowerCase()
+      return this.drawerStatusMap[normalized] || this.drawerStatusMap.pending
+    },
+    getSelectedEventDetails() {
+      if (!this.selectedEvent) return {}
+      return this.selectedEvent.details || this.selectedEvent.compliance || {}
+    },
+    getSelectedEventDocuments() {
+      const details = this.getSelectedEventDetails()
+      if (Array.isArray(details.documents)) return details.documents
+      if (Array.isArray(details.compliance_documents)) return details.compliance_documents
+      return []
+    },
+    getSelectedEventDocumentsCount() {
+      const details = this.getSelectedEventDetails()
+      if (details.documents_count != null) return details.documents_count
+      return this.getSelectedEventDocuments().length
+    },
+    formatFileSize(bytes) {
+      const value = Number(bytes)
+      if (!Number.isFinite(value) || value <= 0) return '0 Bytes'
+      const sizes = ['Bytes', 'KB', 'MB', 'GB']
+      const index = Math.min(Math.floor(Math.log(value) / Math.log(1024)), sizes.length - 1)
+      return `${(value / Math.pow(1024, index)).toFixed(2)} ${sizes[index]}`
     },
     getEventsForDate(date) {
       return this.events.filter(event => event.date === date)
@@ -624,7 +687,7 @@ export default {
       >
         <RightDrawer
           v-model="isDrawerOpen"
-          title="Event details"
+          :title="drawerTitle"
           :size="drawerSize"
           @close="closeEvent"
         >
@@ -632,75 +695,106 @@ export default {
             v-if="selectedEvent"
             class="h-full overflow-y-auto p-4 space-y-4"
           >
-            <div
-              class="h-1 w-14 rounded-full"
-              :class="getColorStripClass(selectedEvent.color)"
-            />
-
-            <h3 class="text-base font-semibold ui-text leading-tight wrap-break-word">
-              {{ selectedEvent.title }}
-            </h3>
-
-            <div v-if="selectedEvent.status">
-              <span
-                class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border"
-                :class="selectedEvent.status === 'complied' ? 'ui-success-soft ui-success' : 'ui-warning-soft ui-warning'"
+            <div class="rounded-xl border ui-border bg-(--ui-surface-muted) p-4">
+              <div
+                class="mb-2 h-1 w-full rounded-full"
+                :class="getColorStripClass(selectedEvent.color)"
+              />
+              <h4 class="text-lg font-bold leading-tight ui-text wrap-break-word">
+                {{ selectedEvent.title }}
+              </h4>
+              <div
+                v-if="selectedEvent.status"
+                class="mt-3"
               >
-                {{ selectedEvent.status === 'complied' ? '✓ Complied' : '⏱ Pending' }}
-              </span>
+                <span
+                  class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                  :class="getDrawerStatus(selectedEvent.status).class"
+                >
+                  {{ getDrawerStatus(selectedEvent.status).label }}
+                </span>
+              </div>
             </div>
 
-            <div class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2.5">
-              <div class="text-[10px] uppercase tracking-wider ui-text-soft font-semibold">
-                Schedule
-              </div>
-              <div class="flex items-start gap-2 text-sm ui-text">
-                <Icon
-                  icon="calendar-days"
-                  class="w-3.5 h-3.5 shrink-0 opacity-60"
-                />
-                {{ formatConsistentDate(selectedEvent.date) }}
-              </div>
-              <div class="flex items-start gap-2 text-sm ui-text">
-                <Icon
-                  icon="clock"
-                  class="w-3.5 h-3.5 shrink-0 opacity-60"
-                />
-                {{ selectedEvent.time || 'All day' }}
+            <div
+              class="grid grid-cols-1 gap-3"
+            >
+              <div
+                v-for="(field, idx) in drawerDetailFields"
+                v-show="shouldShowDrawerField(field)"
+                :key="`${field.path}-${idx}`"
+                class="rounded-lg border ui-border bg-(--ui-surface) p-3"
+              >
+                <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
+                  {{ field.label }}
+                </p>
+                <p class="mt-1 text-sm ui-text">
+                  {{ formatDrawerFieldValue(field, getNestedValue(selectedEvent, field.path)) }}
+                </p>
               </div>
             </div>
 
             <div
               v-if="selectedEvent.description"
-              class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3"
+              class="rounded-lg border ui-border bg-(--ui-surface) p-3"
             >
-              <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">
+              <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
                 Description
               </p>
-              <p class="text-sm ui-text leading-relaxed">
+              <p class="mt-1 text-sm ui-text leading-relaxed">
                 {{ selectedEvent.description }}
               </p>
             </div>
 
             <div
-              v-if="selectedEvent.compliance"
-              class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2"
+              v-if="getSelectedEventDetails().remarks"
+              class="rounded-lg border ui-border bg-(--ui-surface) p-3"
             >
-              <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft">
-                Compliance
+              <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
+                Compliance Remarks
               </p>
-              <p
-                v-if="selectedEvent.compliance.remarks"
-                class="text-sm ui-text"
-              >
-                {{ selectedEvent.compliance.remarks }}
+              <p class="mt-1 text-sm ui-text">
+                {{ getSelectedEventDetails().remarks }}
               </p>
+            </div>
+
+            <div
+              v-if="getSelectedEventDetails()"
+              class="rounded-lg border ui-border bg-(--ui-surface) p-3"
+            >
+              <div class="mb-2 flex items-center justify-between">
+                <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft">
+                  Documents
+                </p>
+                <span class="text-xs ui-text-muted">
+                  {{ getSelectedEventDocumentsCount() }} file(s)
+                </span>
+              </div>
+
               <p
-                v-if="selectedEvent.compliance.compliance_documents?.length"
+                v-if="!getSelectedEventDocuments().length"
                 class="text-sm ui-text-muted"
               >
-                {{ selectedEvent.compliance.compliance_documents.length }} document(s) attached
+                No documents uploaded
               </p>
+
+              <div
+                v-else
+                class="space-y-2"
+              >
+                <div
+                  v-for="(doc, idx) in getSelectedEventDocuments()"
+                  :key="doc.doc_id || doc.id || doc.filename || idx"
+                  class="rounded-md border ui-border bg-(--ui-surface-muted) p-2.5"
+                >
+                  <p class="truncate text-sm font-semibold ui-text">
+                    {{ doc.filename || doc.name || 'Document' }}
+                  </p>
+                  <p class="text-xs ui-text-muted">
+                    {{ formatFileSize(doc.file_size || doc.size || 0) }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </RightDrawer>
