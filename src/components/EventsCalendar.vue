@@ -21,7 +21,8 @@ export default {
     },
     size: {
       type: String,
-      default: 'default'
+      default: 'default',
+      validator: (value) => ['compact', 'default', 'large', 'full'].includes(value)
     }
   },
   emits: ['select-date', 'select-event'],
@@ -39,6 +40,51 @@ export default {
     }
   },
   computed: {
+    sizePreset() {
+      const presets = {
+        compact: {
+          rootTextClass: 'text-xs',
+          toolbarPaddingClass: 'px-3 py-2',
+          titleClass: 'text-sm min-w-[120px]',
+          controlButtonClass: 'px-2 py-1 text-[11px]',
+          iconButtonClass: 'w-6 h-6',
+          viewButtonClass: 'px-2 py-0.5 text-[11px]',
+          monthDayCellClass: 'min-h-[72px]',
+          sidebarWidthClass: 'w-56'
+        },
+        default: {
+          rootTextClass: 'text-sm',
+          toolbarPaddingClass: 'px-4 py-2.5',
+          titleClass: 'text-base min-w-[150px]',
+          controlButtonClass: 'px-3 py-1.5 text-xs',
+          iconButtonClass: 'w-7 h-7',
+          viewButtonClass: 'px-3 py-1 text-xs',
+          monthDayCellClass: 'min-h-[92px]',
+          sidebarWidthClass: 'w-64'
+        },
+        large: {
+          rootTextClass: 'text-base',
+          toolbarPaddingClass: 'px-5 py-3',
+          titleClass: 'text-lg min-w-[180px]',
+          controlButtonClass: 'px-3.5 py-2 text-sm',
+          iconButtonClass: 'w-8 h-8',
+          viewButtonClass: 'px-3.5 py-1.5 text-sm',
+          monthDayCellClass: 'min-h-[108px]',
+          sidebarWidthClass: 'w-72'
+        },
+        full: {
+          rootTextClass: 'text-base',
+          toolbarPaddingClass: 'px-5 py-3',
+          titleClass: 'text-lg min-w-[180px]',
+          controlButtonClass: 'px-3.5 py-2 text-sm',
+          iconButtonClass: 'w-8 h-8',
+          viewButtonClass: 'px-3.5 py-1.5 text-sm',
+          monthDayCellClass: 'min-h-[116px]',
+          sidebarWidthClass: 'w-80'
+        }
+      }
+      return presets[this.size] || presets.default
+    },
     displayTitle() {
       if (this.viewMode === 'year') {
         return getYear(this.currentDate)
@@ -197,19 +243,19 @@ export default {
 </script>
 
 <template>
-  <div class="flex flex-col h-full ui-surface border ui-border rounded-xl overflow-hidden shadow-sm text-sm">
+  <div :class="['flex flex-col h-full ui-surface border ui-border rounded-xl overflow-hidden shadow-sm', sizePreset.rootTextClass]">
     <!-- ── Toolbar ── -->
-    <div class="flex items-center justify-between px-4 py-2.5 border-b ui-border ui-surface shrink-0">
+    <div :class="['flex items-center justify-between border-b ui-border ui-surface shrink-0', sizePreset.toolbarPaddingClass]">
       <div class="flex items-center gap-2">
         <button
-          class="px-3 py-1.5 text-xs font-medium border ui-border-strong rounded-md ui-text hover:bg-(--ui-surface-muted) transition-colors"
+          :class="['font-medium border ui-border-strong rounded-md ui-text hover:bg-(--ui-surface-muted) transition-colors', sizePreset.controlButtonClass]"
           @click="goToToday"
         >
           Today
         </button>
         <div class="flex">
           <button
-            class="w-7 h-7 flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors"
+            :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors', sizePreset.iconButtonClass]"
             @click="previousPeriod"
           >
             <svg
@@ -227,7 +273,7 @@ export default {
             </svg>
           </button>
           <button
-            class="w-7 h-7 flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors"
+            :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors', sizePreset.iconButtonClass]"
             @click="nextPeriod"
           >
             <svg
@@ -245,7 +291,7 @@ export default {
             </svg>
           </button>
         </div>
-        <h2 class="text-base font-semibold ui-text min-w-[150px]">
+        <h2 :class="['font-semibold ui-text', sizePreset.titleClass]">
           {{ displayTitle }}
         </h2>
       </div>
@@ -255,8 +301,11 @@ export default {
         <button
           v-for="v in ['year', 'month', 'week', 'day']"
           :key="v"
-          class="px-3 py-1 text-xs font-medium rounded-md transition-colors capitalize"
-          :class="viewMode === v ? 'ui-surface ui-text shadow-sm' : 'ui-text-muted hover:text-(--ui-text)'"
+          :class="[
+            'font-medium rounded-md transition-colors capitalize',
+            sizePreset.viewButtonClass,
+            viewMode === v ? 'ui-surface ui-text shadow-sm' : 'ui-text-muted hover:text-(--ui-text)'
+          ]"
           @click="viewMode = v"
         >
           {{ v }}
@@ -330,8 +379,9 @@ export default {
             <div
               v-for="(day, index) in calendarDays"
               :key="index"
-              class="border-r border-b ui-border p-1.5 min-h-[92px] cursor-pointer transition-colors"
               :class="[
+                'border-r border-b ui-border p-1.5 cursor-pointer transition-colors',
+                sizePreset.monthDayCellClass,
                 !day.isCurrentMonth ? 'bg-(--ui-surface-muted)' : 'ui-surface hover:bg-(--ui-surface-muted)',
                 day.isToday ? 'bg-(--ui-primary-soft) hover:bg-(--ui-primary-soft)' : '',
                 selectedDate === day.date ? 'ring-2 ring-inset ring-(--ui-primary)' : ''
@@ -537,7 +587,7 @@ export default {
         >
           <div
             v-if="selectedEvent"
-            class="w-64 shrink-0 border-l ui-border bg-(--ui-surface-muted) flex flex-col overflow-hidden"
+            :class="[sizePreset.sidebarWidthClass, 'shrink-0 border-l ui-border bg-(--ui-surface-muted) flex flex-col overflow-hidden']"
           >
             <div class="flex items-center justify-between px-4 py-3 border-b ui-border">
               <span class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">Event details</span>

@@ -26,6 +26,7 @@ const props = defineProps({
   showHeaderLogo: { type: Boolean, default: true },
   logoUrl: { type: String, default: 'dist/applogo.png' },
   headerLogo: { type: String, default: 'dist/logo.png' },
+  companyLogoClass: { type: String, default: 'h-16 sm:h-30 md:h-30' },
   searchPlaceholder: { type: String, default: 'Search...' },
   notificationsTitle: { type: String, default: 'Notifications' },
   companySwitcherTitle: { type: String, default: 'Switch Company' },
@@ -331,7 +332,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           <img
             :src="resolvedCurrentCompanyLogo"
             alt="Company logo"
-            class="h-16 sm:h-30 md:h-30 w-auto object-contain rounded-2xl"
+            :class="cn(props.companyLogoClass, 'w-auto object-contain rounded-2xl')"
           >
         </div>
 
