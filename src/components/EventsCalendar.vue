@@ -5,15 +5,18 @@ import {
   getMonthCalendarDays,
   getWeekDays,
   getWeekBounds,
-  formatEventDate,
   getTimeSlots,
   isSameDay,
   getMonthName,
   getYear
 } from '../helpers/calendarHelper.js'
+import Icon from './Icon.vue'
 
 export default {
   name: 'EventsCalendar',
+  components: {
+    Icon
+  },
   props: {
     events: {
       type: Array,
@@ -118,17 +121,10 @@ export default {
       if (this.viewMode === 'year') {
         return getYear(this.currentDate)
       } else if (this.viewMode === 'day') {
-        return formatEventDate(this.currentDate, 'full')
+        return this.formatConsistentDate(this.currentDate)
       } else if (this.viewMode === 'week') {
         const { startDate, endDate } = getWeekBounds(this.currentDate)
-        const startMonth = getMonthName(startDate, 'short')
-        const endMonth = getMonthName(endDate, 'short')
-        const year = getYear(this.currentDate)
-        if (startDate.getMonth() === endDate.getMonth()) {
-          return `${startMonth} ${startDate.getDate()} – ${endDate.getDate()}, ${year}`
-        } else {
-          return `${startMonth} ${startDate.getDate()} – ${endMonth} ${endDate.getDate()}, ${year}`
-        }
+        return `${this.formatConsistentDate(startDate)} - ${this.formatConsistentDate(endDate)}`
       } else {
         return `${getMonthName(this.currentDate)} ${getYear(this.currentDate)}`
       }
@@ -182,7 +178,25 @@ export default {
     }
   },
   methods: {
-    formatEventDate,
+    formatConsistentDate(value) {
+      if (!value) return ''
+
+      let date
+      if (value instanceof Date) {
+        date = value
+      } else if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        const [year, month, day] = value.split('-').map(Number)
+        date = new Date(year, month - 1, day)
+      } else {
+        date = new Date(value)
+      }
+
+      if (Number.isNaN(date.getTime())) return String(value)
+
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${day}-${months[date.getMonth()]}-${date.getFullYear()}`
+    },
     getEventsForDate(date) {
       return this.events.filter(event => event.date === date)
     },
@@ -290,37 +304,19 @@ export default {
             :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors', sizePreset.iconButtonClass]"
             @click="previousPeriod"
           >
-            <svg
+            <Icon
+              icon="chevron-left"
               class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            />
           </button>
           <button
             :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors', sizePreset.iconButtonClass]"
             @click="nextPeriod"
           >
-            <svg
+            <Icon
+              icon="chevron-right"
               class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+            />
           </button>
         </div>
         <h2 :class="['font-semibold ui-text', sizePreset.titleClass]">
@@ -619,129 +615,88 @@ export default {
         >
           <div
             v-if="selectedEvent"
-            :class="[sizePreset.sidebarWidthClass, 'shrink-0 border-l ui-border bg-(--ui-surface-muted) flex flex-col overflow-hidden']"
+            :class="[sizePreset.sidebarWidthClass, 'shrink-0 border-l ui-border ui-surface flex flex-col overflow-hidden']"
           >
-            <div class="flex items-center justify-between px-4 py-3 border-b ui-border">
+            <div class="flex items-center justify-between px-4 py-3 border-b ui-border ui-surface-muted/60">
               <span class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">Event details</span>
               <button
-                class="w-6 h-6 flex items-center justify-center rounded ui-text-soft hover:bg-(--ui-surface-soft) hover:text-(--ui-text) transition-colors"
+                class="w-7 h-7 flex items-center justify-center rounded-md ui-text-soft hover:bg-(--ui-surface-soft) hover:text-(--ui-text) transition-colors"
                 @click="closeEvent"
               >
-                <svg
+                <Icon
+                  icon="x"
                   class="w-3.5 h-3.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                />
               </button>
             </div>
 
-            <div class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
+            <div class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
               <div
-                class="h-0.5 w-full rounded-full"
+                class="h-1 w-14 rounded-full"
                 :class="getColorStripClass(selectedEvent.color)"
               />
 
-              <h3 class="text-sm font-semibold ui-text leading-snug">
+              <h3 class="text-base font-semibold ui-text leading-tight wrap-break-word">
                 {{ selectedEvent.title }}
               </h3>
 
               <div v-if="selectedEvent.status">
                 <span
-                  class="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full"
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border"
                   :class="selectedEvent.status === 'complied' ? 'ui-success-soft ui-success' : 'ui-warning-soft ui-warning'"
                 >
                   {{ selectedEvent.status === 'complied' ? '✓ Complied' : '⏱ Pending' }}
                 </span>
               </div>
 
-              <div class="flex flex-col gap-1.5">
-                <div class="flex items-center gap-2 text-xs ui-text-muted">
-                  <svg
-                    class="w-3.5 h-3.5 shrink-0 opacity-60"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="18"
-                      rx="2"
-                    /><line
-                      x1="16"
-                      y1="2"
-                      x2="16"
-                      y2="6"
-                    /><line
-                      x1="8"
-                      y1="2"
-                      x2="8"
-                      y2="6"
-                    /><line
-                      x1="3"
-                      y1="10"
-                      x2="21"
-                      y2="10"
-                    />
-                  </svg>
-                  {{ formatEventDate(selectedEvent.date, 'full') }}
+              <div class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2.5">
+                <div class="text-[10px] uppercase tracking-wider ui-text-soft font-semibold">
+                  Schedule
                 </div>
-                <div class="flex items-center gap-2 text-xs ui-text-muted">
-                  <svg
+                <div class="flex items-start gap-2 text-sm ui-text">
+                  <Icon
+                    icon="calendar-days"
                     class="w-3.5 h-3.5 shrink-0 opacity-60"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                    /><polyline points="12 6 12 12 16 14" />
-                  </svg>
-                  {{ selectedEvent.time }}
+                  />
+                  {{ formatConsistentDate(selectedEvent.date) }}
+                </div>
+                <div class="flex items-start gap-2 text-sm ui-text">
+                  <Icon
+                    icon="clock"
+                    class="w-3.5 h-3.5 shrink-0 opacity-60"
+                  />
+                  {{ selectedEvent.time || 'All day' }}
                 </div>
               </div>
 
               <div
                 v-if="selectedEvent.description"
-                class="pt-3 border-t ui-border"
+                class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3"
               >
-                <p class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">
+                <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft mb-1.5">
                   Description
                 </p>
-                <p class="text-xs ui-text-muted leading-relaxed">
+                <p class="text-sm ui-text leading-relaxed">
                   {{ selectedEvent.description }}
                 </p>
               </div>
 
               <div
                 v-if="selectedEvent.compliance"
-                class="pt-3 border-t ui-border flex flex-col gap-2"
+                class="rounded-xl border ui-border bg-(--ui-surface-muted) p-3 flex flex-col gap-2"
               >
-                <p class="text-[11px] font-semibold uppercase tracking-wider ui-text-soft">
+                <p class="text-[10px] font-semibold uppercase tracking-wider ui-text-soft">
                   Compliance
                 </p>
                 <p
                   v-if="selectedEvent.compliance.remarks"
-                  class="text-xs ui-text-muted"
+                  class="text-sm ui-text"
                 >
                   {{ selectedEvent.compliance.remarks }}
                 </p>
                 <p
                   v-if="selectedEvent.compliance.compliance_documents?.length"
-                  class="text-xs ui-text-muted"
+                  class="text-sm ui-text-muted"
                 >
                   {{ selectedEvent.compliance.compliance_documents.length }} document(s) attached
                 </p>
