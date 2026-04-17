@@ -22,7 +22,7 @@ export default {
     size: {
       type: String,
       default: 'default',
-      validator: (value) => ['compact', 'default', 'large', 'full'].includes(value)
+      validator: (value) => ['xs', 'compact', 'default', 'large', 'full'].includes(value)
     }
   },
   emits: ['select-date', 'select-event'],
@@ -42,6 +42,16 @@ export default {
   computed: {
     sizePreset() {
       const presets = {
+        xs: {
+          rootTextClass: 'text-[11px]',
+          toolbarPaddingClass: 'px-2.5 py-1.5',
+          titleClass: 'text-xs min-w-[100px]',
+          controlButtonClass: 'px-2 py-0.5 text-[10px]',
+          iconButtonClass: 'w-5 h-5',
+          viewButtonClass: 'px-2 py-0.5 text-[10px]',
+          monthDayCellClass: 'min-h-[60px]',
+          sidebarWidthClass: 'w-48'
+        },
         compact: {
           rootTextClass: 'text-xs',
           toolbarPaddingClass: 'px-3 py-2',
