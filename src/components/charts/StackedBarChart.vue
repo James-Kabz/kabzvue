@@ -323,17 +323,18 @@ const handleBarClick = (dataIndex, barIndex) => {
               fill="freeze"
             />
           </rect>
-          <text
-            v-for="(key, barIndex) in groupKeys"
-            v-if="showValues"
-            :key="`bar-value-${dataIndex}-${barIndex}`"
-            :x="getBarX(dataIndex, barIndex) + barWidth / 2"
-            :y="Math.max(getBarY(item[key] || 0) + 18, padding.top + 16)"
-            class="fill-white text-[10px] font-semibold"
-            text-anchor="middle"
-          >
-            {{ formatValue(item[key] || 0) }}
-          </text>
+          <g v-if="showValues">
+            <text
+              v-for="(key, barIndex) in groupKeys"
+              :key="`bar-value-${dataIndex}-${barIndex}`"
+              :x="getBarX(dataIndex, barIndex) + barWidth / 2"
+              :y="Math.max(getBarY(item[key] || 0) + 18, padding.top + 16)"
+              class="fill-white text-[10px] font-semibold"
+              text-anchor="middle"
+            >
+              {{ formatValue(item[key] || 0) }}
+            </text>
+          </g>
         </g>
       </g>
 
