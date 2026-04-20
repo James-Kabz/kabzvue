@@ -460,7 +460,7 @@ defineExpose({
             </div>
           </div>
 
-          <nav class="py-2 pb-8 flex-1 min-h-0 overflow-y-auto overscroll-contain">
+          <nav class="py-2 pb-16 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <div
               v-if="shouldShowSubmenuSearch && searchQuery && filteredSubmenuItems.length === 0"
               class="px-4 py-6 text-center"
