@@ -96,7 +96,9 @@ const contentMarginLeft = computed(() => {
 const submenuDrawerStyle = computed(() => ({
   left: `${props.sidebarWidth}px`,
   width: `${submenuWidth}px`,
-  maxWidth: `calc(100vw - ${props.sidebarWidth}px)`
+  maxWidth: `calc(100vw - ${props.sidebarWidth}px)`,
+  top: '0px',
+  height: '100vh',
 }))
 
 // Methods
@@ -418,14 +420,8 @@ defineExpose({
         <div
           v-if="submenuOpen && currentSubmenu && (!isMobile || isMobileOpen)"
           data-submenu-dropdown
-          :class="cn(
-            'ui-surface border ui-border-strong shadow-2xl overflow-hidden z-50 fixed border-l rounded-none flex flex-col'
-          )"
-          :style="{
-            ...submenuDrawerStyle,
-            top: '0',
-            height: '100vh'
-          }"
+          :class="cn('ui-surface border ui-border-strong shadow-2xl overflow-hidden z-50 fixed border-l rounded-none flex flex-col min-h-0')"
+          :style="submenuDrawerStyle"
         >
           <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
             <p class="text-sm font-semibold ui-text">
@@ -464,7 +460,7 @@ defineExpose({
             </div>
           </div>
 
-          <nav class="py-2 overflow-y-auto flex-1 min-h-0">
+          <nav class="py-2 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <div
               v-if="shouldShowSubmenuSearch && searchQuery && filteredSubmenuItems.length === 0"
               class="px-4 py-6 text-center"
@@ -480,7 +476,7 @@ defineExpose({
                 :key="subItem.name"
                 :to="subItem.route"
                 :class="cn(
-                  'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                  'mx-2 flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-colors',
                   isItemActive(subItem)
                     ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
                     : 'ui-text hover:bg-(--ui-surface-muted)'
@@ -491,7 +487,7 @@ defineExpose({
                   :icon="subItem.icon || 'circle'"
                   size="xxl"
                 />
-                <span class="truncate ">{{ subItem.label }}</span>
+                <span class="truncate text-xl">{{ subItem.label }}</span>
                 <span
                   v-if="subItem.badge"
                   class="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse"
