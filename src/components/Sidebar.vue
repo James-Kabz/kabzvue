@@ -489,9 +489,9 @@ defineExpose({
               >
                 <Icon
                   :icon="subItem.icon || 'circle'"
-                  class="w-4 h-4 shrink-0"
+                  size="xxl"
                 />
-                <span class="truncate">{{ subItem.label }}</span>
+                <span class="truncate ">{{ subItem.label }}</span>
                 <span
                   v-if="subItem.badge"
                   class="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] font-bold rounded-full ui-danger-bg ui-text-inverse"
