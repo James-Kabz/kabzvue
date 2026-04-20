@@ -52,6 +52,7 @@ const isMobile = ref(false)
 const submenuOpen = ref(false)
 const currentSubmenu = ref(null)
 const searchQuery = ref('')
+const submenuWidth = 320
 
 // Computed
 const isMobileOpen = computed(() => props.mobileOpen)
@@ -89,12 +90,12 @@ const contentMarginLeft = computed(() => {
     return 0
   }
 
-  return props.sidebarWidth
+  return props.sidebarWidth + (submenuOpen.value ? submenuWidth : 0)
 })
 
 const submenuDrawerStyle = computed(() => ({
   left: `${props.sidebarWidth}px`,
-  width: '16rem',
+  width: `${submenuWidth}px`,
   maxWidth: `calc(100vw - ${props.sidebarWidth}px)`
 }))
 
@@ -409,21 +410,21 @@ defineExpose({
       <transition
         enter-active-class="transition-transform duration-250 ease-out"
         leave-active-class="transition-transform duration-200 ease-in"
-        enter-from-class="translate-x-full"
+        enter-from-class="-translate-x-full"
         enter-to-class="translate-x-0"
         leave-from-class="translate-x-0"
-        leave-to-class="translate-x-full"
+        leave-to-class="-translate-x-full"
       >
         <div
           v-if="submenuOpen && currentSubmenu && (!isMobile || isMobileOpen)"
           data-submenu-dropdown
           :class="cn(
-            'ui-surface border ui-border-strong shadow-2xl overflow-hidden z-50 fixed border-l rounded-none'
+            'ui-surface border ui-border-strong shadow-2xl overflow-hidden z-50 fixed border-l rounded-none flex flex-col'
           )"
           :style="{
             ...submenuDrawerStyle,
-            top: isMobile ? '0' : '4rem',
-            height: isMobile ? '100vh' : 'calc(100vh - 4rem)'
+            top: '0',
+            height: '100vh'
           }"
         >
           <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
@@ -463,7 +464,7 @@ defineExpose({
             </div>
           </div>
 
-          <nav class="py-2 max-h-72 overflow-y-auto">
+          <nav class="py-2 overflow-y-auto flex-1 min-h-0">
             <div
               v-if="shouldShowSubmenuSearch && searchQuery && filteredSubmenuItems.length === 0"
               class="px-4 py-6 text-center"
