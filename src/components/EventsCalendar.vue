@@ -427,6 +427,9 @@ export default {
       this.selectedEvent = day.events.length === 1 ? day.events[0] : null
       this.$emit('select-date', { date: day.date, events: day.events })
     },
+    getVisibleMonthEvents(day) {
+      return this.selectedDate === day.date ? day.events : day.events.slice(0, 2)
+    },
     selectEvent(event, day) {
       this.selectedEvent = event
       this.selectedDate = day.date
@@ -463,16 +466,6 @@ export default {
         orange: 'bg-(--ui-warning-soft) text-(--ui-warning-strong) border-l-2 border-(--ui-warning)',
       }
       return colorMap[color] || 'ui-surface-soft ui-text-muted border-l-2 border-(--ui-border-strong)'
-    },
-    getEventDotClass(color) {
-      const colorMap = {
-        blue: 'bg-(--ui-primary)',
-        red: 'bg-(--ui-danger)',
-        green: 'bg-(--ui-success)',
-        purple: 'bg-(--ui-accent)',
-        orange: 'bg-(--ui-warning)',
-      }
-      return colorMap[color] || 'bg-(--ui-border-strong)'
     },
     getColorStripClass(color) {
       const colorMap = {
@@ -646,43 +639,23 @@ export default {
               >
                 {{ day.dayNumber }}
               </div>
-              <div
-                v-if="day.events.length > 1 && selectedDate === day.date"
-                class="mt-0.5 flex flex-col gap-0.5"
-              >
-                <button
-                  v-for="(event, ei) in day.events.slice(0, 3)"
-                  :key="`sel-event-${day.date}-${ei}`"
-                  type="button"
-                  class="text-[10px] px-1.5 py-0.5 rounded truncate text-left cursor-pointer hover:opacity-80 transition-opacity"
+              <div class="flex flex-col gap-0.5">
+                <div
+                  v-for="(event, ei) in getVisibleMonthEvents(day)"
+                  :key="ei"
+                  class="text-xs px-1.5 py-0.5 rounded truncate cursor-pointer hover:opacity-75 transition-opacity"
                   :class="getEventColorClass(event.color)"
                   @click.stop="selectEvent(event, day)"
                 >
                   {{ event.title }}
-                </button>
-                <div
-                  v-if="day.events.length > 3"
-                  class="text-[10px] ui-text-soft pl-1"
-                >
-                  +{{ day.events.length - 3 }} more
                 </div>
-              </div>
-              <div
-                v-else-if="day.events.length"
-                class="mt-0.5 flex items-center justify-center gap-1"
-              >
-                <span
-                  v-for="(event, ei) in day.events.slice(0, 3)"
-                  :key="`dot-${day.date}-${ei}`"
-                  class="w-1.5 h-1.5 rounded-full"
-                  :class="getEventDotClass(event.color)"
-                />
-                <span
-                  v-if="day.events.length > 3"
-                  class="text-[10px] font-medium ui-text-soft leading-none"
+                <div
+                  v-if="day.events.length > 2 && selectedDate !== day.date"
+                  class="text-[10px] ui-text-soft pl-1 cursor-pointer hover:underline"
+                  @click.stop="selectDay(day)"
                 >
-                  +{{ day.events.length - 3 }}
-                </span>
+                  +{{ day.events.length - 2 }} more
+                </div>
               </div>
             </div>
           </div>
