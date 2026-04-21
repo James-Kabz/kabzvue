@@ -48,7 +48,7 @@ import { cn } from "../utils/cn"
 const props = defineProps({
   defaultIndex: { type: Number, default: 0 },
   modelValue: { type: Number, default: null },
-  size: { type: String, default: 'md' },
+  size: { type: String, default: 'sm' },
   variant: { type: String, default: 'default' },
   loading: { type: Boolean, default: false }
 })
@@ -58,9 +58,9 @@ const tabVariants = cva(
   {
     variants: {
       size: {
-        sm: "px-3.5 py-2 text-xs",
-        md: "px-4 py-2.5 text-sm",
-        lg: "px-5 py-3 text-base",
+        sm: "px-2.5 py-1 text-[11px]",
+        md: "px-3 py-1.5 text-xs",
+        lg: "px-3.5 py-2 text-sm",
       },
       variant: {
         default: "",
