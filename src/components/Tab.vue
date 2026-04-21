@@ -2,11 +2,11 @@
   <div class="w-full">
     <!-- Tab headers -->
     <div
-      class="relative inline-flex w-full gap-1 rounded-xl border ui-border-strong ui-surface-muted p-1"
+      class="relative inline-flex w-full gap-2 rounded-xl border ui-border-strong ui-surface-muted p-1.5"
       role="tablist"
     >
       <span
-        class="pointer-events-none absolute top-1 bottom-1 rounded-lg bg-(--ui-surface) shadow-sm ring-1 ring-(--ui-primary) transition-all duration-250 ease-out z-0"
+        class="pointer-events-none absolute top-1.5 bottom-1.5 rounded-lg bg-(--ui-primary) opacity-10 transition-all duration-250 ease-out z-0"
         :style="indicatorStyle"
       />
       <button
@@ -18,7 +18,7 @@
         :class="cn(
           tabVariants({ size: props.size, variant: props.variant }),
           activeIndex === index
-            ? 'text-(--ui-text)'
+            ? 'bg-(--ui-primary) text-(--ui-text-inverse) shadow-sm'
             : 'border-transparent ui-text-muted hover:ui-text hover:bg-(--ui-surface)',
           props.loading && 'cursor-not-allowed opacity-50'
         )"
@@ -58,9 +58,9 @@ const tabVariants = cva(
   {
     variants: {
       size: {
-        sm: "px-3 py-1.5 text-xs",
-        md: "px-3.5 py-2 text-sm",
-        lg: "px-4 py-2.5 text-base",
+        sm: "px-3.5 py-2 text-xs",
+        md: "px-4 py-2.5 text-sm",
+        lg: "px-5 py-3 text-base",
       },
       variant: {
         default: "",
