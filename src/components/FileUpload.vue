@@ -174,6 +174,12 @@ const getUploadTone = (progress) => {
     text: 'text-green-700'
   }
 }
+
+const getUploadProgressVariant = (progress) => {
+  if (progress < 40) return 'danger'
+  if (progress < 80) return 'warning'
+  return 'success'
+}
 </script>
 
 <template>
@@ -236,7 +242,6 @@ const getUploadTone = (progress) => {
             :value="fileItem.progress"
             :max="100"
             size="sm"
-            variant="default"
             :dynamic-color="true"
             class="shrink-0"
           />

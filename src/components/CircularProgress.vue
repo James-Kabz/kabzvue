@@ -76,6 +76,22 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  dynamicColorStops: {
+    type: Array,
+    default: () => ([
+      { max: 39, stroke: '#ef4444', textClass: 'text-red-700' },
+      { max: 79, stroke: '#f97316', textClass: 'text-orange-700' },
+      { max: 100, stroke: '#22c55e', textClass: 'text-green-700' }
+    ])
+  },
+  dynamicFallbackStroke: {
+    type: String,
+    default: '#22c55e'
+  },
+  dynamicFallbackTextClass: {
+    type: String,
+    default: 'text-green-700'
+  },
   strokeLinecap: {
     type: String,
     default: 'round',
@@ -121,12 +137,16 @@ const strokeDashoffset = computed(() => {
   return circumference.value - (clampedValue.value / 100) * circumference.value
 })
 
+const resolvedDynamicStop = computed(() => {
+  const percentage = clampedValue.value
+  const stops = Array.isArray(props.dynamicColorStops) ? props.dynamicColorStops : []
+  const sorted = [...stops].sort((a, b) => Number(a?.max ?? 0) - Number(b?.max ?? 0))
+  return sorted.find(stop => percentage <= Number(stop?.max ?? 0)) || null
+})
+
 const progressColor = computed(() => {
   if (props.dynamicColor) {
-    const percentage = clampedValue.value
-    if (percentage < 40) return '#ef4444' // red-500
-    if (percentage < 80) return '#f97316' // orange-500
-    return '#22c55e' // green-500
+    return resolvedDynamicStop.value?.stroke || props.dynamicFallbackStroke
   }
 
   const colors = {
@@ -144,10 +164,7 @@ const backgroundColor = computed(() => {
 
 const textColor = computed(() => {
   if (props.dynamicColor) {
-    const percentage = clampedValue.value
-    if (percentage < 40) return 'text-red-700'
-    if (percentage < 80) return 'text-orange-700'
-    return 'text-green-700'
+    return resolvedDynamicStop.value?.textClass || props.dynamicFallbackTextClass
   }
 
   const colors = {
