@@ -12,7 +12,7 @@ const props = defineProps({
   maxFiles: Number, // maximum number of files
   variant: {
     type: String,
-    default: 'default',
+    default: 'dashed',
     validator: (value) => ['default', 'dashed'].includes(value)
   }
 })
@@ -122,17 +122,18 @@ const addFiles = (newFiles) => {
         fileItem.uploading = false
         clearInterval(interval)
 
-        // Move to files array after upload completes
-        if (props.multiple) {
-          files.value.push(fileItem.file)
-          emit('files-selected', files.value)
-        } else {
-          files.value = [fileItem.file]
-          emit('files-selected', fileItem.file)
-        }
+        // Keep the green success state visible briefly
+        setTimeout(() => {
+          if (props.multiple) {
+            files.value.push(fileItem.file)
+            emit('files-selected', files.value)
+          } else {
+            files.value = [fileItem.file]
+            emit('files-selected', fileItem.file)
+          }
 
-        // Remove from uploading
-        uploadingFiles.value.splice(uploadingFiles.value.indexOf(fileItem), 1)
+          uploadingFiles.value.splice(uploadingFiles.value.indexOf(fileItem), 1)
+        }, 450)
       }
     }, intervalTime)
   })
@@ -153,6 +154,25 @@ const formatFileSize = (bytes) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const getUploadTone = (progress) => {
+  if (progress < 40) {
+    return {
+      row: 'border-red-500 bg-red-50',
+      text: 'text-red-700'
+    }
+  }
+  if (progress < 80) {
+    return {
+      row: 'border-orange-500 bg-orange-50',
+      text: 'text-orange-700'
+    }
+  }
+  return {
+    row: 'border-green-500 bg-green-50',
+    text: 'text-green-700'
+  }
 }
 </script>
 
@@ -206,7 +226,10 @@ const formatFileSize = (bytes) => {
       <div
         v-for="(fileItem, index) in uploadingFiles"
         :key="`uploading-${index}`"
-        class="flex items-center justify-between p-3 ui-surface  border ui-border-strong  rounded-lg shadow-sm"
+        :class="[
+          'flex items-center justify-between p-3 border rounded-lg shadow-sm transition-colors duration-300',
+          getUploadTone(fileItem.progress).row
+        ]"
       >
         <div class="flex items-center space-x-3">
           <CircularProgress
@@ -219,7 +242,9 @@ const formatFileSize = (bytes) => {
           />
           <div class="flex flex-col">
             <span class="text-sm font-medium ui-text">{{ fileItem.file.name }}</span>
-            <span class="text-xs ui-text">Uploading... {{ Math.round(fileItem.progress) }}%</span>
+            <span :class="['text-xs font-medium', getUploadTone(fileItem.progress).text]">
+              Uploading... {{ Math.round(fileItem.progress) }}%
+            </span>
           </div>
         </div>
       </div>
@@ -234,7 +259,7 @@ const formatFileSize = (bytes) => {
           <div class="ui-success-soft rounded-md p-2">
             <Icon
               icon="file"
-              class="h-5 w-5 ui-success"
+              class="h-5 w-5 ui-text"
             />
           </div>
           <div class="flex flex-col">

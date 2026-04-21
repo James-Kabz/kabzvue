@@ -124,11 +124,9 @@ const strokeDashoffset = computed(() => {
 const progressColor = computed(() => {
   if (props.dynamicColor) {
     const percentage = clampedValue.value
-    if (percentage >= 80) return 'var(--ui-danger)'
-    if (percentage >= 60) return 'var(--ui-warning)'
-    if (percentage >= 40) return 'var(--ui-warning)'
-    if (percentage >= 20) return 'var(--ui-success)'
-    return 'var(--ui-text)'
+    if (percentage < 40) return '#ef4444' // red-500
+    if (percentage < 80) return '#f97316' // orange-500
+    return '#22c55e' // green-500
   }
 
   const colors = {
@@ -147,11 +145,9 @@ const backgroundColor = computed(() => {
 const textColor = computed(() => {
   if (props.dynamicColor) {
     const percentage = clampedValue.value
-    if (percentage >= 80) return 'ui-danger'
-    if (percentage >= 60) return 'ui-warning'
-    if (percentage >= 40) return 'ui-warning'
-    if (percentage >= 20) return 'ui-success'
-    return 'ui-text'
+    if (percentage < 40) return 'text-red-700'
+    if (percentage < 80) return 'text-orange-700'
+    return 'text-green-700'
   }
 
   const colors = {
