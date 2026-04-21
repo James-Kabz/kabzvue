@@ -175,11 +175,6 @@ const getUploadTone = (progress) => {
   }
 }
 
-const getUploadProgressVariant = (progress) => {
-  if (progress < 40) return 'danger'
-  if (progress < 80) return 'warning'
-  return 'success'
-}
 </script>
 
 <template>
