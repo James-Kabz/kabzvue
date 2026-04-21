@@ -476,7 +476,7 @@ defineExpose({
                 :key="subItem.name"
                 :to="subItem.route"
                 :class="cn(
-                  'mx-2 flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-colors',
+                  'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                   isItemActive(subItem)
                     ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
                     : 'ui-text hover:bg-(--ui-surface-muted)'

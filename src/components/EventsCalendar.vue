@@ -26,7 +26,7 @@ export default {
     },
     size: {
       type: String,
-      default: 'default',
+      default: 'compact',
       validator: (value) => ['xs', 'compact', 'default', 'large', 'full'].includes(value)
     },
     height: {
@@ -150,7 +150,7 @@ export default {
           controlButtonClass: 'px-2 py-0.5 text-[10px]',
           iconButtonClass: 'w-5 h-5',
           viewButtonClass: 'px-2 py-0.5 text-[10px]',
-          monthDayCellClass: 'min-h-[60px]',
+          monthDayCellClass: 'min-h-[52px]',
           sidebarWidthClass: 'w-48'
         },
         compact: {
@@ -160,8 +160,8 @@ export default {
           controlButtonClass: 'px-2 py-1 text-[11px]',
           iconButtonClass: 'w-6 h-6',
           viewButtonClass: 'px-2 py-0.5 text-[11px]',
-          monthDayCellClass: 'min-h-[72px]',
-          sidebarWidthClass: 'w-56'
+          monthDayCellClass: 'min-h-[42px]',
+          sidebarWidthClass: 'w-52'
         },
         default: {
           rootTextClass: 'text-sm',
@@ -170,7 +170,7 @@ export default {
           controlButtonClass: 'px-3 py-1.5 text-xs',
           iconButtonClass: 'w-7 h-7',
           viewButtonClass: 'px-3 py-1 text-xs',
-          monthDayCellClass: 'min-h-[92px]',
+          monthDayCellClass: 'min-h-[82px]',
           sidebarWidthClass: 'w-64'
         },
         large: {
@@ -180,7 +180,7 @@ export default {
           controlButtonClass: 'px-3.5 py-2 text-sm',
           iconButtonClass: 'w-8 h-8',
           viewButtonClass: 'px-3.5 py-1.5 text-sm',
-          monthDayCellClass: 'min-h-[108px]',
+          monthDayCellClass: 'min-h-[96px]',
           sidebarWidthClass: 'w-72'
         },
         full: {
@@ -190,7 +190,7 @@ export default {
           controlButtonClass: 'px-3.5 py-2 text-sm',
           iconButtonClass: 'w-8 h-8',
           viewButtonClass: 'px-3.5 py-1.5 text-sm',
-          monthDayCellClass: 'min-h-[116px]',
+          monthDayCellClass: 'min-h-[104px]',
           sidebarWidthClass: 'w-80'
         }
       }
@@ -222,6 +222,14 @@ export default {
         ...day,
         events: this.getEventsForDate(day.date)
       }))
+    },
+    visibleCalendarDays() {
+      if (this.calendarDays.length < 7) return this.calendarDays
+
+      const lastWeek = this.calendarDays.slice(-7)
+      const isTrailingNextMonthWeek = lastWeek.every(day => !day.isCurrentMonth)
+
+      return isTrailingNextMonthWeek ? this.calendarDays.slice(0, -7) : this.calendarDays
     },
     weekViewDays() {
       const days = getWeekDays(this.currentDate)
@@ -416,6 +424,7 @@ export default {
       this.selectedDate = day.date
       const [year, month, dayNum] = day.date.split('-').map(Number)
       this.currentDate = new Date(year, month - 1, dayNum)
+      this.selectedEvent = day.events.length === 1 ? day.events[0] : null
       this.$emit('select-date', { date: day.date, events: day.events })
     },
     selectEvent(event, day) {
@@ -454,6 +463,16 @@ export default {
         orange: 'bg-(--ui-warning-soft) text-(--ui-warning-strong) border-l-2 border-(--ui-warning)',
       }
       return colorMap[color] || 'ui-surface-soft ui-text-muted border-l-2 border-(--ui-border-strong)'
+    },
+    getEventDotClass(color) {
+      const colorMap = {
+        blue: 'bg-(--ui-primary)',
+        red: 'bg-(--ui-danger)',
+        green: 'bg-(--ui-success)',
+        purple: 'bg-(--ui-accent)',
+        orange: 'bg-(--ui-warning)',
+      }
+      return colorMap[color] || 'bg-(--ui-border-strong)'
     },
     getColorStripClass(color) {
       const colorMap = {
@@ -607,7 +626,7 @@ export default {
           </div>
           <div class="grid grid-cols-7 flex-1 overflow-y-auto border-l border-t ui-border">
             <div
-              v-for="(day, index) in calendarDays"
+              v-for="(day, index) in visibleCalendarDays"
               :key="index"
               :class="[
                 'border-r border-b ui-border p-1.5 cursor-pointer transition-colors',
@@ -619,7 +638,7 @@ export default {
               @click="selectDay(day)"
             >
               <div
-                class="w-6 h-6 flex items-center justify-center rounded-full text-xs mb-1"
+                class="w-10 h-8 flex items-center justify-center rounded-full text-xl mb-1 font-semibold"
                 :class="[
                   day.isToday ? 'bg-(--ui-primary) text-(--ui-text-inverse) font-semibold' : '',
                   !day.isToday && day.isCurrentMonth ? 'ui-text' : 'ui-text-soft opacity-60'
@@ -627,22 +646,43 @@ export default {
               >
                 {{ day.dayNumber }}
               </div>
-              <div class="flex flex-col gap-0.5">
-                <div
+              <div
+                v-if="day.events.length > 1 && selectedDate === day.date"
+                class="mt-0.5 flex flex-col gap-0.5"
+              >
+                <button
                   v-for="(event, ei) in day.events.slice(0, 3)"
-                  :key="ei"
-                  class="text-[11px] px-1.5 py-0.5 rounded truncate cursor-pointer hover:opacity-75 transition-opacity"
+                  :key="`sel-event-${day.date}-${ei}`"
+                  type="button"
+                  class="text-[10px] px-1.5 py-0.5 rounded truncate text-left cursor-pointer hover:opacity-80 transition-opacity"
                   :class="getEventColorClass(event.color)"
                   @click.stop="selectEvent(event, day)"
                 >
                   {{ event.title }}
-                </div>
+                </button>
                 <div
                   v-if="day.events.length > 3"
                   class="text-[10px] ui-text-soft pl-1"
                 >
                   +{{ day.events.length - 3 }} more
                 </div>
+              </div>
+              <div
+                v-else-if="day.events.length"
+                class="mt-0.5 flex items-center justify-center gap-1"
+              >
+                <span
+                  v-for="(event, ei) in day.events.slice(0, 3)"
+                  :key="`dot-${day.date}-${ei}`"
+                  class="w-1.5 h-1.5 rounded-full"
+                  :class="getEventDotClass(event.color)"
+                />
+                <span
+                  v-if="day.events.length > 3"
+                  class="text-[10px] font-medium ui-text-soft leading-none"
+                >
+                  +{{ day.events.length - 3 }}
+                </span>
               </div>
             </div>
           </div>

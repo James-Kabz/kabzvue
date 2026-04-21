@@ -125,6 +125,25 @@ const componentPlaygroundPresets = {
         }
       ]
     }
+  },
+  EventsCalendar: {
+    props: {
+      size: 'compact',
+      minHeight: '520px',
+      events: [
+        { id: 1, title: 'Ops Standup', date: '2026-04-07', time: '09:00', color: 'blue' },
+        { id: 2, title: 'Tax Filing Deadline', date: '2026-04-07', color: 'red' },
+        { id: 3, title: 'Board Prep', date: '2026-04-07', time: '14:00', color: 'orange' },
+        { id: 4, title: 'Vendor Review', date: '2026-04-07', time: '16:00', color: 'green' },
+        { id: 5, title: 'Legal Checkpoint', date: '2026-04-10', color: 'purple' },
+        { id: 6, title: 'Audit Kickoff', date: '2026-04-14', time: '11:00', color: 'blue' },
+        { id: 7, title: 'Compliance Committee', date: '2026-04-14', time: '13:00', color: 'green' },
+        { id: 8, title: 'Policy Refresh', date: '2026-04-18', color: 'orange' },
+        { id: 9, title: 'Contract Renewal', date: '2026-04-21', time: '10:00', color: 'red' },
+        { id: 10, title: 'Risk Workshop', date: '2026-04-23', time: '15:00', color: 'purple' },
+        { id: 11, title: 'Quarter Close', date: '2026-04-29', color: 'blue' }
+      ]
+    }
   }
 }
 
