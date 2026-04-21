@@ -6,16 +6,23 @@
     :aria-labelledby="`tab-${index}`"
     class="ui-text"
   >
-    <div
-      v-if="loading"
-      class="flex items-center justify-center p-8"
-    >
-      <Spinner
-        size="lg"
-        :label="`Loading ${props.label}`"
-      />
+    <div class="rounded-xl border ui-border bg-(--ui-surface) p-4 md:p-5 shadow-xs">
+      <div
+        v-if="loading"
+        class="flex items-center justify-center p-8"
+      >
+        <Spinner
+          size="lg"
+          :label="`Loading ${props.label}`"
+        />
+      </div>
+      <div
+        v-else
+        class="transition-opacity duration-200 opacity-100"
+      >
+        <slot />
+      </div>
     </div>
-    <slot v-else />
   </div>
 </template>
 

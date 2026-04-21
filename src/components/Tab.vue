@@ -2,24 +2,31 @@
   <div class="w-full">
     <!-- Tab headers -->
     <div
-      class="flex space-x-1 border-b ui-border-strong "
+      class="relative inline-flex w-full gap-1 rounded-xl border ui-border-strong ui-surface-muted p-1"
       role="tablist"
     >
+      <span
+        class="pointer-events-none absolute top-1 bottom-1 rounded-lg bg-(--ui-surface) shadow-sm ring-1 ring-(--ui-primary) transition-all duration-250 ease-out z-0"
+        :style="indicatorStyle"
+      />
       <button
         v-for="(tab, index) in tabs"
         :id="`tab-${index}`"
         :key="index"
+        :ref="(el) => setTabRef(el, index)"
         :disabled="props.loading"
         :class="cn(
           tabVariants({ size: props.size, variant: props.variant }),
           activeIndex === index
-            ? 'border-(--ui-primary) ui-primary ui-primary-soft'
-            : 'border-transparent ui-text hover:text-(--ui-text) hover:border-(--ui-border-strong)',
+            ? 'text-(--ui-text)'
+            : 'border-transparent ui-text-muted hover:ui-text hover:bg-(--ui-surface)',
           props.loading && 'cursor-not-allowed opacity-50'
         )"
         :aria-selected="activeIndex === index"
         :aria-controls="`panel-${index}`"
         role="tab"
+        tabindex="0"
+        @keydown="onTabKeydown($event, index)"
         @click="!props.loading && selectTab(index)"
       >
         {{ tab.label }}
@@ -34,25 +41,26 @@
 </template>
 
 <script setup>
-import { provide, ref } from "vue"
+import { nextTick, onMounted, onUnmounted, provide, ref, watch } from "vue"
 import { cva } from "class-variance-authority"
 import { cn } from "../utils/cn"
 
 const props = defineProps({
   defaultIndex: { type: Number, default: 0 },
+  modelValue: { type: Number, default: null },
   size: { type: String, default: 'md' },
   variant: { type: String, default: 'default' },
   loading: { type: Boolean, default: false }
 })
 
 const tabVariants = cva(
-  "font-medium transition-colors border-b-2 -mb-px",
+  "relative z-10 rounded-lg font-medium transition-all duration-200 border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-primary)",
   {
     variants: {
       size: {
         sm: "px-3 py-1.5 text-xs",
-        md: "px-4 py-2 text-sm",
-        lg: "px-5 py-2.5 text-base",
+        md: "px-3.5 py-2 text-sm",
+        lg: "px-4 py-2.5 text-base",
       },
       variant: {
         default: "",
@@ -65,25 +73,125 @@ const tabVariants = cva(
   }
 )
 
-const activeIndex = ref(props.defaultIndex)
+const activeIndex = ref(props.modelValue ?? props.defaultIndex)
 const tabs = ref([])
+const tabRefs = ref([])
+const indicatorStyle = ref({ width: '0px', transform: 'translateX(0px)' })
 
 const selectTab = (index) => {
+  if (index < 0 || index >= tabs.value.length) return
   activeIndex.value = index
+  emit('update:modelValue', index)
   emit('tab-change', index)
+  updateIndicator()
 }
 
-const emit = defineEmits(['tab-change'])
+watch(() => props.modelValue, (value) => {
+  if (typeof value === 'number' && value !== activeIndex.value) {
+    activeIndex.value = value
+    updateIndicator()
+  }
+})
+
+const emit = defineEmits(['tab-change', 'update:modelValue'])
+
+const setTabRef = (element, index) => {
+  tabRefs.value[index] = element || null
+}
+
+const focusTab = (index) => {
+  const target = tabRefs.value[index]
+  if (target && typeof target.focus === 'function') {
+    target.focus()
+  }
+}
+
+const onTabKeydown = (event, index) => {
+  if (props.loading) return
+
+  const lastIndex = tabs.value.length - 1
+  if (lastIndex < 0) return
+
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    const nextIndex = index >= lastIndex ? 0 : index + 1
+    selectTab(nextIndex)
+    focusTab(nextIndex)
+    return
+  }
+
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    const prevIndex = index <= 0 ? lastIndex : index - 1
+    selectTab(prevIndex)
+    focusTab(prevIndex)
+    return
+  }
+
+  if (event.key === 'Home') {
+    event.preventDefault()
+    selectTab(0)
+    focusTab(0)
+    return
+  }
+
+  if (event.key === 'End') {
+    event.preventDefault()
+    selectTab(lastIndex)
+    focusTab(lastIndex)
+  }
+}
+
+const updateIndicator = () => {
+  nextTick(() => {
+    const activeEl = tabRefs.value[activeIndex.value]
+    if (!activeEl) {
+      indicatorStyle.value = { width: '0px', transform: 'translateX(0px)' }
+      return
+    }
+
+    indicatorStyle.value = {
+      width: `${activeEl.offsetWidth}px`,
+      transform: `translateX(${activeEl.offsetLeft}px)`
+    }
+  })
+}
+
+watch(() => tabs.value.length, () => {
+  updateIndicator()
+})
+
+watch(activeIndex, () => {
+  updateIndicator()
+})
+
+onMounted(() => {
+  updateIndicator()
+  window.addEventListener('resize', updateIndicator)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateIndicator)
+})
 
 provide("tabsContext", {
   activeIndex,
   tabs,
   registerTab: (label) => {
     tabs.value.push({ label })
-    return tabs.value.length - 1
+    const index = tabs.value.length - 1
+    updateIndicator()
+    return index
   },
   unregisterTab: (index) => {
     tabs.value.splice(index, 1)
+    tabRefs.value.splice(index, 1)
+    if (activeIndex.value >= tabs.value.length) {
+      activeIndex.value = Math.max(tabs.value.length - 1, 0)
+      emit('update:modelValue', activeIndex.value)
+      emit('tab-change', activeIndex.value)
+    }
+    updateIndicator()
   }
 })
 </script>

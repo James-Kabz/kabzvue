@@ -6,6 +6,8 @@ import Button from '../../../components/Button.vue'
 import Checkbox from '../../../components/Checkbox.vue'
 import Input from '../../../components/Input.vue'
 import Select from '../../../components/Select.vue'
+import Tab from '../../../components/Tab.vue'
+import TabPanel from '../../../components/TabPanel.vue'
 import { getComponentGroups } from '../componentDocs.js'
 
 const route = useRoute()
@@ -17,6 +19,8 @@ const liveQuery = ref('Policy reminder')
 const demoPlan = ref('starter')
 const demoNotifications = ref(false)
 const demoButtonLoading = ref(false)
+const demoActiveTab = ref(0)
+const demoTabLoading = ref(false)
 
 const demoPlanOptions = [
   { value: 'starter', label: 'Starter' },
@@ -65,6 +69,13 @@ const runDemoAction = () => {
   }, 900)
 }
 
+const handleDemoTabChange = () => {
+  demoTabLoading.value = true
+  window.setTimeout(() => {
+    demoTabLoading.value = false
+  }, 280)
+}
+
 const copySnippet = async (key, content) => {
   if (!navigator?.clipboard) return
 
@@ -98,7 +109,7 @@ const copySnippet = async (key, content) => {
         </RouterLink>
       </div>
 
-      <div class="mt-4 grid gap-4 lg:grid-cols-2">
+      <div class="mt-4 grid gap-4 lg:grid-cols-3">
         <div class="rounded-xl border ui-border-strong ui-surface-soft p-4">
           <p class="text-xs font-semibold uppercase tracking-wide ui-text-muted">
             Interactive Playground
@@ -155,6 +166,36 @@ const copySnippet = async (key, content) => {
             </button>
           </div>
           <pre class="overflow-x-auto text-sm text-white"><code>{{ componentsPlayground }}</code></pre>
+        </div>
+
+        <div class="rounded-xl border ui-border-strong ui-surface-soft p-4">
+          <p class="text-xs font-semibold uppercase tracking-wide ui-text-muted">
+            Tabs Preview
+          </p>
+          <div class="mt-3">
+            <Tab
+              v-model="demoActiveTab"
+              size="sm"
+              :loading="demoTabLoading"
+              @tab-change="handleDemoTabChange"
+            >
+              <TabPanel label="Overview" :loading="demoTabLoading">
+                <p class="text-sm ui-text-muted">
+                  Quick summary panel with modern active pill and keyboard navigation.
+                </p>
+              </TabPanel>
+              <TabPanel label="Schedule" :loading="demoTabLoading">
+                <p class="text-sm ui-text-muted">
+                  Use Left/Right arrow keys, Home, and End to switch tabs quickly.
+                </p>
+              </TabPanel>
+              <TabPanel label="Settings" :loading="demoTabLoading">
+                <p class="text-sm ui-text-muted">
+                  `v-model` can persist active tab via route query to survive refresh.
+                </p>
+              </TabPanel>
+            </Tab>
+          </div>
         </div>
       </div>
     </article>
