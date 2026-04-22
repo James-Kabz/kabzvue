@@ -235,7 +235,7 @@ const showModal = ref(false)
 const modalContent = ref('')
 
 // CVA variants
-const tableContainerVariants = cva('border ui-border-strong rounded-2xl relative overflow-hidden flex flex-col gap-y-2 px-2', {
+const tableContainerVariants = cva('border ui-border-strong rounded-2xl relative overflow-hidden flex flex-col gap-y-2 px-2 pb-2', {
   variants: {
     variant: {
       default: 'shadow-sm ui-border-strong',
