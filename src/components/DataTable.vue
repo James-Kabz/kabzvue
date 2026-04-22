@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, useSlots } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 import Checkbox from './Checkbox.vue'
@@ -128,6 +128,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  addButton: {
+    type: Object,
+    default: () => ({})
+  },
   // Loading Props
   loading: {
     type: Boolean,
@@ -207,7 +211,20 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['selection-change', 'sort-change', 'row-click', 'page-change', 'page-size-change', 'refresh', 'action', 'update:density', 'toggle-column'])
+const emit = defineEmits([
+  'selection-change',
+  'sort-change',
+  'row-click',
+  'page-change',
+  'page-size-change',
+  'refresh',
+  'action',
+  'update:density',
+  'toggle-column',
+  'add',
+  'add-button-click'
+])
+const slots = useSlots()
 
 const currentPage = ref(1)
 const pageSize = ref(props.pageSize)
@@ -327,8 +344,10 @@ const handleToggleColumn = (key, visible) => {
 const shouldShowActionsColumn = computed(() => {
   if (!props.showActionsColumn) return false
 
+  if (isHeaderAddButtonVisible.value) return true
+
   // If using custom actions slot, always show
-  if (props.$slots?.actions) return true
+  if (slots.actions) return true
 
   // If no actions defined, don't show
   if (!props.actions || props.actions.length === 0) return false
@@ -353,6 +372,41 @@ const shouldShowActionsColumn = computed(() => {
 
   return hasActionablePermission
 })
+
+const hasAddButton = computed(() => Object.keys(props.addButton || {}).length > 0)
+
+const hasAddButtonPermission = computed(() => {
+  if (!hasAddButton.value) return false
+  if (props.addButton.permission === undefined) return true
+  if (typeof props.addButton.permission === 'function') return props.addButton.permission()
+  return Boolean(props.addButton.permission)
+})
+
+const isAddButtonVisible = computed(() => {
+  if (!hasAddButton.value || !hasAddButtonPermission.value) return false
+  if (typeof props.addButton.visible === 'function') return props.addButton.visible()
+  if (props.addButton.visible === undefined) return true
+  return Boolean(props.addButton.visible)
+})
+
+const isAddButtonDisabled = computed(() => {
+  if (!isAddButtonVisible.value) return true
+  if (typeof props.addButton.disabled === 'function') return props.addButton.disabled()
+  return Boolean(props.addButton.disabled)
+})
+
+const isHeaderAddButtonVisible = computed(() => isAddButtonVisible.value)
+
+const addButtonTooltip = computed(() => props.addButton.tooltip || props.addButton.label || 'Add new item')
+
+const handleAddButtonClick = () => {
+  if (isAddButtonDisabled.value) return
+  emit('add')
+  emit('add-button-click', props.addButton)
+  if (typeof props.addButton.onClick === 'function') {
+    props.addButton.onClick()
+  }
+}
 
 const totalColumns = computed(() => {
   let count = props.columns.length
@@ -845,7 +899,26 @@ defineExpose({
                 v-if="shouldShowActionsColumn"
                 :class="actionsCellClasses"
               >
-                Actions
+                <div class="flex items-center justify-center gap-2">
+                  <span>Actions</span>
+                  <Tooltip
+                    v-if="isHeaderAddButtonVisible"
+                    :content="addButtonTooltip"
+                    placement="top"
+                  >
+                    <Button
+                      variant="success"
+                      size="2xs"
+                      :disabled="isAddButtonDisabled"
+                      @click.stop="handleAddButtonClick"
+                    >
+                      <Icon
+                        :icon="props.addButton.icon || 'plus'"
+                        class="w-3.5 h-3.5"
+                      />
+                    </Button>
+                  </Tooltip>
+                </div>
               </th>
             </tr>
           </thead>

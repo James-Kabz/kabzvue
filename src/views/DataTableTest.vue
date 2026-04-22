@@ -18,13 +18,9 @@
           :show-file-upload="true"
           :show-date-filter="true"
           :show-export="true"
-          :show-add="true"
           :show-search="false"
           search-placeholder="Search users..."
-          :add-button="addButtonConfig"
           @export="handleExport"
-          @add="handleAddUser"
-          @add-button-click="handleAddButtonClick"
           @clear-filters="clearAllFilters"
         >
           <template #filters>
@@ -98,7 +94,10 @@
           :show-pagination="true"
           :density="density"
           :actions="userActions"
+          :add-button="addButtonConfig"
           empty-text="No users found"
+          @add="handleAddUser"
+          @add-button-click="handleAddButtonClick"
           @selection-change="selectedUsers = $event"
           @sort-change="handleSort"
           @row-click="handleRowClick"
@@ -185,7 +184,7 @@ const props = defineProps({
 const currentUser = ref({
   id: 1,
   role: 'admin', // Can be: admin, editor, viewer
-  permissions: ['users.view', 'users.edit', 'users.delete', 'users.activate']
+  permissions: ['users.view', 'users.edit', 'users.delete', 'users.activate', 'users.create']
 })
 
 // Helper function to check permissions

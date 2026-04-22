@@ -165,43 +165,6 @@
           Export
         </Button>
 
-        <!-- Add Button -->
-        <div v-if="showAdd && isAddButtonVisible">
-          <!-- Custom Add Button from prop -->
-          <Button
-            v-if="hasAddButton"
-            :variant="addButton.variant || 'success'"
-            :size="addButton.size || 'lg'"
-            :disabled="isAddButtonDisabled || !hasAddButtonPermission"
-            :title="addButton.tooltip"
-            @click="handleAddButtonClick"
-          >
-            <Icon
-              v-if="addButton.icon"
-              :icon="addButton.icon"
-              class="w-4 h-4 mr-2"
-            />
-            {{ addButton.label || 'Add' }}
-          </Button>
-
-          <!-- Add Button Slot (fallback) -->
-          <slot
-            v-else
-            name="add"
-          >
-            <Button
-              variant="success"
-              size="lg"
-              @click="$emit('add')"
-            >
-              <Icon
-                icon="plus"
-                class="w-4 h-4 mr-2"
-              />
-              Add
-            </Button>
-          </slot>
-        </div>
       </div>
     </div>
 
@@ -553,26 +516,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  showAdd: {
-    type: Boolean,
-    default: false
-  },
-  addButton: {
-    type: Object,
-    default: () => ({})
-    // Expected format:
-    // {
-    //   label: 'Add Item',
-    //   icon: 'plus',
-    //   variant: 'success',
-    //   size: 'lg',
-    //   permission: () => true, // Function to check permission
-    //   visible: () => true,     // Function to check visibility
-    //   disabled: () => false,   // Function to check if disabled
-    //   tooltip: 'Add new item',
-    //   onClick: () => {}        // Optional click handler
-    // }
-  },
   showTableInfo: {
     type: Boolean,
     default: true
@@ -636,9 +579,7 @@ const emit = defineEmits([
   'update:numberFilters',
   'update:multiSelectFilters',
   'export',
-  'add',
   'clear-filters',
-  'add-button-click',
   'files-selected',
   'file-removed'
 ])
@@ -647,55 +588,6 @@ const emit = defineEmits([
 const showAdvancedFilters = ref(false)
 const isFileUploadModalOpen = ref(false)
 
-// Add button configuration helpers
-const hasAddButton = computed(() => {
-  return Object.keys(props.addButton).length > 0
-})
-
-const isAddButtonVisible = computed(() => {
-  if (!hasAddButton.value) return props.showAdd
-
-  // Check permission first - hide if no permission
-  if (props.addButton.permission !== undefined) {
-    if (typeof props.addButton.permission === 'function') {
-      if (!props.addButton.permission()) {
-        return false
-      }
-    } else if (!props.addButton.permission) {
-      return false
-    }
-  }
-
-  // Then check visibility function
-  if (props.addButton.visible && typeof props.addButton.visible === 'function') {
-    return props.addButton.visible()
-  }
-  
-  return true
-})
-
-const hasAddButtonPermission = computed(() => {
-  if (!hasAddButton.value) return true
-
-  if (props.addButton.permission !== undefined) {
-    if (typeof props.addButton.permission === 'function') {
-      return props.addButton.permission()
-    }
-    return props.addButton.permission
-  }
-  
-  return true
-})
-
-
-const isAddButtonDisabled = computed(() => {
-  if (!hasAddButton.value) return false
-
-  if (props.addButton.disabled && typeof props.addButton.disabled === 'function') {
-    return props.addButton.disabled()
-  }
-  return false
-})
 
 const openFileUploadModal = () => {
   isFileUploadModalOpen.value = true
@@ -715,23 +607,6 @@ const handleFileRemoved = (files) => {
   emit('file-removed', files)
 }
 
-
-const handleAddButtonClick = () => {
-  if (isAddButtonDisabled.value || !hasAddButtonPermission.value) {
-    return
-  }
-
-  // Emit the add event for backward compatibility
-  emit('add')
-
-  // Emit the new add-button-click event
-  emit('add-button-click', props.addButton)
-
-  // Call optional onClick handler
-  if (props.addButton.onClick && typeof props.addButton.onClick === 'function') {
-    props.addButton.onClick()
-  }
-}
 
 // CVA Variants
 const filtersVariants = cva('flex flex-wrap items-center gap-4', {

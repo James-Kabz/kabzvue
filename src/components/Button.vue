@@ -164,7 +164,7 @@ const buttonVariants = cva(
           'bg-linear-to-r from-(--ui-primary) to-(--ui-accent) ui-text-inverse shadow-sm hover:from-(--ui-primary-strong) hover:to-(--ui-accent-strong) hover:shadow-md',
       },
       size: {
-        '2xs': 'h-6 px-2 py-1 text-xs rounded',
+        '2xs': 'h-4 px-1 py-3 text-md rounded',
         'xs': 'h-7 px-2.5 py-1 text-xs rounded-md',
         'sm': 'h-8 px-3 py-1.5 text-sm rounded-md',
         'default': 'h-10 px-4 py-2 text-sm rounded-md',
