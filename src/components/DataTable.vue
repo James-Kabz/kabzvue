@@ -344,8 +344,6 @@ const handleToggleColumn = (key, visible) => {
 const shouldShowActionsColumn = computed(() => {
   if (!props.showActionsColumn) return false
 
-  if (isHeaderAddButtonVisible.value) return true
-
   // If using custom actions slot, always show
   if (slots.actions) return true
 
@@ -372,41 +370,6 @@ const shouldShowActionsColumn = computed(() => {
 
   return hasActionablePermission
 })
-
-const hasAddButton = computed(() => Object.keys(props.addButton || {}).length > 0)
-
-const hasAddButtonPermission = computed(() => {
-  if (!hasAddButton.value) return false
-  if (props.addButton.permission === undefined) return true
-  if (typeof props.addButton.permission === 'function') return props.addButton.permission()
-  return Boolean(props.addButton.permission)
-})
-
-const isAddButtonVisible = computed(() => {
-  if (!hasAddButton.value || !hasAddButtonPermission.value) return false
-  if (typeof props.addButton.visible === 'function') return props.addButton.visible()
-  if (props.addButton.visible === undefined) return true
-  return Boolean(props.addButton.visible)
-})
-
-const isAddButtonDisabled = computed(() => {
-  if (!isAddButtonVisible.value) return true
-  if (typeof props.addButton.disabled === 'function') return props.addButton.disabled()
-  return Boolean(props.addButton.disabled)
-})
-
-const isHeaderAddButtonVisible = computed(() => isAddButtonVisible.value)
-
-const addButtonTooltip = computed(() => props.addButton.tooltip || props.addButton.label || 'Add new item')
-
-const handleAddButtonClick = () => {
-  if (isAddButtonDisabled.value) return
-  emit('add')
-  emit('add-button-click', props.addButton)
-  if (typeof props.addButton.onClick === 'function') {
-    props.addButton.onClick()
-  }
-}
 
 const totalColumns = computed(() => {
   let count = props.columns.length
@@ -778,12 +741,15 @@ defineExpose({
       :show-density-toggle="showDensityToggle"
       :show-column-toggle="showColumnToggle"
       :show-refresh="showRefresh"
+      :add-button="addButton"
       :density="density"
       :toggleable-columns="toggleableColumns"
       :visible-columns="visibleColumnKeys"
       @update:density="(value) => emit('update:density', value)"
       @toggle-column="handleToggleColumn"
       @refresh="$emit('refresh')"
+      @add="emit('add')"
+      @add-button-click="(config) => emit('add-button-click', config)"
     >
       <template #actions>
         <slot name="toolbar-actions" />
@@ -899,26 +865,7 @@ defineExpose({
                 v-if="shouldShowActionsColumn"
                 :class="actionsCellClasses"
               >
-                <div class="flex items-center justify-center gap-2">
-                  <span>Actions</span>
-                  <Tooltip
-                    v-if="isHeaderAddButtonVisible"
-                    :content="addButtonTooltip"
-                    placement="top"
-                  >
-                    <Button
-                      variant="success"
-                      size="2xs"
-                      :disabled="isAddButtonDisabled"
-                      @click.stop="handleAddButtonClick"
-                    >
-                      <Icon
-                        :icon="props.addButton.icon || 'plus'"
-                        class="w-3.5 h-3.5"
-                      />
-                    </Button>
-                  </Tooltip>
-                </div>
+                Actions
               </th>
             </tr>
           </thead>

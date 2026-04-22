@@ -53,6 +53,7 @@
           :selected-items="selectedUsers"
           :total-items="filteredUsers.length"
           :bulk-actions="bulkActions"
+          :add-button="addButtonConfig"
           :density="density"
           :toggleable-columns="allColumns"
           :visible-columns="visibleColumns"
@@ -67,6 +68,8 @@
           @update:search-query="(value) => (searchQuery = value)"
           @toggle-column="handleColumnToggle"
           @refresh="handleRefresh"
+          @add="handleAddUser"
+          @add-button-click="handleAddButtonClick"
         >
           <template #actions>
             <!-- Additional toolbar actions -->
@@ -94,10 +97,7 @@
           :show-pagination="true"
           :density="density"
           :actions="userActions"
-          :add-button="addButtonConfig"
           empty-text="No users found"
-          @add="handleAddUser"
-          @add-button-click="handleAddButtonClick"
           @selection-change="selectedUsers = $event"
           @sort-change="handleSort"
           @row-click="handleRowClick"
@@ -195,9 +195,7 @@ const hasPermission = (permission) => {
 // Define add button configuration with permission checks
 const addButtonConfig = computed(() => ({
   label: 'Add User',
-  icon: 'plus',
-  size: 'lg',
-  tooltip: 'Create new user',
+  icon: 'user-plus',
   permission: () => hasPermission('users.create'),
   onClick: () => handleAddUser()
 }))

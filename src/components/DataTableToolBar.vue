@@ -155,6 +155,19 @@
             @input="$emit('update:search-query', $event.target.value)"
           >
         </div>
+
+        <Button
+          v-if="isAddButtonVisible"
+          :variant="addButton.variant || 'success'"
+          :disabled="isAddButtonDisabled"
+          :title="addButtonTooltip"
+          @click="handleAddButtonClick"
+        >
+          <Icon
+            :icon="addButton.icon || 'plus'"
+          />
+          <span>{{ addButton.label || 'Add' }}</span>
+        </Button>
       </div>
     </div>
   </div>
@@ -215,6 +228,7 @@ export default {
 
 <script setup>
 import Button from './Button.vue'
+import Icon from './Icon.vue'
 import { ref, computed, onMounted, onUnmounted, h } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
@@ -231,6 +245,7 @@ const props = defineProps({
   showSearch: { type: Boolean, default: true },
   searchQuery: { type: String, default: '' },
   searchPlaceholder: { type: String, default: 'Search...' },
+  addButton: { type: Object, default: () => ({}) },
   isRefreshing: { type: Boolean, default: false },
   density: {
     type: String,
@@ -251,7 +266,15 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['bulk-action', 'update:density', 'toggle-column', 'refresh', 'update:search-query'])
+const emit = defineEmits([
+  'bulk-action',
+  'update:density',
+  'toggle-column',
+  'refresh',
+  'update:search-query',
+  'add',
+  'add-button-click'
+])
 
 // Refs
 const showColumnMenu = ref(false)
@@ -260,6 +283,29 @@ const columnMenu = ref(null)
 const columnMenuStyle = ref({})
 
 const selectedCount = computed(() => props.selectedItems.length)
+const hasAddButton = computed(() => Object.keys(props.addButton || {}).length > 0)
+
+const hasAddButtonPermission = computed(() => {
+  if (!hasAddButton.value) return false
+  if (props.addButton.permission === undefined) return true
+  if (typeof props.addButton.permission === 'function') return props.addButton.permission()
+  return Boolean(props.addButton.permission)
+})
+
+const isAddButtonVisible = computed(() => {
+  if (!hasAddButton.value || !hasAddButtonPermission.value) return false
+  if (typeof props.addButton.visible === 'function') return props.addButton.visible()
+  if (props.addButton.visible === undefined) return true
+  return Boolean(props.addButton.visible)
+})
+
+const isAddButtonDisabled = computed(() => {
+  if (!isAddButtonVisible.value) return true
+  if (typeof props.addButton.disabled === 'function') return props.addButton.disabled()
+  return Boolean(props.addButton.disabled)
+})
+
+const addButtonTooltip = computed(() => props.addButton.tooltip || props.addButton.label || 'Add new item')
 
 const densityOptions = [
   { value: 'compact', label: 'Compact', icon: ['fas', 'minus'] },
@@ -432,6 +478,15 @@ const isColumnVisible = (columnKey) => props.visibleColumns.includes(columnKey)
 
 const toggleColumn = (columnKey, visible) => {
   emit('toggle-column', { column: columnKey, visible })
+}
+
+const handleAddButtonClick = () => {
+  if (isAddButtonDisabled.value) return
+  emit('add')
+  emit('add-button-click', props.addButton)
+  if (typeof props.addButton.onClick === 'function') {
+    props.addButton.onClick()
+  }
 }
 
 // Lifecycle
