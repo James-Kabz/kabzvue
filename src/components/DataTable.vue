@@ -86,7 +86,7 @@ const props = defineProps({
   },
   density: {
     type: String,
-    default: 'normal',
+    default: 'compact',
     validator: (value) => ['compact', 'normal', 'comfortable'].includes(value)
   },
   headerVariant: {
@@ -546,7 +546,7 @@ const bodyClasses = computed(() =>
 
 const getHeaderCellClasses = (column) => {
   const densityPadding = {
-    compact: 'px-4 py-2',
+    compact: 'px-3.5 py-1.5',
     normal: 'px-6 py-3',
     comfortable: 'px-8 py-4'
   }
@@ -563,7 +563,7 @@ const getHeaderCellClasses = (column) => {
 
 const getDataCellClasses = () => {
   const densityPadding = {
-    compact: 'px-4 py-2',
+    compact: 'px-3.5 py-1.5',
     normal: 'px-6 py-4',
     comfortable: 'px-8 py-6'
   }
@@ -619,7 +619,7 @@ const closeModal = () => {
 
 const checkboxCellClasses = computed(() => {
   const densityPadding = {
-    compact: 'px-4 py-2',
+    compact: 'px-3.5 py-1.5',
     normal: 'px-6 py-4',
     comfortable: 'px-8 py-6'
   }
@@ -632,7 +632,7 @@ const checkboxCellClasses = computed(() => {
 
 const actionsCellClasses = computed(() => {
   const densityPadding = {
-    compact: 'px-4 py-2',
+    compact: 'px-3.5 py-1.5',
     normal: 'px-6 py-4',
     comfortable: 'px-8 py-6'
   }

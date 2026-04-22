@@ -363,7 +363,7 @@ const dateTo = ref('')
 // Table state
 const selectedUsers = ref([])
 const pageSize = ref(10)
-const density = ref('normal')
+const density = ref('compact')
 const isRefreshing = ref(false)
 
 // Status messages

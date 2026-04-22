@@ -234,7 +234,7 @@ const props = defineProps({
   isRefreshing: { type: Boolean, default: false },
   density: {
     type: String,
-    default: 'normal',
+    default: 'compact',
     validator: (v) => ['compact', 'normal', 'comfortable'].includes(v)
   },
   toggleableColumns: { type: Array, default: () => [] },
