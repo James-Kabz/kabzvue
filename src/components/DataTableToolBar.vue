@@ -1,178 +1,3 @@
-<template>
-  <div class="flex flex-col">
-    <div :class="toolbarClasses">
-      <!-- Left side - Selection actions -->
-      <div class="flex items-center gap-3">
-        <div
-          v-if="selectedCount > 0"
-          class="flex items-center gap-3"
-        >
-          <span class="text-sm ui-text">
-            {{ selectedCount }} selected
-          </span>
-
-          <!-- Bulk actions -->
-          <div class="flex items-center gap-2">
-            <Button
-              v-for="action in bulkActions"
-              :key="action.key"
-              :class="getBulkActionClasses(action)"
-              @click="$emit('bulk-action', { action: action.key, items: selectedItems })"
-            >
-              <font-awesome-icon
-                v-if="action.icon"
-                :icon="action.icon"
-                class="w-4 h-4"
-              />
-              {{ action.label }}
-            </Button>
-          </div>
-        </div>
-
-        <!-- Default info when no selection -->
-        <div
-          v-else-if="totalItems > 0"
-          :class="itemCountClasses"
-        >
-          {{ totalItems }} {{ itemLabel }}
-        </div>
-      </div>
-
-      <!-- Right side - View controls and actions -->
-      <div class="flex items-center gap-3">
-        <!-- View density toggle -->
-        <div
-          v-if="showDensityToggle"
-          :class="densityToggleClasses"
-        >
-          <button
-            v-for="option in densityOptions"
-            :key="option.value"
-            :class="getDensityButtonClasses(option.value)"
-            :title="option.label"
-            type="button"
-            @click="$emit('update:density', option.value)"
-          >
-            <font-awesome-icon
-              :icon="option.icon"
-              class="w-4 h-4"
-            />
-          </button>
-        </div>
-
-        <!-- Column visibility toggle -->
-        <div
-          v-if="showColumnToggle"
-          class="relative"
-        >
-          <button
-            ref="columnToggleButton"
-            :class="columnToggleButtonClasses"
-            type="button"
-            @click.stop="toggleColumnMenu"
-          >
-            <font-awesome-icon
-              icon="columns"
-              class="w-4 h-4"
-            />
-            <span>Columns</span>
-          </button>
-
-          <!-- Column menu -->
-          <Teleport to="body">
-            <div
-              v-show="showColumnMenu"
-              ref="columnMenu"
-              :class="columnMenuClasses"
-              :style="columnMenuStyle"
-              @click.stop
-            >
-              <div class="p-3">
-                <div :class="columnMenuHeaderClasses">
-                  Show Columns
-                </div>
-                <div class="space-y-1">
-                  <div
-                    v-for="column in toggleableColumns"
-                    :key="column.key"
-                    :class="columnMenuItemClasses"
-                  >
-                    <label class="flex items-center gap-2 cursor-pointer w-full">
-                      <input
-                        type="checkbox"
-                        :checked="isColumnVisible(column.key)"
-                        :class="checkboxClasses"
-                        @change="toggleColumn(column.key, $event.target.checked)"
-                      >
-                      <span :class="labelClasses">
-                        {{ column.label }}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Teleport>
-        </div>
-
-        <!-- Refresh button -->
-        <button
-          v-if="showRefresh"
-          :disabled="isRefreshing"
-          :class="getRefreshButtonClasses()"
-          type="button"
-          @click="$emit('refresh')"
-        >
-          <font-awesome-icon
-            icon="sync"
-            :class="getRefreshIconClasses()"
-          />
-          <span>Refresh</span>
-        </button>
-
-        <!-- Custom actions -->
-        <div
-          v-if="$slots.actions"
-          class="flex items-center gap-2"
-        >
-          <slot name="actions" />
-        </div>
-
-        <!-- Search input (right-most control) -->
-        <div
-          v-if="showSearch"
-          class="relative"
-        >
-          <font-awesome-icon
-            icon="search"
-            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ui-text-soft"
-          />
-          <input
-            :value="searchQuery"
-            type="text"
-            :placeholder="searchPlaceholder"
-            :class="searchInputClasses"
-            @input="$emit('update:search-query', $event.target.value)"
-          >
-        </div>
-
-        <Button
-          v-if="isAddButtonVisible"
-          :variant="addButton.variant || 'success'"
-          :disabled="isAddButtonDisabled"
-          :title="addButtonTooltip"
-          @click="handleAddButtonClick"
-        >
-          <Icon
-            :icon="addButton.icon || 'plus'"
-          />
-          <span>{{ addButton.label || 'Add' }}</span>
-        </Button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 
 // Default bulk actions
@@ -502,3 +327,179 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateColumnMenuPosition)
 })
 </script>
+
+
+<template>
+  <div class="flex flex-col rounded-2xl">
+    <div :class="toolbarClasses">
+      <!-- Left side - Selection actions -->
+      <div class="flex items-center gap-3">
+        <div
+          v-if="selectedCount > 0"
+          class="flex items-center gap-3"
+        >
+          <span class="text-sm ui-text">
+            {{ selectedCount }} selected
+          </span>
+
+          <!-- Bulk actions -->
+          <div class="flex items-center gap-2">
+            <Button
+              v-for="action in bulkActions"
+              :key="action.key"
+              :class="getBulkActionClasses(action)"
+              @click="$emit('bulk-action', { action: action.key, items: selectedItems })"
+            >
+              <font-awesome-icon
+                v-if="action.icon"
+                :icon="action.icon"
+                class="w-4 h-4"
+              />
+              {{ action.label }}
+            </Button>
+          </div>
+        </div>
+
+        <!-- Default info when no selection -->
+        <div
+          v-else-if="totalItems > 0"
+          :class="itemCountClasses"
+        >
+          {{ totalItems }} {{ itemLabel }}
+        </div>
+      </div>
+
+      <!-- Right side - View controls and actions -->
+      <div class="flex items-center gap-3">
+        <!-- View density toggle -->
+        <div
+          v-if="showDensityToggle"
+          :class="densityToggleClasses"
+        >
+          <button
+            v-for="option in densityOptions"
+            :key="option.value"
+            :class="getDensityButtonClasses(option.value)"
+            :title="option.label"
+            type="button"
+            @click="$emit('update:density', option.value)"
+          >
+            <font-awesome-icon
+              :icon="option.icon"
+              class="w-4 h-4"
+            />
+          </button>
+        </div>
+
+        <!-- Column visibility toggle -->
+        <div
+          v-if="showColumnToggle"
+          class="relative"
+        >
+          <button
+            ref="columnToggleButton"
+            :class="columnToggleButtonClasses"
+            type="button"
+            @click.stop="toggleColumnMenu"
+          >
+            <font-awesome-icon
+              icon="columns"
+              class="w-4 h-4"
+            />
+            <span>Columns</span>
+          </button>
+
+          <!-- Column menu -->
+          <Teleport to="body">
+            <div
+              v-show="showColumnMenu"
+              ref="columnMenu"
+              :class="columnMenuClasses"
+              :style="columnMenuStyle"
+              @click.stop
+            >
+              <div class="p-3">
+                <div :class="columnMenuHeaderClasses">
+                  Show Columns
+                </div>
+                <div class="space-y-1">
+                  <div
+                    v-for="column in toggleableColumns"
+                    :key="column.key"
+                    :class="columnMenuItemClasses"
+                  >
+                    <label class="flex items-center gap-2 cursor-pointer w-full">
+                      <input
+                        type="checkbox"
+                        :checked="isColumnVisible(column.key)"
+                        :class="checkboxClasses"
+                        @change="toggleColumn(column.key, $event.target.checked)"
+                      >
+                      <span :class="labelClasses">
+                        {{ column.label }}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Teleport>
+        </div>
+
+        <!-- Refresh button -->
+        <button
+          v-if="showRefresh"
+          :disabled="isRefreshing"
+          :class="getRefreshButtonClasses()"
+          type="button"
+          @click="$emit('refresh')"
+        >
+          <font-awesome-icon
+            icon="sync"
+            :class="getRefreshIconClasses()"
+          />
+          <span>Refresh</span>
+        </button>
+
+        <!-- Custom actions -->
+        <div
+          v-if="$slots.actions"
+          class="flex items-center gap-2"
+        >
+          <slot name="actions" />
+        </div>
+
+        <!-- Search input (right-most control) -->
+        <div
+          v-if="showSearch"
+          class="relative"
+        >
+          <font-awesome-icon
+            icon="search"
+            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ui-text-soft"
+          />
+          <input
+            :value="searchQuery"
+            type="text"
+            :placeholder="searchPlaceholder"
+            :class="searchInputClasses"
+            @input="$emit('update:search-query', $event.target.value)"
+          >
+        </div>
+
+        <Button
+          v-if="isAddButtonVisible"
+          :variant="addButton.variant || 'success'"
+          :disabled="isAddButtonDisabled"
+          :title="addButtonTooltip"
+          @click="handleAddButtonClick"
+        >
+          <Icon
+            :icon="addButton.icon || 'plus'"
+          />
+          <span>{{ addButton.label || 'Add' }}</span>
+        </Button>
+      </div>
+    </div>
+  </div>
+</template>
