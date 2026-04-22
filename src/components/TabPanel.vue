@@ -6,7 +6,7 @@
     :aria-labelledby="`tab-${index}`"
     class="ui-text"
   >
-    <div class="rounded-xl border ui-border bg-(--ui-surface) p-4 md:p-5 shadow-xs">
+    <div class="rounded-xl border ui-border bg-(--ui-surface) p-2 shadow-xs">
       <div
         v-if="loading"
         class="flex items-center justify-center p-8"
