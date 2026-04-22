@@ -225,12 +225,12 @@ const props = defineProps({
 defineEmits(['update:currentPage', 'update:pageSize'])
 
 // CVA variants
-const footerVariants = cva('border-t ui-border-strong rounded-2xl', {
+const footerVariants = cva('border ui-border-strong rounded-2xl', {
   variants: {
     variant: {
       default: 'bg-(--ui-bg) ',
       minimal: 'bg-transparent ui-border-strong ',
-      bordered: 'bg-(--ui-bg)  border-t-2 ui-border-strong '
+      bordered: 'bg-(--ui-bg) border-2 ui-border-strong '
     },
     padding: {
       compact: 'px-4 py-2',

@@ -683,7 +683,7 @@ const removeFilter = (filterKey) => {
 </script>
 
 <template>
-  <div class=" border-b ui-border rounded-2xl">
+  <div class="border ui-border rounded-2xl mb-2 ui-surface overflow-hidden">
     <!-- Main Filters Bar -->
     <div :class="filtersClasses">
       <!-- Search Input -->

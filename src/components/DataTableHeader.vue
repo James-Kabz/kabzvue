@@ -58,12 +58,12 @@ const props = defineProps({
   }
 })
 
-const headerVariants = cva('border-b ui-border-strong', {
+const headerVariants = cva('border ui-border-strong rounded-2xl', {
   variants: {
     variant: {
       default: 'ui-border-strong',
       minimal: 'bg-transparent border-none',
-      bordered: ' border-2 ui-border-strong'
+      bordered: 'border-2 ui-border-strong'
     },
     padding: {
       compact: 'px-4 py-2',

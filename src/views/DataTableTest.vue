@@ -1,108 +1,96 @@
 <template>
-  <div
-    id="app"
-    class="min-h-screen bg-(--ui-bg) "
+  <div class="p-2">
+  <DataTableFilters
+    v-model:search-query="searchQuery"
+    v-model:date-from="dateFrom"
+    v-model:date-to="dateTo"
+    :status-options="statusOptions"
+    :show-file-upload="true"
+    :show-date-filter="true"
+    :show-export="true"
+    :show-search="false"
+    search-placeholder="Search users..."
+    @export="handleExport"
+    @clear-filters="clearAllFilters"
   >
-    <div class="container mx-auto py-8">
-      <h1 class="text-3xl font-bold ui-text mb-8">
-        Vue DataTable with Filters
-      </h1>
-      <!-- DataTable with Filters -->
-      <div class="rounded-lg shadow-sm border ui-border-strong overflow-hidden">
-        <!-- Filters Component -->
-        <DataTableFilters
-          v-model:search-query="searchQuery"
-          v-model:date-from="dateFrom"
-          v-model:date-to="dateTo"
-          :status-options="statusOptions"
-          :show-file-upload="true"
-          :show-date-filter="true"
-          :show-export="true"
-          :show-search="false"
-          search-placeholder="Search users..."
-          @export="handleExport"
-          @clear-filters="clearAllFilters"
-        >
-          <template #filters>
-            <!-- Custom filters -->
-            <select
-              v-model="departmentFilter"
-              class="px-3 py-2 border ui-border-strong rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-(--ui-primary)"
-            >
-              <option value="">
-                All Departments
-              </option>
-              <option value="Engineering">
-                Engineering
-              </option>
-              <option value="Marketing">
-                Marketing
-              </option>
-              <option value="Sales">
-                Sales
-              </option>
-              <option value="Design">
-                Design
-              </option>
-            </select>
-          </template>
-        </DataTableFilters>
+    <template #filters>
+      <!-- Custom filters -->
+      <select
+        v-model="departmentFilter"
+        class="px-3 py-2 border ui-border-strong rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-(--ui-primary)"
+      >
+        <option value="">
+          All Departments
+        </option>
+        <option value="Engineering">
+          Engineering
+        </option>
+        <option value="Marketing">
+          Marketing
+        </option>
+        <option value="Sales">
+          Sales
+        </option>
+        <option value="Design">
+          Design
+        </option>
+      </select>
+    </template>
+  </DataTableFilters>
 
-        <!-- Toolbar Component -->
-        <DataTableToolBar
-          :selected-items="selectedUsers"
-          :total-items="filteredUsers.length"
-          :bulk-actions="bulkActions"
-          :add-button="addButtonConfig"
-          :density="density"
-          :toggleable-columns="allColumns"
-          :visible-columns="visibleColumns"
-          :is-refreshing="isRefreshing"
-          :show-density-toggle="true"
-          :show-column-toggle="true"
-          :show-refresh="true"
-          :search-query="searchQuery"
-          search-placeholder="Search users..."
-          @bulk-action="handleBulkAction"
-          @update:density="handleDensityChange"
-          @update:search-query="(value) => (searchQuery = value)"
-          @toggle-column="handleColumnToggle"
-          @refresh="handleRefresh"
-          @add="handleAddUser"
-          @add-button-click="handleAddButtonClick"
-        >
-          <template #actions>
-            <!-- Additional toolbar actions -->
-            <button
-              :disabled="selectedUsers.length === 0"
-              class="px-3 py-2 text-sm ui-text hover:text-(--ui-text) border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              @click="handleBulkExport"
-            >
-              <font-awesome-icon icon="download" />
-              Export Selected
-            </button>
-          </template>
-        </DataTableToolBar>
+  <DataTableToolBar
+    :selected-items="selectedUsers"
+    :total-items="filteredUsers.length"
+    :bulk-actions="bulkActions"
+    :add-button="addButtonConfig"
+    :density="density"
+    :toggleable-columns="allColumns"
+    :visible-columns="visibleColumns"
+    :is-refreshing="isRefreshing"
+    :show-density-toggle="true"
+    :show-column-toggle="true"
+    :show-refresh="true"
+    :search-query="searchQuery"
+    search-placeholder="Search users..."
+    @bulk-action="handleBulkAction"
+    @update:density="handleDensityChange"
+    @update:search-query="(value) => (searchQuery = value)"
+    @toggle-column="handleColumnToggle"
+    @refresh="handleRefresh"
+    @add="handleAddUser"
+    @add-button-click="handleAddButtonClick"
+  >
+    <template #actions>
+      <!-- Additional toolbar actions -->
+      <button
+        :disabled="selectedUsers.length === 0"
+        class="px-3 py-2 text-sm ui-text hover:text-(--ui-text) border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        @click="handleBulkExport"
+      >
+        <font-awesome-icon icon="download" />
+        Export Selected
+      </button>
+    </template>
+  </DataTableToolBar>
 
-        <!-- DataTable Component -->
-        <DataTable
-          :data="filteredUsers"
-          :columns="visibleColumnObjects"
-          :selectable="true"
-          :selected-items="selectedUsers"
-          :striped="true"
-          :hoverable="true"
-          :clickable-rows="true"
-          :page-size="pageSize"
-          :show-pagination="true"
-          :density="density"
-          :actions="userActions"
-          empty-text="No users found"
-          @selection-change="selectedUsers = $event"
-          @sort-change="handleSort"
-          @row-click="handleRowClick"
-          @action="handleAction"
-        >
+  <DataTable
+    :data="filteredUsers"
+    :columns="visibleColumnObjects"
+    :selectable="true"
+    :selected-items="selectedUsers"
+    :striped="true"
+    :hoverable="true"
+    :clickable-rows="true"
+    :page-size="pageSize"
+    :show-pagination="true"
+    :density="density"
+    :actions="userActions"
+    empty-text="No users found"
+    @selection-change="selectedUsers = $event"
+    @sort-change="handleSort"
+    @row-click="handleRowClick"
+    @action="handleAction"
+  >
           <!-- Custom cell for user name with avatar -->
           <template #cell-name="{ item }">
             <div class="flex items-center">
@@ -151,19 +139,8 @@
               {{ formatDate(value) }}
             </span>
           </template>
-        </DataTable>
-      </div>
-
-      <!-- Status Messages -->
-      <div
-        v-if="statusMessage"
-        class="mt-4 p-4 rounded-lg"
-        :class="statusMessageClass"
-      >
-        {{ statusMessage }}
-      </div>
-    </div>
-  </div>
+  </DataTable>
+</div>
 </template>
 
 <script setup>

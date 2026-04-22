@@ -140,7 +140,7 @@ const densityOptions = [
 
 
 // CVA Variants
-const toolbarVariants = cva('flex items-center justify-between border-b ui-border-strong', {
+const toolbarVariants = cva('flex items-center justify-between border ui-border-strong rounded-2xl', {
   variants: {
     variant: {
       default: 'ui-border-strong',
@@ -330,7 +330,7 @@ onUnmounted(() => {
 
 
 <template>
-  <div class="flex flex-col rounded-2xl">
+  <div class="flex flex-col rounded-2xl mb-2 px-2">
     <div :class="toolbarClasses">
       <!-- Left side - Selection actions -->
       <div class="flex items-center gap-3">
