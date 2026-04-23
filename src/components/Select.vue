@@ -52,6 +52,11 @@ const buttonRef = ref(null)
 const dropdownRef = ref(null)
 const filteredOptions = ref([...props.options])
 const dropdownStyle = ref({})
+const VIEWPORT_PADDING = 12
+const DROPDOWN_GAP = 4
+const MAX_DROPDOWN_HEIGHT = 320
+const DROPDOWN_MIN_HEIGHT = 180
+const DROPDOWN_Z_INDEX = 10050
 
 const selectedOption = computed(() => {
   return props.options.find(option => option.value === props.modelValue)
@@ -87,15 +92,40 @@ const selectButtonClasses = computed(() =>
 )
 
 const updateDropdownPosition = () => {
-  if (!buttonRef.value) return
+  if (!buttonRef.value || !isOpen.value) return
 
   const rect = buttonRef.value.getBoundingClientRect()
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+  const availableBelow = Math.max(0, viewportHeight - rect.bottom - DROPDOWN_GAP - VIEWPORT_PADDING)
+  const availableAbove = Math.max(0, rect.top - DROPDOWN_GAP - VIEWPORT_PADDING)
+  const openAbove = availableAbove > availableBelow
+  const availableHeight = openAbove ? availableAbove : availableBelow
+  const maxHeight = Math.max(
+    Math.min(MAX_DROPDOWN_HEIGHT, availableHeight),
+    Math.min(DROPDOWN_MIN_HEIGHT, MAX_DROPDOWN_HEIGHT)
+  )
+
+  const maxWidth = Math.max(0, viewportWidth - VIEWPORT_PADDING * 2)
+  const width = Math.min(rect.width, maxWidth)
+  let left = rect.left
+
+  if (left + width > viewportWidth - VIEWPORT_PADDING) {
+    left = viewportWidth - VIEWPORT_PADDING - width
+  }
+  if (left < VIEWPORT_PADDING) {
+    left = VIEWPORT_PADDING
+  }
+
   dropdownStyle.value = {
     position: 'fixed',
-    top: `${rect.bottom + 4}px`,
-    left: `${rect.left}px`,
-    width: `${rect.width}px`,
-    zIndex: 9999
+    left: `${left}px`,
+    width: `${width}px`,
+    maxHeight: `${maxHeight}px`,
+    zIndex: DROPDOWN_Z_INDEX,
+    ...(openAbove
+      ? { bottom: `${viewportHeight - rect.top + DROPDOWN_GAP}px` }
+      : { top: `${rect.bottom + DROPDOWN_GAP}px` })
   }
 }
 
@@ -258,7 +288,7 @@ watch(isOpen, (open) => {
         ref="dropdownRef"
         :style="dropdownStyle"
         data-select-dropdown
-        class="ui-surface border ui-border-strong shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none"
+        class="ui-surface border ui-border-strong shadow-lg rounded-md py-1 text-base overflow-hidden focus:outline-none flex flex-col overscroll-contain"
       >
         <!-- Search input -->
         <div class="px-3 py-2 border-b ui-border">
@@ -277,7 +307,8 @@ watch(isOpen, (open) => {
         <!-- Options list -->
         <div
           v-if="filteredOptions.length > 0"
-          class="max-h-48 overflow-y-auto"
+          class="overflow-y-auto flex-1 overscroll-contain"
+          @wheel.stop
         >
           <button
             v-for="option in filteredOptions"

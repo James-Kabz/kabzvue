@@ -43,6 +43,8 @@ const dropdownStyle = ref({})
 const VIEWPORT_PADDING = 12
 const DROPDOWN_GAP = 4
 const MAX_DROPDOWN_HEIGHT = 320
+const DROPDOWN_MIN_HEIGHT = 180
+const DROPDOWN_Z_INDEX = 10050
 
 const selectedLabels = computed(() => {
   return props.options
@@ -66,7 +68,10 @@ const updateDropdownPosition = () => {
   const availableAbove = Math.max(0, rect.top - DROPDOWN_GAP - VIEWPORT_PADDING)
   const openAbove = availableAbove > availableBelow
   const availableHeight = openAbove ? availableAbove : availableBelow
-  const maxHeight = Math.min(MAX_DROPDOWN_HEIGHT, availableHeight)
+  const maxHeight = Math.max(
+    Math.min(MAX_DROPDOWN_HEIGHT, availableHeight),
+    Math.min(DROPDOWN_MIN_HEIGHT, MAX_DROPDOWN_HEIGHT)
+  )
 
   const maxWidth = Math.max(0, viewportWidth - VIEWPORT_PADDING * 2)
   const width = Math.min(rect.width, maxWidth)
@@ -84,7 +89,7 @@ const updateDropdownPosition = () => {
     left: `${left}px`,
     width: `${width}px`,
     maxHeight: `${maxHeight}px`,
-    zIndex: 9999,
+    zIndex: DROPDOWN_Z_INDEX,
     ...(openAbove
       ? { bottom: `${viewportHeight - rect.top + DROPDOWN_GAP}px` }
       : { top: `${rect.bottom + DROPDOWN_GAP}px` })
@@ -252,7 +257,7 @@ watch(isOpen, (open) => {
           ref="dropdownRef"
           :style="dropdownStyle"
           data-multiselect-dropdown
-          class="shadow-lg rounded-md text-base ring-1 ring-(--ui-border-strong) ring-opacity-5 overflow-hidden focus:outline-none ui-surface flex flex-col"
+          class="shadow-lg rounded-md text-base ring-1 ring-(--ui-border-strong) ring-opacity-5 overflow-hidden focus:outline-none ui-surface flex flex-col overscroll-contain"
         >
           <!-- Search input -->
           <div class="px-3 py-2.5 border-b ui-border-strong  ui-surface-muted">
@@ -270,7 +275,8 @@ watch(isOpen, (open) => {
           <!-- Options list -->
           <div
             v-if="filteredOptions.length > 0"
-            class="overflow-y-auto py-1 flex-1"
+            class="overflow-y-auto py-1 flex-1 overscroll-contain"
+            @wheel.stop
           >
             <button
               v-for="option in filteredOptions"
