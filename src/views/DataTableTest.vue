@@ -1,146 +1,146 @@
 <template>
   <div class="p-2">
-  <DataTableFilters
-    v-model:search-query="searchQuery"
-    v-model:date-from="dateFrom"
-    v-model:date-to="dateTo"
-    :status-options="statusOptions"
-    :show-file-upload="true"
-    :show-date-filter="true"
-    :show-export="true"
-    :show-search="false"
-    search-placeholder="Search users..."
-    @export="handleExport"
-    @clear-filters="clearAllFilters"
-  >
-    <template #filters>
-      <!-- Custom filters -->
-      <select
-        v-model="departmentFilter"
-        class="px-3 py-2 border ui-border-strong rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-(--ui-primary)"
-      >
-        <option value="">
-          All Departments
-        </option>
-        <option value="Engineering">
-          Engineering
-        </option>
-        <option value="Marketing">
-          Marketing
-        </option>
-        <option value="Sales">
-          Sales
-        </option>
-        <option value="Design">
-          Design
-        </option>
-      </select>
-    </template>
-  </DataTableFilters>
+    <DataTableFilters
+      v-model:search-query="searchQuery"
+      v-model:date-from="dateFrom"
+      v-model:date-to="dateTo"
+      :status-options="statusOptions"
+      :show-file-upload="true"
+      :show-date-filter="true"
+      :show-export="true"
+      :show-search="false"
+      search-placeholder="Search users..."
+      @export="handleExport"
+      @clear-filters="clearAllFilters"
+    >
+      <template #filters>
+        <!-- Custom filters -->
+        <select
+          v-model="departmentFilter"
+          class="px-3 py-2 border ui-border-strong rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-(--ui-primary)"
+        >
+          <option value="">
+            All Departments
+          </option>
+          <option value="Engineering">
+            Engineering
+          </option>
+          <option value="Marketing">
+            Marketing
+          </option>
+          <option value="Sales">
+            Sales
+          </option>
+          <option value="Design">
+            Design
+          </option>
+        </select>
+      </template>
+    </DataTableFilters>
 
-  <DataTableToolBar
-    :selected-items="selectedUsers"
-    :total-items="filteredUsers.length"
-    :bulk-actions="bulkActions"
-    :add-button="addButtonConfig"
-    :density="density"
-    :toggleable-columns="allColumns"
-    :visible-columns="visibleColumns"
-    :is-refreshing="isRefreshing"
-    :show-density-toggle="true"
-    :show-column-toggle="true"
-    :show-refresh="true"
-    :search-query="searchQuery"
-    search-placeholder="Search users..."
-    @bulk-action="handleBulkAction"
-    @update:density="handleDensityChange"
-    @update:search-query="(value) => (searchQuery = value)"
-    @toggle-column="handleColumnToggle"
-    @refresh="handleRefresh"
-    @add="handleAddUser"
-    @add-button-click="handleAddButtonClick"
-  >
-    <template #actions>
-      <!-- Additional toolbar actions -->
-      <button
-        :disabled="selectedUsers.length === 0"
-        class="px-3 py-2 text-sm ui-text hover:text-(--ui-text) border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        @click="handleBulkExport"
-      >
-        <font-awesome-icon icon="download" />
-        Export Selected
-      </button>
-    </template>
-  </DataTableToolBar>
+    <DataTableToolBar
+      :selected-items="selectedUsers"
+      :total-items="filteredUsers.length"
+      :bulk-actions="bulkActions"
+      :add-button="addButtonConfig"
+      :density="density"
+      :toggleable-columns="allColumns"
+      :visible-columns="visibleColumns"
+      :is-refreshing="isRefreshing"
+      :show-density-toggle="true"
+      :show-column-toggle="true"
+      :show-refresh="true"
+      :search-query="searchQuery"
+      search-placeholder="Search users..."
+      @bulk-action="handleBulkAction"
+      @update:density="handleDensityChange"
+      @update:search-query="(value) => (searchQuery = value)"
+      @toggle-column="handleColumnToggle"
+      @refresh="handleRefresh"
+      @add="handleAddUser"
+      @add-button-click="handleAddButtonClick"
+    >
+      <template #actions>
+        <!-- Additional toolbar actions -->
+        <button
+          :disabled="selectedUsers.length === 0"
+          class="px-3 py-2 text-sm ui-text hover:text-(--ui-text) border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="handleBulkExport"
+        >
+          <font-awesome-icon icon="download" />
+          Export Selected
+        </button>
+      </template>
+    </DataTableToolBar>
 
-  <DataTable
-    :data="filteredUsers"
-    :columns="visibleColumnObjects"
-    :selectable="true"
-    :selected-items="selectedUsers"
-    :striped="true"
-    :hoverable="true"
-    :clickable-rows="true"
-    :page-size="pageSize"
-    :show-pagination="true"
-    :density="density"
-    :actions="userActions"
-    empty-text="No users found"
-    @selection-change="selectedUsers = $event"
-    @sort-change="handleSort"
-    @row-click="handleRowClick"
-    @action="handleAction"
-  >
-          <!-- Custom cell for user name with avatar -->
-          <template #cell-name="{ item }">
-            <div class="flex items-center">
-              <img
-                :src="item.avatar"
-                :alt="item.name"
-                class="w-8 h-8 rounded-full mr-3"
-                @error="handleImageError"
-              >
-              <div>
-                <div class="font-medium ui-text">
-                  {{ item.name }}
-                </div>
-                <div class="text-xs ui-text">
-                  ID: {{ item.id }}
-                </div>
-              </div>
+    <DataTable
+      :data="filteredUsers"
+      :columns="visibleColumnObjects"
+      :selectable="true"
+      :selected-items="selectedUsers"
+      :striped="true"
+      :hoverable="true"
+      :clickable-rows="true"
+      :page-size="pageSize"
+      :show-pagination="true"
+      :density="density"
+      :actions="userActions"
+      empty-text="No users found"
+      @selection-change="selectedUsers = $event"
+      @sort-change="handleSort"
+      @row-click="handleRowClick"
+      @action="handleAction"
+    >
+      <!-- Custom cell for user name with avatar -->
+      <template #cell-name="{ item }">
+        <div class="flex items-center">
+          <img
+            :src="item.avatar"
+            :alt="item.name"
+            class="w-8 h-8 rounded-full mr-3"
+            @error="handleImageError"
+          >
+          <div>
+            <div class="font-medium ui-text">
+              {{ item.name }}
             </div>
-          </template>
+            <div class="text-xs ui-text">
+              ID: {{ item.id }}
+            </div>
+          </div>
+        </div>
+      </template>
 
-          <!-- Custom cell for status -->
-          <template #cell-status="{ value }">
-            <span :class="getStatusBadgeClasses(value)">
-              <span class="flex items-center gap-1">
-                <span
-                  :class="[
-                    'w-2 h-2 rounded-full',
-                    value === 'active' ? 'ui-success-bg' : 'ui-danger-bg'
-                  ]"
-                />
-                {{ value }}
-              </span>
-            </span>
-          </template>
+      <!-- Custom cell for status -->
+      <template #cell-status="{ value }">
+        <span :class="getStatusBadgeClasses(value)">
+          <span class="flex items-center gap-1">
+            <span
+              :class="[
+                'w-2 h-2 rounded-full',
+                value === 'active' ? 'ui-success-bg' : 'ui-danger-bg'
+              ]"
+            />
+            {{ value }}
+          </span>
+        </span>
+      </template>
 
-          <!-- Custom cell for salary -->
-          <template #cell-salary="{ value }">
-            <span class="font-mono ui-success">
-              {{ formatCurrency(value) }}
-            </span>
-          </template>
+      <!-- Custom cell for salary -->
+      <template #cell-salary="{ value }">
+        <span class="font-mono ui-success">
+          {{ formatCurrency(value) }}
+        </span>
+      </template>
 
-          <!-- Custom cell for last login -->
-          <template #cell-lastLogin="{ value }">
-            <span class="text-sm ui-text">
-              {{ formatDate(value) }}
-            </span>
-          </template>
-  </DataTable>
-</div>
+      <!-- Custom cell for last login -->
+      <template #cell-lastLogin="{ value }">
+        <span class="text-sm ui-text">
+          {{ formatDate(value) }}
+        </span>
+      </template>
+    </DataTable>
+  </div>
 </template>
 
 <script setup>

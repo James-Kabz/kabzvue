@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, provide } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Sidebar from '../components/Sidebar.vue'
 import Header from '../components/Header.vue'
@@ -33,38 +33,24 @@ const currentSection = ref(props.initialSection)
 const currentPage = ref(props.initialPage)
 const currentRoute = ref(route.path)
 const mobileOpen = ref(false)
+const demoCompanies = ref([])
+const demoCurrentCompany = ref(null)
 
-// Management settings items
-const managementSettingsItems = [
+const fallbackCompanies = [
   {
-    name: 'system-settings',
-    label: 'System Settings',
-    route: '/management/system-settings',
-    icon: 'cog'
+    company_id: 101,
+    company_name: 'Acme Holdings Ltd',
+    company_role: 'Primary'
   },
   {
-    name: 'user-management',
-    label: 'User Management',
-    route: '/management/user-management',
-    icon: 'users'
+    company_id: 102,
+    company_name: 'Bluewave Logistics',
+    company_role: 'Subsidiary'
   },
   {
-    name: 'permissions',
-    label: 'Permissions',
-    route: '/management/permissions',
-    icon: 'shield'
-  },
-  {
-    name: 'audit-logs',
-    label: 'Audit Logs',
-    route: '/management/audit-logs',
-    icon: 'clipboard-list'
-  },
-  {
-    name: 'backup',
-    label: 'Backup & Restore',
-    route: '/management/backup',
-    icon: 'database'
+    company_id: 103,
+    company_name: 'Northwind Services',
+    company_role: 'Partner'
   }
 ]
 
@@ -156,14 +142,27 @@ const navigationItems = [
 const sidebarWidth = computed(() => 130)
 const resolvedCompanies = computed(() => {
   if (Array.isArray(props.user?.companies) && props.user.companies.length > 0) return props.user.companies
-  return []
+  if (demoCompanies.value.length > 0) return demoCompanies.value
+  return fallbackCompanies
 })
 
 const resolvedCurrentCompany = computed(() => {
   return props.user?.currentCompany
     || props.user?.company
+    || demoCurrentCompany.value
     || resolvedCompanies.value[0]
     || null
+})
+
+const setCompanySwitcherDemoData = ({ companies = [], currentCompany = null } = {}) => {
+  demoCompanies.value = Array.isArray(companies) ? companies : []
+  demoCurrentCompany.value = currentCompany || demoCompanies.value[0] || null
+}
+
+provide('dashboardLayout', {
+  currentSection,
+  currentPage,
+  setCompanySwitcherDemoData
 })
 
 const resolveEntityLogo = (entity) => {
@@ -297,12 +296,10 @@ defineExpose({
       :companies="resolvedCompanies"
       :logo-url="resolvedAppLogoUrl"
       :show-search="false"
-      :settings-menu-items="managementSettingsItems"
-      :settings-badge-count="managementSettingsItems.filter(item => item?.route).length"
+      settings-route="/management/system-settings"
       @search="handleSearch"
       @profile-action="handleProfileAction"
       @logout="handleLogout"
-      @settings-action="handleProfileAction"
       @navigate="handleNavigation"
       @toggle-mobile-sidebar="handleMobileSidebarToggle"
       @company-change="handleCompanyChange"

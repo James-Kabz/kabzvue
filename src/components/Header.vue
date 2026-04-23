@@ -1,7 +1,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { cn } from '../utils/cn.js'
+import { getMode, setMode } from '../lib/theme'
 import Icon from './Icon.vue'
+import Switch from './Switch.vue'
 
 const props = defineProps({
   sidebarWidth: { type: Number, default: 256 },
@@ -33,10 +35,15 @@ const props = defineProps({
   companySwitcherDescription: { type: String, default: 'Select a company to view its data' },
   entityLabel: { type: String, default: 'Company' },
   entityFieldMap: { type: Object, default: () => ({}) },
-  settingsMenuItems: { type: Array, default: () => [] },
   showSettings: { type: Boolean, default: true },
-  settingsTitle: { type: String, default: 'Settings' },
-  settingsBadgeCount: { type: Number, default: 0 },
+  settingsLabel: { type: String, default: 'Settings' },
+  settingsRoute: { type: [String, Object], default: '/settings' },
+  showThemeSwitcher: { type: Boolean, default: true },
+  themeSwitcherTitle: { type: String, default: 'Appearance' },
+  themeModes: {
+    type: Array,
+    default: () => ['light', 'dark']
+  },
   userInitialsOverride: { type: String, default: '' },
   userRoleDisplayOverride: { type: String, default: '' }
 })
@@ -50,7 +57,7 @@ const emit = defineEmits([
   'company-change',
   'notification-click',
   'view-all-notifications',
-  'settings-action'
+  'theme-change'
 ])
 
 const searchQuery = ref('')
@@ -59,13 +66,24 @@ const showProfile = ref(false)
 const showMobileSearch = ref(false)
 const isMobile = ref(false)
 const showCompanyDropdown = ref(false)
-const showSettingsDropdown = ref(false)
+const currentThemeMode = ref('light')
 
 const notificationCount = computed(() => props.notifications.filter(n => !n.read).length)
-
-const resolvedSettingsBadge = computed(() => {
-  if (props.settingsBadgeCount > 0) return props.settingsBadgeCount
-  return props.settingsMenuItems.filter(item => item?.route).length
+const resolvedThemeModes = computed(() => {
+  const modes = (Array.isArray(props.themeModes) ? props.themeModes : [])
+    .map(mode => String(mode || '').toLowerCase())
+    .filter(mode => mode === 'light' || mode === 'dark')
+  return modes.length > 0 ? [...new Set(modes)] : ['light', 'dark']
+})
+const canToggleTheme = computed(() => resolvedThemeModes.value.length > 1)
+const isDarkTheme = computed({
+  get: () => currentThemeMode.value === 'dark',
+  set: (value) => {
+    const targetMode = value ? 'dark' : 'light'
+    if (resolvedThemeModes.value.includes(targetMode)) {
+      setThemeMode(targetMode)
+    }
+  }
 })
 
 const userInitials = computed(() => {
@@ -145,34 +163,23 @@ const normalizedCompanies = computed(() => sourceCompanies.value.map(normalizeCo
 const toggleNotifications = () => {
   showNotificationsDropdown.value = !showNotificationsDropdown.value
   showProfile.value = false
-  showSettingsDropdown.value = false
 }
 
 const toggleProfile = () => {
   showProfile.value = !showProfile.value
   showNotificationsDropdown.value = false
   showCompanyDropdown.value = false
-  showSettingsDropdown.value = false
 }
 
 const toggleCompanyDropdown = () => {
   showCompanyDropdown.value = !showCompanyDropdown.value
   showProfile.value = false
   showNotificationsDropdown.value = false
-  showSettingsDropdown.value = false
-}
-
-const toggleSettingsDropdown = () => {
-  showSettingsDropdown.value = !showSettingsDropdown.value
-  showProfile.value = false
-  showNotificationsDropdown.value = false
-  showCompanyDropdown.value = false
 }
 
 const handleNavigation = (item) => {
   emit('navigate', item)
   showProfile.value = false
-  showSettingsDropdown.value = false
 }
 
 const isItemActive = (item) => {
@@ -207,18 +214,19 @@ const handleViewAllNotifications = () => {
   showNotificationsDropdown.value = false
 }
 
-const handleSettingsAction = (item) => {
-  emit('settings-action', item)
-  showSettingsDropdown.value = false
-}
-
 const handleClickOutside = (event) => {
   if (!event.target.closest('.absolute') && !event.target.closest('button')) {
     showNotificationsDropdown.value = false
     showProfile.value = false
     showCompanyDropdown.value = false
-    showSettingsDropdown.value = false
   }
+}
+
+const setThemeMode = (mode) => {
+  if (!resolvedThemeModes.value.includes(mode)) return
+  currentThemeMode.value = mode
+  setMode(mode)
+  emit('theme-change', mode)
 }
 
 const checkMobile = () => {
@@ -295,6 +303,8 @@ onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   checkMobile()
   window.addEventListener('resize', checkMobile)
+  const activeMode = getMode() || resolvedThemeModes.value[0] || 'light'
+  currentThemeMode.value = resolvedThemeModes.value.includes(activeMode) ? activeMode : resolvedThemeModes.value[0]
 })
 
 onUnmounted(() => {
@@ -330,43 +340,49 @@ watch(searchQuery, (newValue) => emit('search', newValue))
         <!-- Logged-in Company Logo -->
         <div
           v-if="resolvedCurrentCompanyLogo"
-          class="shrink-0"
+          :class="cn('shrink-0 overflow-hidden rounded-2xl flex items-center justify-center', props.companyLogoClass)"
         >
           <img
             :src="resolvedCurrentCompanyLogo || '/logo.png'"
             alt="Company logo"
-            :class="cn(props.companyLogoClass, 'w-auto object-contain rounded-2xl')"
+            class="max-w-full max-h-full w-auto h-auto object-contain object-center"
             @error="(e) => { e.target.src = '/logo.png' }"
           >
         </div>
 
         <!-- Divider -->
-        <div
+        <!-- <div
           v-if="resolvedCurrentCompanyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
           class="h-5 sm:h-18 w-px ui-border-strong-bg shrink-0 hidden sm:block"
-        />
+        /> -->
 
         <!-- Company Info Card - Simplified for mobile -->
         <div
           v-if="resolvedShowCompanyInfo && normalizedCurrentCompany"
-          class="shrink-0 ui-surface border ui-border-strong px-1 sm:px-1 py-1 sm:py-3 rounded-lg shadow-sm flex items-center gap-1 relative hover:bg-(--ui-surface-muted) transition-colors max-w-36 sm:max-w-52"
+          class="shrink-0 ui-surface border ui-border-strong px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-(--ui-surface-muted) transition-colors max-w-52 sm:max-w-72"
         >
           <!-- Company Details with Switcher -->
           <button
             v-if="normalizedCompanies.length > 1"
-            class="flex items-center gap-1.5 sm:gap-2 w-32 sm:w-40 cursor-pointer hover:bg-[color:color-mix(in oklab, var(--ui-surface-muted), transparent 35%)] rounded-md px-1 py-0.5 transition-all group"
+            class="flex items-center gap-2 sm:gap-3 w-44 sm:w-60 cursor-pointer rounded-lg px-1.5 py-1 transition-all group"
             @click="toggleCompanyDropdown"
           >
+            <div class="w-8 h-8 rounded-lg ui-surface-muted border ui-border-strong flex items-center justify-center shrink-0">
+              <Icon
+                icon="building"
+                class="w-4 h-4 ui-primary"
+              />
+            </div>
             <div class="flex-1 min-w-0">
               <p
-                class="text-xs sm:text-xl font-semibold ui-text truncate group-hover:text-(--ui-primary) leading-tight"
+                class="text-xs sm:text-sm font-semibold ui-text truncate group-hover:text-(--ui-primary) leading-tight"
               >
                 {{ normalizedCurrentCompany.__name }}
               </p>
             </div>
             <Icon
               icon="chevron-down"
-              class="w-3.5 h-3.5 ui-primary shrink-0 group-hover:text-(--ui-primary) transition-transform"
+              class="w-3.5 h-3.5 ui-text-soft shrink-0 group-hover:text-(--ui-primary) transition-transform"
               :class="{ 'rotate-180': showCompanyDropdown }"
             />
           </button>
@@ -374,9 +390,9 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           <!-- Static display when only one company -->
           <div
             v-else
-            class="min-w-0 flex-1"
+            class="min-w-0 flex-1 px-1"
           >
-            <p class="text-xs sm:text-sm font-semibold ui-text truncate max-w-[88px] sm:max-w-32 leading-tight">
+            <p class="text-xs sm:text-sm font-semibold ui-text truncate max-w-[160px] sm:max-w-52 leading-tight">
               {{ normalizedCurrentCompany.__name }}
             </p>
           </div>
@@ -392,7 +408,7 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           >
             <div
               v-if="showCompanyDropdown"
-              class="ui-surface absolute top-full left-0 right-0 sm:left-0 sm:right-auto mt-2 w-72 sm:w-80 rounded-2xl border ui-border-strong shadow-2xl z-50 max-h-96 overflow-hidden"
+              class="ui-surface absolute top-full left-0 right-0 sm:left-0 sm:right-auto mt-2 w-[min(92vw,24rem)] rounded-2xl border ui-border-strong shadow-2xl z-50 max-h-96 overflow-hidden"
             >
               <div class="p-3 sm:p-4 border-b ui-border-strong ui-surface-muted">
                 <h3 class="text-sm sm:text-base font-semibold ui-text flex items-center gap-2">
@@ -411,10 +427,10 @@ watch(searchQuery, (newValue) => emit('search', newValue))
                   v-for="company in normalizedCompanies"
                   :key="company.__id || company.__name"
                   :class="cn(
-                    'flex items-center w-full px-3 sm:px-4 py-2.5 text-sm transition-all group',
+                    'mx-2 flex items-center w-[calc(100%-1rem)] rounded-xl px-3 sm:px-4 py-2.5 text-sm transition-all group border',
                     company.__id === normalizedCurrentCompany?.__id
-                      ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 30%)] ui-primary border-l-4 border-(--ui-primary)'
-                      : 'ui-text hover:bg-(--ui-surface-muted) border-l-4 border-transparent'
+                      ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 25%)] ui-primary border-(--ui-primary-soft)'
+                      : 'ui-text border-transparent hover:bg-(--ui-surface-muted)'
                   )"
                   @click="handleCompanyChange(company)"
                 >
@@ -439,14 +455,8 @@ watch(searchQuery, (newValue) => emit('search', newValue))
                     />
                   </div>
                   <div class="flex-1 text-left min-w-0">
-                    <p class="font-semibold truncate text-md">
+                    <p class="font-semibold truncate text-sm sm:text-md">
                       {{ company.__name }}
-                    </p>
-                    <p
-                      v-if="company.__typeName"
-                      class="text-xs ui-text truncate"
-                    >
-                      {{ company.__typeName }}
                     </p>
                   </div>
                   <Icon
@@ -704,91 +714,41 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           </div>
         </transition>
 
-        <!-- Settings Dropdown -->
+        <!-- Theme Switcher -->
         <div
-          v-if="showSettings && settingsMenuItems.length > 0"
+          v-if="showThemeSwitcher"
           class="relative"
         >
-          <button
-            class="relative p-2 ui-text rounded-xl hover:bg-(--ui-surface-muted) transition-colors"
-            @click="toggleSettingsDropdown"
+          <div
+            class="group flex items-center gap-2 rounded-xl border ui-border-strong px-2 py-1.5 ui-surface hover:bg-(--ui-surface-muted) transition-colors shadow-xs"
+            :title="`${themeSwitcherTitle}: ${currentThemeMode}`"
+            :aria-label="`${themeSwitcherTitle} switch`"
           >
             <Icon
-              icon="cog"
-              class="w-5 h-5"
+              :icon="currentThemeMode === 'dark' ? 'moon' : 'sun'"
+              class="w-4 h-4"
+              :class="currentThemeMode === 'dark' ? 'ui-primary' : 'ui-text'"
             />
-            <span
-              v-if="resolvedSettingsBadge > 0"
-              class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[18px] sm:h-[18px] bg-amber-500 text-white text-[10px] sm:text-xs rounded-full flex items-center justify-center font-semibold px-0.5 sm:px-1"
-            >
-              {{ resolvedSettingsBadge > 99 ? '99+' : resolvedSettingsBadge }}
-            </span>
-          </button>
-
-          <transition
-            enter-active-class="transition-all duration-200 ease-out"
-            leave-active-class="transition-all duration-200 ease-in"
-            enter-from-class="opacity-0 translate-y-2 scale-95"
-            enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 translate-y-2 scale-95"
-          >
-            <div
-              v-if="showSettingsDropdown"
-              class="ui-surface absolute right-0 mt-2 w-64 rounded-xl border ui-border-strong shadow-xl z-50 overflow-hidden"
-            >
-              <div class="px-4 py-3 border-b ui-border-strong ui-surface-muted">
-                <p class="text-sm font-semibold ui-text">
-                  {{ settingsTitle }}
-                </p>
-              </div>
-
-              <div class="py-2">
-                <template
-                  v-for="item in settingsMenuItems"
-                  :key="item.name || item.label"
-                >
-                  <div
-                    v-if="item.type === 'section'"
-                    class="px-4 py-1 text-[11px] font-semibold uppercase tracking-wider ui-text-muted"
-                  >
-                    {{ item.label }}
-                  </div>
-
-                  <router-link
-                    v-else-if="item.route"
-                    :to="item.route"
-                    :class="cn(
-                      'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                      isItemActive(item)
-                        ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
-                        : 'ui-text hover:bg-(--ui-surface-muted)'
-                    )"
-                    @click="handleNavigation(item)"
-                  >
-                    <Icon
-                      :icon="item.icon || 'cog'"
-                      class="w-4 h-4 shrink-0"
-                    />
-                    <span class="truncate">{{ item.label }}</span>
-                  </router-link>
-
-                  <button
-                    v-else
-                    class="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ui-text hover:bg-(--ui-surface-muted) transition-colors"
-                    @click="handleSettingsAction(item)"
-                  >
-                    <Icon
-                      :icon="item.icon || 'cog'"
-                      class="w-4 h-4 shrink-0"
-                    />
-                    <span class="truncate">{{ item.label }}</span>
-                  </button>
-                </template>
-              </div>
-            </div>
-          </transition>
+            <Switch
+              v-model="isDarkTheme"
+              size="md"
+              :disabled="!canToggleTheme"
+            />
+          </div>
         </div>
+
+        <router-link
+          v-if="showSettings && settingsRoute"
+          :to="settingsRoute"
+          class="relative p-2 ui-text rounded-xl hover:bg-(--ui-surface-muted) transition-colors"
+          :title="settingsLabel"
+          @click="handleNavigation({ name: 'settings', label: settingsLabel, route: settingsRoute })"
+        >
+          <Icon
+            icon="cog"
+            class="w-5 h-5"
+          />
+        </router-link>
 
         <!-- Profile Dropdown -->
         <div class="relative">

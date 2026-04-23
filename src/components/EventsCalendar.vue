@@ -847,7 +847,10 @@ export default {
                   @click="handleViewMoreDetails"
                 >
                   Full details
-                  <Icon icon="arrow-right" class="ml-1 w-3 h-3" />
+                  <Icon
+                    icon="arrow-right"
+                    class="ml-1 w-3 h-3"
+                  />
                 </button>
               </div>
               <div
@@ -873,10 +876,16 @@ export default {
                 :key="`${(field.path || (field.paths || []).join('|'))}-${idx}`"
                 :class="[drawerSectionCardClass, getDrawerFieldColSpanClass(field), field.cardClass]"
               >
-                <p class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft" :class="field.labelClass">
+                <p
+                  class="text-[11px] font-semibold uppercase tracking-wide ui-text-soft"
+                  :class="field.labelClass"
+                >
                   {{ field.label }}
                 </p>
-                <p class="mt-1 text-sm ui-text" :class="field.valueClass">
+                <p
+                  class="mt-1 text-sm ui-text"
+                  :class="field.valueClass"
+                >
                   {{ formatDrawerFieldValue(field, getDrawerFieldValue(field)) }}
                 </p>
               </div>

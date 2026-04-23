@@ -8,14 +8,6 @@ import { cn } from '../utils/cn.js'
 import Icon from './Icon.vue'
 
 const props = defineProps({
-  searchQuery: {
-    type: String,
-    default: ''
-  },
-  searchPlaceholder: {
-    type: String,
-    default: 'Search...'
-  },
   // Legacy props for backward compatibility
   selectedStatus: {
     type: String,
@@ -97,10 +89,6 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  showSearch: {
-    type: Boolean,
-    default: true
-  },
   showFilters: {
     type: Boolean,
     default: true
@@ -147,7 +135,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'update:searchQuery',
   'update:selectedStatus',
   'update:dateFrom',
   'update:dateTo',
@@ -355,7 +342,6 @@ const hasAdvancedFilters = computed(() => {
 
 // Computed Properties
 const hasActiveFilters = computed(() => {
-  const hasSearch = props.searchQuery
   const hasStatus = props.selectedStatus
   const hasLegacyDates = props.dateFrom || props.dateTo
   const hasSelectFilters = props.selectFilters.some(f => f.value)
@@ -363,13 +349,12 @@ const hasActiveFilters = computed(() => {
   const hasNumberFilters = props.numberFilters.some(f => f.min || f.max)
   const hasMultiSelectFilters = props.multiSelectFilters.some(f => f.selected && f.selected.length > 0)
 
-  return hasSearch || hasStatus || hasLegacyDates || hasSelectFilters ||
+  return hasStatus || hasLegacyDates || hasSelectFilters ||
     hasDynamicDates || hasNumberFilters || hasMultiSelectFilters
 })
 
 const activeFiltersCount = computed(() => {
   let count = 0
-  if (props.searchQuery) count++
   if (props.selectedStatus) count++
   if (props.dateFrom || props.dateTo) count++
   count += props.selectFilters.filter(f => f.value).length
@@ -381,16 +366,6 @@ const activeFiltersCount = computed(() => {
 
 const activeFiltersDisplay = computed(() => {
   const filters = []
-
-  // Search filter
-  if (props.searchQuery && props.searchQuery.trim()) {
-    filters.push({
-      key: 'search',
-      label: 'Search',
-      value: `"${props.searchQuery}"`,
-      icon: 'magnifying-glass'
-    })
-  }
 
   // Legacy status filter
   if (props.selectedStatus) {
@@ -510,21 +485,6 @@ const filtersClasses = computed(() =>
   }))
 )
 
-const searchIconClasses = computed(() =>
-  'absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ui-text group-hover:text-(--ui-text) transition-colors'
-)
-
-const searchInputClasses = computed(() =>
-  cn(
-    inputVariants({ size: 'md' }),
-    'w-full pl-10 pr-10 hover:border-(--ui-border-strong)'
-  )
-)
-
-const clearSearchButtonClasses = computed(() =>
-  'absolute right-3 top-1/2 transform -translate-y-1/2 ui-text hover:text-(--ui-text) p-1 hover:bg-(--ui-surface) rounded-full transition-all'
-)
-
 const selectClasses = computed(() =>
   cn(
     inputVariants({ size: 'md' }),
@@ -593,7 +553,6 @@ const activeFilterRemoveButtonClasses = computed(() =>
 
 // Clear all filters
 const clearFilters = () => {
-  emit('update:searchQuery', '')
   emit('update:selectedStatus', '')
   emit('update:dateFrom', '')
   emit('update:dateTo', '')
@@ -634,9 +593,6 @@ const clearFilters = () => {
 // Remove individual filter
 const removeFilter = (filterKey) => {
   switch (filterKey) {
-    case 'search':
-      emit('update:searchQuery', '')
-      break
     case 'status':
       emit('update:selectedStatus', '')
       break
@@ -686,35 +642,6 @@ const removeFilter = (filterKey) => {
   <div class="border ui-border rounded-2xl mb-2 ui-surface overflow-hidden">
     <!-- Main Filters Bar -->
     <div :class="filtersClasses">
-      <!-- Search Input -->
-      <div
-        v-if="showSearch"
-        class="flex-1 min-w-80 max-w-md"
-      >
-        <div class="relative group">
-          <Icon
-            icon="magnifying-glass"
-            :class="searchIconClasses"
-          />
-          <input
-            :model-value="searchQuery"
-            :placeholder="searchPlaceholder"
-            :class="searchInputClasses"
-            @input="$emit('update:searchQuery', $event.target.value)"
-          >
-          <button
-            v-if="searchQuery"
-            :class="clearSearchButtonClasses"
-            @click="$emit('update:searchQuery', '')"
-          >
-            <Icon
-              icon="circle-xmark"
-              class="w-3 h-3"
-            />
-          </button>
-        </div>
-      </div>
-
       <!-- Dynamic Select Filters -->
       <div
         v-for="filter in selectFilters"
@@ -848,7 +775,6 @@ const removeFilter = (filterKey) => {
           />
           Export
         </Button>
-
       </div>
     </div>
 

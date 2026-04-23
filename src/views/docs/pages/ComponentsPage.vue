@@ -179,17 +179,26 @@ const copySnippet = async (key, content) => {
               :loading="demoTabLoading"
               @tab-change="handleDemoTabChange"
             >
-              <TabPanel label="Overview" :loading="demoTabLoading">
+              <TabPanel
+                label="Overview"
+                :loading="demoTabLoading"
+              >
                 <p class="text-sm ui-text-muted">
                   Quick summary panel with modern active pill and keyboard navigation.
                 </p>
               </TabPanel>
-              <TabPanel label="Schedule" :loading="demoTabLoading">
+              <TabPanel
+                label="Schedule"
+                :loading="demoTabLoading"
+              >
                 <p class="text-sm ui-text-muted">
                   Use Left/Right arrow keys, Home, and End to switch tabs quickly.
                 </p>
               </TabPanel>
-              <TabPanel label="Settings" :loading="demoTabLoading">
+              <TabPanel
+                label="Settings"
+                :loading="demoTabLoading"
+              >
                 <p class="text-sm ui-text-muted">
                   `v-model` can persist active tab via route query to survive refresh.
                 </p>

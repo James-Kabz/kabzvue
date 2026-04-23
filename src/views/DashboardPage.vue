@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onMounted } from 'vue'
 import Icon from '../components/Icon.vue'
 import Card from '../components/Card.vue'
 import LineChart from '../components/charts/LineChart.vue'
@@ -11,6 +11,24 @@ const layoutRef = ref(null)
 
 // Inject layout context (if needed for nested components)
 const layoutContext = inject('dashboardLayout', null)
+
+const companySwitcherDemoData = [
+  {
+    company_id: 201,
+    company_name: 'Savannah Holdings',
+    company_role: 'Primary'
+  },
+  {
+    company_id: 202,
+    company_name: 'Rift Valley Energy',
+    company_role: 'Subsidiary'
+  },
+  {
+    company_id: 203,
+    company_name: 'Coastal Trade Group',
+    company_role: 'Partner'
+  }
+]
 
 // Demo data
 const stats = ref([
@@ -126,6 +144,15 @@ const getStatusColor = (status) => {
   }
   return colors[status] || 'ui-surface-muted ui-text'
 }
+
+onMounted(() => {
+  if (typeof layoutContext?.setCompanySwitcherDemoData === 'function') {
+    layoutContext.setCompanySwitcherDemoData({
+      companies: companySwitcherDemoData,
+      currentCompany: companySwitcherDemoData[0]
+    })
+  }
+})
 </script>
 
 <template>
