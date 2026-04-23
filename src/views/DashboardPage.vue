@@ -5,6 +5,7 @@ import Card from '../components/Card.vue'
 import LineChart from '../components/charts/LineChart.vue'
 import BarChart from '../components/charts/BarChart.vue'
 import StackedBarChart from '../components/charts/StackedBarChart.vue'
+import { THEME_PRESETS, getThemePreset } from '../lib/theme'
 
 // Layout reference
 const layoutRef = ref(null)
@@ -12,23 +13,188 @@ const layoutRef = ref(null)
 // Inject layout context (if needed for nested components)
 const layoutContext = inject('dashboardLayout', null)
 
-const companySwitcherDemoData = [
+const companySwitcherDemoData = ref([
   {
     company_id: 201,
     company_name: 'Savannah Holdings',
-    company_role: 'Primary'
+    company_role: 'Primary',
+    theme_preset: 'forest',
+    theme: {
+      primary: '#0f766e',
+      secondary: ['#14b8a6', '#3b82f6', '#f97316']
+    }
   },
   {
     company_id: 202,
     company_name: 'Rift Valley Energy',
-    company_role: 'Subsidiary'
+    company_role: 'Subsidiary',
+    theme_preset: 'ocean',
+    theme: {
+      primary: '#1d4ed8',
+      secondary: ['#22c55e', '#8b5cf6', '#f59e0b']
+    }
   },
   {
     company_id: 203,
     company_name: 'Coastal Trade Group',
-    company_role: 'Partner'
+    company_role: 'Partner',
+    theme_preset: 'violet',
+    theme: {
+      primary: '#7c3aed',
+      secondary: ['#ec4899', '#0ea5e9', '#eab308']
+    }
   }
-]
+])
+
+const selectedCompanyId = ref(companySwitcherDemoData.value[0]?.company_id || null)
+const companyForm = ref({
+  company_name: '',
+  theme_preset: 'ocean',
+  primary: '#0070f3',
+  secondary_1: '#14b8a6',
+  secondary_2: '#f97316',
+  secondary_3: '#8b5cf6'
+})
+const latestThemePayload = ref(null)
+const themePresets = THEME_PRESETS
+const selectedPreset = computed(() => getThemePreset(companyForm.value.theme_preset))
+
+const selectedCompany = computed(() => {
+  return companySwitcherDemoData.value.find(c => c.company_id === selectedCompanyId.value) || null
+})
+
+const selectedCompanyTheme = computed(() => {
+  return selectedCompany.value?.theme || {
+    primary: '#0070f3',
+    secondary: ['#14b8a6', '#f97316', '#8b5cf6']
+  }
+})
+
+const applyCompaniesToLayout = () => {
+  if (typeof layoutContext?.setCompanySwitcherDemoData !== 'function') return
+  const currentCompany = selectedCompany.value || companySwitcherDemoData.value[0] || null
+  layoutContext.setCompanySwitcherDemoData({
+    companies: companySwitcherDemoData.value,
+    currentCompany
+  })
+}
+
+const loadThemeFormFromSelectedCompany = () => {
+  if (!selectedCompany.value) return
+  const theme = selectedCompanyTheme.value
+  const secondaries = Array.isArray(theme.secondary) ? theme.secondary : []
+  companyForm.value = {
+    company_name: selectedCompany.value.company_name || '',
+    theme_preset: selectedCompany.value.theme_preset || 'ocean',
+    primary: theme.primary || '#0070f3',
+    secondary_1: secondaries[0] || '#14b8a6',
+    secondary_2: secondaries[1] || '#f97316',
+    secondary_3: secondaries[2] || '#8b5cf6'
+  }
+}
+
+const applyThemePreset = (presetKey = companyForm.value.theme_preset) => {
+  const preset = getThemePreset(presetKey)
+  const palette = preset.light
+  companyForm.value.theme_preset = preset.key
+  companyForm.value.primary = palette.primary
+  companyForm.value.secondary_1 = palette.secondary[0]
+  companyForm.value.secondary_2 = palette.secondary[1]
+  companyForm.value.secondary_3 = palette.secondary[2]
+}
+
+const getPresetSwatchStyle = (preset) => {
+  const palette = preset.light
+  return {
+    '--swatch-top-left': palette.primary,
+    '--swatch-top-right': palette.secondary[0],
+    '--swatch-bottom-left': palette.secondary[1],
+    '--swatch-bottom-right': palette.secondary[2]
+  }
+}
+
+const handleSelectedCompanyChange = () => {
+  loadThemeFormFromSelectedCompany()
+  applyCompaniesToLayout()
+}
+
+const upsertCompanyTheme = (persist = false) => {
+  if (!selectedCompany.value) return
+  const theme = {
+    primary: companyForm.value.primary,
+    secondary: [
+      companyForm.value.secondary_1,
+      companyForm.value.secondary_2,
+      companyForm.value.secondary_3
+    ]
+  }
+
+  companySwitcherDemoData.value = companySwitcherDemoData.value.map((company) => (
+    company.company_id === selectedCompany.value.company_id
+      ? {
+        ...company,
+        company_name: companyForm.value.company_name || company.company_name,
+        theme_preset: companyForm.value.theme_preset,
+        theme
+      }
+      : company
+  ))
+
+  applyCompaniesToLayout()
+
+  const payload = {
+    company_id: selectedCompany.value.company_id,
+    theme: {
+      preset: companyForm.value.theme_preset,
+      primary_color: theme.primary,
+      secondary_1: theme.secondary[0],
+      secondary_2: theme.secondary[1],
+      secondary_3: theme.secondary[2]
+    }
+  }
+
+  latestThemePayload.value = payload
+
+  if (persist && typeof layoutContext?.updateCompanyThemeInDemoData === 'function') {
+    layoutContext.updateCompanyThemeInDemoData({
+      companyId: payload.company_id,
+      theme
+    })
+  }
+}
+
+const createCompanyWithTheme = () => {
+  const nextId = Math.max(...companySwitcherDemoData.value.map(c => c.company_id), 200) + 1
+  const newCompany = {
+    company_id: nextId,
+    company_name: companyForm.value.company_name || `Company ${nextId}`,
+    company_role: 'New',
+    theme_preset: companyForm.value.theme_preset,
+    theme: {
+      primary: companyForm.value.primary,
+      secondary: [
+        companyForm.value.secondary_1,
+        companyForm.value.secondary_2,
+        companyForm.value.secondary_3
+      ]
+    }
+  }
+  companySwitcherDemoData.value = [...companySwitcherDemoData.value, newCompany]
+  selectedCompanyId.value = newCompany.company_id
+  applyCompaniesToLayout()
+
+  latestThemePayload.value = {
+    company_id: newCompany.company_id,
+    company_name: newCompany.company_name,
+    theme: {
+      preset: companyForm.value.theme_preset,
+      primary_color: newCompany.theme.primary,
+      secondary_1: newCompany.theme.secondary[0],
+      secondary_2: newCompany.theme.secondary[1],
+      secondary_3: newCompany.theme.secondary[2]
+    }
+  }
+}
 
 // Demo data
 const stats = ref([
@@ -146,12 +312,8 @@ const getStatusColor = (status) => {
 }
 
 onMounted(() => {
-  if (typeof layoutContext?.setCompanySwitcherDemoData === 'function') {
-    layoutContext.setCompanySwitcherDemoData({
-      companies: companySwitcherDemoData,
-      currentCompany: companySwitcherDemoData[0]
-    })
-  }
+  applyCompaniesToLayout()
+  loadThemeFormFromSelectedCompany()
 })
 </script>
 
@@ -194,6 +356,164 @@ onMounted(() => {
         </button>
       </div>
     </div>
+
+    <Card variant="elevated">
+      <div class="p-5 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <h3 class="text-lg font-semibold ui-text">
+            Company Theme Configuration
+          </h3>
+          <span class="text-xs ui-text-muted">Primary + 3 secondary colors per company</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+          <label class="lg:col-span-2">
+            <span class="block text-xs font-medium ui-text mb-1">Select Company</span>
+            <select
+              v-model.number="selectedCompanyId"
+              class="w-full rounded-lg border ui-border-strong ui-surface px-3 py-2 text-sm ui-text"
+              @change="handleSelectedCompanyChange"
+            >
+              <option
+                v-for="company in companySwitcherDemoData"
+                :key="company.company_id"
+                :value="company.company_id"
+              >
+                {{ company.company_name }}
+              </option>
+            </select>
+          </label>
+
+          <label class="lg:col-span-2">
+            <span class="block text-xs font-medium ui-text mb-1">Company Name</span>
+            <input
+              v-model="companyForm.company_name"
+              type="text"
+              class="w-full rounded-lg border ui-border-strong ui-surface px-3 py-2 text-sm ui-text"
+              placeholder="Company name"
+            >
+          </label>
+
+          <div class="lg:col-span-6">
+            <span class="block text-xs font-medium ui-text mb-2">Pick a Theme Colour</span>
+            <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
+              <button
+                v-for="preset in themePresets"
+                :key="preset.key"
+                class="relative rounded-xl border ui-border-strong p-2 ui-surface hover:bg-(--ui-surface-muted) transition-colors"
+                :class="companyForm.theme_preset === preset.key ? 'ring-2 ring-(--ui-primary) ring-offset-1' : ''"
+                :title="preset.name"
+                @click="applyThemePreset(preset.key)"
+              >
+                <span
+                  class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full overflow-hidden border border-black/10"
+                  :style="getPresetSwatchStyle(preset)"
+                >
+                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-left)]" />
+                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-right)]" />
+                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-left)]" />
+                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-right)]" />
+                </span>
+                <Icon
+                  v-if="companyForm.theme_preset === preset.key"
+                  icon="check"
+                  class="absolute -top-1 -right-1 w-4 h-4 ui-primary-bg rounded-full p-0.5"
+                />
+              </button>
+
+              <div class="rounded-xl border ui-border-strong p-2 ui-surface">
+                <span class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full border border-black/10 bg-[var(--ui-primary-soft)] relative">
+                  <span class="absolute inset-0 m-auto w-fit h-fit text-sm font-bold ui-primary">+</span>
+                </span>
+              </div>
+            </div>
+            <p class="text-xs ui-text-muted mt-2">
+              Selected: {{ selectedPreset.name }} (you can still tweak colors below)
+            </p>
+          </div>
+
+          <label>
+            <span class="block text-xs font-medium ui-text mb-1">Primary</span>
+            <input
+              v-model="companyForm.primary"
+              type="color"
+              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+            >
+          </label>
+
+          <label>
+            <span class="block text-xs font-medium ui-text mb-1">Secondary 1</span>
+            <input
+              v-model="companyForm.secondary_1"
+              type="color"
+              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+            >
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <label>
+            <span class="block text-xs font-medium ui-text mb-1">Secondary 2</span>
+            <input
+              v-model="companyForm.secondary_2"
+              type="color"
+              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+            >
+          </label>
+          <label>
+            <span class="block text-xs font-medium ui-text mb-1">Secondary 3</span>
+            <input
+              v-model="companyForm.secondary_3"
+              type="color"
+              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+            >
+          </label>
+
+          <button
+            class="self-end px-4 py-2 rounded-lg ui-primary-bg hover:bg-(--ui-primary-strong) transition-colors text-sm font-medium"
+            @click="upsertCompanyTheme(true)"
+          >
+            Save Theme (DB Payload)
+          </button>
+
+          <button
+            class="self-end px-4 py-2 rounded-lg border ui-border-strong ui-surface hover:bg-(--ui-surface-muted) transition-colors text-sm font-medium ui-text"
+            @click="createCompanyWithTheme"
+          >
+            Create Company With Theme
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="rounded-xl border ui-border-strong p-4 ui-surface-muted">
+            <p class="text-sm font-semibold ui-text mb-3">
+              Live Preview
+            </p>
+            <div class="rounded-lg p-4 border ui-border-strong" :style="{ background: 'var(--ui-surface)' }">
+              <div class="flex items-center justify-between mb-3">
+                <div class="font-semibold ui-text">{{ companyForm.company_name || 'Company' }}</div>
+                <span class="px-2 py-1 rounded text-xs" :style="{ backgroundColor: companyForm.primary, color: '#fff' }">Primary</span>
+              </div>
+              <div class="flex gap-2 mb-3">
+                <span class="h-6 w-6 rounded-full border ui-border-strong" :style="{ backgroundColor: companyForm.secondary_1 }" />
+                <span class="h-6 w-6 rounded-full border ui-border-strong" :style="{ backgroundColor: companyForm.secondary_2 }" />
+                <span class="h-6 w-6 rounded-full border ui-border-strong" :style="{ backgroundColor: companyForm.secondary_3 }" />
+              </div>
+              <button class="px-3 py-1.5 rounded text-xs font-semibold" :style="{ backgroundColor: companyForm.primary, color: '#fff' }">
+                Action Button
+              </button>
+            </div>
+          </div>
+
+          <div class="rounded-xl border ui-border-strong p-4 ui-surface-muted">
+            <p class="text-sm font-semibold ui-text mb-3">
+              DB Payload
+            </p>
+            <pre class="text-xs ui-text overflow-auto">{{ JSON.stringify(latestThemePayload, null, 2) }}</pre>
+          </div>
+        </div>
+      </div>
+    </Card>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

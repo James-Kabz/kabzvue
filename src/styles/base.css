@@ -44,8 +44,8 @@
     --ui-text-muted: #666666;
     --ui-text-soft: #888888;
 
-    --ui-border: #eaeaea;
-    --ui-border-strong: #d4d4d4;
+    --ui-border: #f2f3f5;
+    --ui-border-strong: #e9ebef;
     --ui-ring: #0070f3;
 
     --ui-primary: #0070f3;
@@ -69,45 +69,51 @@
     --ui-danger-soft: #ffe6e6;
 
     --ui-text-inverse: #ffffff;
+    --ui-header-bg: #f6f9ff;
+    --ui-sidebar-bg: #f4f8ff;
+    --ui-submenu-bg: #f7f9ff;
   }
 
   html[data-mode="dark"] {
     /* Dark mode - Vercel style */
-    --ui-bg: #16161600;
-    --ui-surface: #171717;
-    --ui-surface-muted: #191919;
-    --ui-surface-soft: #1c1c1c;
-    --ui-surface-strong: #171717;
+    --ui-bg: #051f31;
+    --ui-surface: #082a3f;
+    --ui-surface-muted: #0b3149;
+    --ui-surface-soft: #0f3550;
+    --ui-surface-strong: #07283d;
 
-    --ui-text: #ffffff;
-    --ui-text-muted: #a1a1a1;
-    --ui-text-soft: #666666;
+    --ui-text: #d9ecf6;
+    --ui-text-muted: #9fc3d6;
+    --ui-text-soft: #78a8c0;
 
-    --ui-border: #333333;
-    --ui-border-strong: #ffffff0e;
-    --ui-ring: #3b70ac;
+    --ui-border: #10384a;
+    --ui-border-strong: #154459;
+    --ui-ring: #2fd6d8;
 
-    --ui-primary: #0070f3;
-    --ui-primary-strong: #3291ff;
-    --ui-primary-soft: #0a2540d0;
+    --ui-primary: #2fcfd2;
+    --ui-primary-strong: #5ee4e6;
+    --ui-primary-soft: #0c4156;
 
-    --ui-accent: #7928ca;
-    --ui-accent-strong: #8e3dd8;
-    --ui-accent-soft: #2d1a4a;
+    --ui-accent: #2ea8ff;
+    --ui-accent-strong: #60c5ff;
+    --ui-accent-soft: #103d5a;
 
-    --ui-success: #0070f3;
-    --ui-success-strong: #3291ff;
-    --ui-success-soft: #0a2540;
+    --ui-success: #1fc8b3;
+    --ui-success-strong: #4fdcca;
+    --ui-success-soft: #0f3f47;
 
     --ui-warning: #f5a623;
-    --ui-warning-strong: #ffb84d;
-    --ui-warning-soft: #3d2a1a;
+    --ui-warning-strong: #ffc75e;
+    --ui-warning-soft: #4a3b17;
 
-    --ui-danger: #ee0000;
-    --ui-danger-strong: #ff3333;
-    --ui-danger-soft: #3d1a1a;
+    --ui-danger: #ff5f7d;
+    --ui-danger-strong: #ff7f97;
+    --ui-danger-soft: #4a2030;
 
     --ui-text-inverse: #ffffff;
+    --ui-header-bg: #06283d;
+    --ui-sidebar-bg: #052436;
+    --ui-submenu-bg: #083047;
   }
 
   body {
@@ -137,6 +143,18 @@
   .ui-surface-strong {
     background-color: var(--ui-surface-strong);
     color: var(--ui-text-inverse);
+  }
+
+  .ui-header-bg {
+    background-color: var(--ui-header-bg);
+  }
+
+  .ui-sidebar-bg {
+    background-color: var(--ui-sidebar-bg);
+  }
+
+  .ui-submenu-bg {
+    background-color: var(--ui-submenu-bg);
   }
 
   .ui-panel {

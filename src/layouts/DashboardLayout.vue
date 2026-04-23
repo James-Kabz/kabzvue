@@ -3,6 +3,7 @@ import { ref, computed, watch, provide } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Sidebar from '../components/Sidebar.vue'
 import Header from '../components/Header.vue'
+import { setTheme } from '../lib/theme'
 
 const router = useRouter()
 const route = useRoute()
@@ -35,22 +36,35 @@ const currentRoute = ref(route.path)
 const mobileOpen = ref(false)
 const demoCompanies = ref([])
 const demoCurrentCompany = ref(null)
+const selectedCompany = ref(null)
 
 const fallbackCompanies = [
   {
     company_id: 101,
     company_name: 'Acme Holdings Ltd',
-    company_role: 'Primary'
+    company_role: 'Primary',
+    theme: {
+      primary: '#1d4ed8',
+      secondary: ['#0ea5e9', '#22c55e', '#f59e0b']
+    }
   },
   {
     company_id: 102,
     company_name: 'Bluewave Logistics',
-    company_role: 'Subsidiary'
+    company_role: 'Subsidiary',
+    theme: {
+      primary: '#0f766e',
+      secondary: ['#14b8a6', '#6366f1', '#f97316']
+    }
   },
   {
     company_id: 103,
     company_name: 'Northwind Services',
-    company_role: 'Partner'
+    company_role: 'Partner',
+    theme: {
+      primary: '#7c3aed',
+      secondary: ['#a855f7', '#3b82f6', '#ef4444']
+    }
   }
 ]
 
@@ -60,7 +74,8 @@ const emit = defineEmits([
   'search',
   'profile-action',
   'logout',
-  'company-change'
+  'company-change',
+  'company-theme-save'
 ])
 
 const profileMenuItems = [
@@ -147,7 +162,8 @@ const resolvedCompanies = computed(() => {
 })
 
 const resolvedCurrentCompany = computed(() => {
-  return props.user?.currentCompany
+  return selectedCompany.value
+    || props.user?.currentCompany
     || props.user?.company
     || demoCurrentCompany.value
     || resolvedCompanies.value[0]
@@ -157,13 +173,30 @@ const resolvedCurrentCompany = computed(() => {
 const setCompanySwitcherDemoData = ({ companies = [], currentCompany = null } = {}) => {
   demoCompanies.value = Array.isArray(companies) ? companies : []
   demoCurrentCompany.value = currentCompany || demoCompanies.value[0] || null
+  selectedCompany.value = demoCurrentCompany.value
+}
+
+const updateCompanyThemeInDemoData = ({ companyId, theme }) => {
+  if (!companyId || !theme) return
+  demoCompanies.value = resolvedCompanies.value.map((company) => {
+    const id = company?.company_id || company?.companyId || company?.id
+    if (id !== companyId) return company
+    return { ...company, theme }
+  })
+  emit('company-theme-save', { company_id: companyId, theme })
 }
 
 provide('dashboardLayout', {
   currentSection,
   currentPage,
-  setCompanySwitcherDemoData
+  setCompanySwitcherDemoData,
+  updateCompanyThemeInDemoData
 })
+
+const getCompanyTheme = (company) => {
+  if (!company || typeof company !== 'object') return null
+  return company.theme || company.company_theme || null
+}
 
 const resolveEntityLogo = (entity) => {
   if (!entity || typeof entity !== 'object') return ''
@@ -247,8 +280,13 @@ const handleLogout = () => {
 }
 
 const handleCompanyChange = (company) => {
+  selectedCompany.value = company
   emit('company-change', company)
 }
+
+watch(resolvedCurrentCompany, (company) => {
+  setTheme(getCompanyTheme(company), { persist: false })
+}, { immediate: true })
 
 // Watch for route changes
 watch(() => route.path, (newPath) => {
