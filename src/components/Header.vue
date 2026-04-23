@@ -67,6 +67,7 @@ const showMobileSearch = ref(false)
 const isMobile = ref(false)
 const showCompanyDropdown = ref(false)
 const currentThemeMode = ref('light')
+const displayedCompanyLogoSrc = ref('/logo.png')
 
 const notificationCount = computed(() => props.notifications.filter(n => !n.read).length)
 const resolvedThemeModes = computed(() => {
@@ -299,12 +300,32 @@ const resolvedCurrentCompanyLogo = computed(() => {
   return '/logo.png'
 })
 
+const updateDisplayedCompanyLogo = (logoSrc) => {
+  const fallbackLogo = '/logo.png'
+  const targetSrc = logoSrc || fallbackLogo
+
+  if (targetSrc === fallbackLogo || typeof Image === 'undefined') {
+    displayedCompanyLogoSrc.value = fallbackLogo
+    return
+  }
+
+  const probe = new Image()
+  probe.onload = () => {
+    displayedCompanyLogoSrc.value = targetSrc
+  }
+  probe.onerror = () => {
+    displayedCompanyLogoSrc.value = fallbackLogo
+  }
+  probe.src = targetSrc
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   checkMobile()
   window.addEventListener('resize', checkMobile)
   const activeMode = getMode() || resolvedThemeModes.value[0] || 'light'
   currentThemeMode.value = resolvedThemeModes.value.includes(activeMode) ? activeMode : resolvedThemeModes.value[0]
+  updateDisplayedCompanyLogo(resolvedCurrentCompanyLogo.value)
 })
 
 onUnmounted(() => {
@@ -313,6 +334,9 @@ onUnmounted(() => {
 })
 
 watch(searchQuery, (newValue) => emit('search', newValue))
+watch(resolvedCurrentCompanyLogo, (newLogo) => {
+  updateDisplayedCompanyLogo(newLogo)
+})
 </script>
 
 <template>
@@ -343,18 +367,17 @@ watch(searchQuery, (newValue) => emit('search', newValue))
           :class="cn('shrink-0 overflow-hidden rounded-2xl flex items-center justify-center', props.companyLogoClass)"
         >
           <img
-            :src="resolvedCurrentCompanyLogo || '/logo.png'"
+            :src="displayedCompanyLogoSrc"
             alt="Company logo"
             class="max-w-full max-h-full w-auto h-auto object-contain object-center"
-            @error="(e) => { e.target.src = '/logo.png' }"
           >
         </div>
 
         <!-- Divider -->
-        <!-- <div
+        <div
           v-if="resolvedCurrentCompanyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
           class="h-5 sm:h-18 w-px ui-border-strong-bg shrink-0 hidden sm:block"
-        /> -->
+        />
 
         <!-- Company Info Card - Simplified for mobile -->
         <div
