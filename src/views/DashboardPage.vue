@@ -489,17 +489,37 @@ onMounted(() => {
             <p class="text-sm font-semibold ui-text mb-3">
               Live Preview
             </p>
-            <div class="rounded-lg p-4 border ui-border-strong" :style="{ background: 'var(--ui-surface)' }">
+            <div
+              class="rounded-lg p-4 border ui-border-strong"
+              :style="{ background: 'var(--ui-surface)' }"
+            >
               <div class="flex items-center justify-between mb-3">
-                <div class="font-semibold ui-text">{{ companyForm.company_name || 'Company' }}</div>
-                <span class="px-2 py-1 rounded text-xs" :style="{ backgroundColor: companyForm.primary, color: '#fff' }">Primary</span>
+                <div class="font-semibold ui-text">
+                  {{ companyForm.company_name || 'Company' }}
+                </div>
+                <span
+                  class="px-2 py-1 rounded text-xs"
+                  :style="{ backgroundColor: companyForm.primary, color: '#fff' }"
+                >Primary</span>
               </div>
               <div class="flex gap-2 mb-3">
-                <span class="h-6 w-6 rounded-full border ui-border-strong" :style="{ backgroundColor: companyForm.secondary_1 }" />
-                <span class="h-6 w-6 rounded-full border ui-border-strong" :style="{ backgroundColor: companyForm.secondary_2 }" />
-                <span class="h-6 w-6 rounded-full border ui-border-strong" :style="{ backgroundColor: companyForm.secondary_3 }" />
+                <span
+                  class="h-6 w-6 rounded-full border ui-border-strong"
+                  :style="{ backgroundColor: companyForm.secondary_1 }"
+                />
+                <span
+                  class="h-6 w-6 rounded-full border ui-border-strong"
+                  :style="{ backgroundColor: companyForm.secondary_2 }"
+                />
+                <span
+                  class="h-6 w-6 rounded-full border ui-border-strong"
+                  :style="{ backgroundColor: companyForm.secondary_3 }"
+                />
               </div>
-              <button class="px-3 py-1.5 rounded text-xs font-semibold" :style="{ backgroundColor: companyForm.primary, color: '#fff' }">
+              <button
+                class="px-3 py-1.5 rounded text-xs font-semibold"
+                :style="{ backgroundColor: companyForm.primary, color: '#fff' }"
+              >
                 Action Button
               </button>
             </div>

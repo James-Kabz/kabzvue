@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 import Modal from './Modal.vue'
 import ReusableForm from './ReusableForm.vue'
 
@@ -31,6 +31,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'submit', 'close', 'form-change'])
+const slots = useSlots()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -55,6 +56,12 @@ const allFields = computed(() => {
     if (sectionFields.length > 0) return sectionFields
   }
   return props.fields || []
+})
+
+const fieldSlots = computed(() => {
+  return allFields.value
+    .map((field) => field?.name)
+    .filter((name) => typeof name === 'string' && Boolean(name) && Boolean(slots[`field-${name}`]))
 })
 
 const handleClose = () => {
@@ -104,16 +111,35 @@ const handleSubmit = (payload) => {
       @cancel="handleCancel"
       @form-change="emit('form-change', $event)"
     >
-      <template v-if="$slots['section-header']" #section-header="slotProps">
-        <slot name="section-header" v-bind="slotProps" />
+      <template
+        v-if="slots['section-header']"
+        #section-header="slotProps"
+      >
+        <slot
+          name="section-header"
+          v-bind="slotProps"
+        />
       </template>
 
-      <template v-for="field in allFields" :key="`slot-${field.name}`" v-if="$slots[`field-${field.name}`]" #[`field-${field.name}`]="slotProps">
-        <slot :name="`field-${field.name}`" v-bind="slotProps" />
+      <template
+        v-for="fieldName in fieldSlots"
+        :key="`slot-${fieldName}`"
+        #[`field-${fieldName}`]="slotProps"
+      >
+        <slot
+          :name="`field-${fieldName}`"
+          v-bind="slotProps"
+        />
       </template>
 
-      <template v-if="$slots.actions" #actions="slotProps">
-        <slot name="actions" v-bind="slotProps" />
+      <template
+        v-if="slots.actions"
+        #actions="slotProps"
+      >
+        <slot
+          name="actions"
+          v-bind="slotProps"
+        />
       </template>
     </ReusableForm>
   </Modal>

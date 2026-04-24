@@ -403,25 +403,65 @@ const handleCancel = () => emit('cancel')
 
 <template>
   <div class="w-full p-2">
-    <div v-if="title" class="mb-6">
-      <h2 class="text-xl font-semibold ui-text">{{ title }}</h2>
-      <p v-if="description" class="mt-1 text-sm ui-text-muted">{{ description }}</p>
+    <div
+      v-if="title"
+      class="mb-6"
+    >
+      <h2 class="text-xl font-semibold ui-text">
+        {{ title }}
+      </h2>
+      <p
+        v-if="description"
+        class="mt-1 text-sm ui-text-muted"
+      >
+        {{ description }}
+      </p>
     </div>
 
-    <form class="space-y-6" @submit.prevent="handleSubmit">
-      <div v-for="section in normalizedSections" :key="section.id" :class="section.wrapperClass || ''">
+    <form
+      class="space-y-6"
+      @submit.prevent="handleSubmit"
+    >
+      <div
+        v-for="section in normalizedSections"
+        :key="section.id"
+        :class="section.wrapperClass || ''"
+      >
         <div :class="section.card ? 'ui-surface border ui-border-strong rounded-xl p-4 sm:p-5' : ''">
-          <slot name="section-header" :section="section">
-            <div v-if="section.title || section.description" class="mb-4">
-              <h3 v-if="section.title" class="text-base font-semibold ui-text">{{ section.title }}</h3>
-              <p v-if="section.description" class="mt-1 text-sm ui-text-muted">{{ section.description }}</p>
+          <slot
+            name="section-header"
+            :section="section"
+          >
+            <div
+              v-if="section.title || section.description"
+              class="mb-4"
+            >
+              <h3
+                v-if="section.title"
+                class="text-base font-semibold ui-text"
+              >
+                {{ section.title }}
+              </h3>
+              <p
+                v-if="section.description"
+                class="mt-1 text-sm ui-text-muted"
+              >
+                {{ section.description }}
+              </p>
             </div>
           </slot>
 
           <div :class="section.gridClass">
-            <div v-for="field in section.fields" :key="field.name" :class="field.wrapperClass || 'col-span-12'">
+            <div
+              v-for="field in section.fields"
+              :key="field.name"
+              :class="field.wrapperClass || 'col-span-12'"
+            >
               <template v-if="field.type === 'hidden'">
-                <input :value="getFieldValue(field.name)" type="hidden">
+                <input
+                  :value="getFieldValue(field.name)"
+                  type="hidden"
+                >
               </template>
 
               <FormField
@@ -438,11 +478,14 @@ const handleCancel = () => emit('cancel')
                   <slot
                     :name="`field-${field.name}`"
                     :field="field"
-                    :formData="formData"
+                    :form-data="formData"
                     :error="errors[field.name]"
                     :update="(value) => setFieldValue(field.name, value)"
                   >
-                    <div v-if="['text', 'number', 'password', 'color', 'email', 'tel', 'url', 'search'].includes(field.type)" :class="['relative', hasTrailingIcon(field) ? 'has-trailing-icon' : '']">
+                    <div
+                      v-if="['text', 'number', 'password', 'color', 'email', 'tel', 'url', 'search'].includes(field.type)"
+                      :class="['relative', hasTrailingIcon(field) ? 'has-trailing-icon' : '']"
+                    >
                       <Input
                         :id="fieldId"
                         :model-value="getFieldValue(field.name)"
@@ -463,7 +506,10 @@ const handleCancel = () => emit('cancel')
                         :disabled="isTrailingIconDisabled(field)"
                         @click="handleTrailingIconClick(field)"
                       >
-                        <font-awesome-icon :icon="getTrailingIcon(field)" :class="getTrailingIconClass(field)" />
+                        <font-awesome-icon
+                          :icon="getTrailingIcon(field)"
+                          :class="getTrailingIconClass(field)"
+                        />
                       </button>
                     </div>
 
@@ -480,7 +526,10 @@ const handleCancel = () => emit('cancel')
                       @update:model-value="setFieldValue(field.name, $event)"
                     />
 
-                    <div v-else-if="field.type === 'select'" class="flex w-full items-center gap-2">
+                    <div
+                      v-else-if="field.type === 'select'"
+                      class="flex w-full items-center gap-2"
+                    >
                       <div class="min-w-0 flex-1">
                         <Select
                           :id="fieldId"
@@ -508,7 +557,10 @@ const handleCancel = () => emit('cancel')
                       </Button>
                     </div>
 
-                    <div v-else-if="field.type === 'multiselect'" class="flex w-full items-center gap-2">
+                    <div
+                      v-else-if="field.type === 'multiselect'"
+                      class="flex w-full items-center gap-2"
+                    >
                       <div class="min-w-0 flex-1">
                         <MultiSelect
                           :id="fieldId"
@@ -549,12 +601,29 @@ const handleCancel = () => emit('cancel')
                       @update:model-value="handleSelectChange(field, $event)"
                     />
 
-                    <div v-else-if="field.type === 'checkbox'" class="flex items-center">
-                      <Input :id="fieldId" :model-value="getFieldValue(field.name)" type="checkbox" :disabled="isLoading || field.disabled" class="h-4 w-4 rounded ui-border-strong" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
-                      <Label :for="fieldId" class="ml-2 text-sm ui-text">{{ field.checkboxLabel || field.label }}</Label>
+                    <div
+                      v-else-if="field.type === 'checkbox'"
+                      class="flex items-center"
+                    >
+                      <Input
+                        :id="fieldId"
+                        :model-value="getFieldValue(field.name)"
+                        type="checkbox"
+                        :disabled="isLoading || field.disabled"
+                        class="h-4 w-4 rounded ui-border-strong"
+                        :aria-describedby="ariaDescribedBy"
+                        @update:model-value="setFieldValue(field.name, $event)"
+                      />
+                      <Label
+                        :for="fieldId"
+                        class="ml-2 text-sm ui-text"
+                      >{{ field.checkboxLabel || field.label }}</Label>
                     </div>
 
-                    <div v-else-if="field.type === 'switch'" class="flex items-center">
+                    <div
+                      v-else-if="field.type === 'switch'"
+                      class="flex items-center"
+                    >
                       <button
                         :id="fieldId"
                         type="button"
@@ -570,34 +639,146 @@ const handleCancel = () => emit('cancel')
                       >
                         <span :class="['inline-block h-4 w-4 transform rounded-full ui-surface border ui-border-strong transition-transform', getFieldValue(field.name) ? 'translate-x-6' : 'translate-x-1']" />
                       </button>
-                      <Label :for="fieldId" class="ml-3 text-sm ui-text">{{ field.checkboxLabel || field.label }}</Label>
+                      <Label
+                        :for="fieldId"
+                        class="ml-3 text-sm ui-text"
+                      >{{ field.checkboxLabel || field.label }}</Label>
                     </div>
 
-                    <div v-else-if="field.type === 'radio'" class="space-y-2">
-                      <div v-for="option in field.options" :key="option.value" class="flex items-center">
-                        <Input :id="`${fieldId}-${option.value}`" :model-value="getFieldValue(field.name)" type="radio" :value="option.value" :disabled="isLoading || field.disabled" class="h-4 w-4 ui-border-strong" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
-                        <Label :for="`${fieldId}-${option.value}`" class="ml-2 text-sm ui-text">{{ option.label }}</Label>
+                    <div
+                      v-else-if="field.type === 'radio'"
+                      class="space-y-2"
+                    >
+                      <div
+                        v-for="option in field.options"
+                        :key="option.value"
+                        class="flex items-center"
+                      >
+                        <Input
+                          :id="`${fieldId}-${option.value}`"
+                          :model-value="getFieldValue(field.name)"
+                          type="radio"
+                          :value="option.value"
+                          :disabled="isLoading || field.disabled"
+                          class="h-4 w-4 ui-border-strong"
+                          :aria-describedby="ariaDescribedBy"
+                          @update:model-value="setFieldValue(field.name, $event)"
+                        />
+                        <Label
+                          :for="`${fieldId}-${option.value}`"
+                          class="ml-2 text-sm ui-text"
+                        >{{ option.label }}</Label>
                       </div>
                     </div>
 
-                    <FileUpload v-else-if="field.type === 'file'" :multiple="false" :accept="field.accept" :max-size="field.maxSize" :variant="field.variant || 'default'" @files-selected="handleFileSelected(field, $event)" @file-removed="handleFileRemoved(field, $event)" />
-                    <FileUpload v-else-if="field.type === 'multifile'" :multiple="field.multiple !== false" :accept="field.accept" :max-size="field.maxSize" :max-files="field.maxFiles" :variant="field.variant || 'default'" @files-selected="handleMultiFileSelected(field, $event)" @file-removed="handleMultiFileRemoved(field, $event)" />
+                    <FileUpload
+                      v-else-if="field.type === 'file'"
+                      :multiple="false"
+                      :accept="field.accept"
+                      :max-size="field.maxSize"
+                      :variant="field.variant || 'default'"
+                      @files-selected="handleFileSelected(field, $event)"
+                      @file-removed="handleFileRemoved(field, $event)"
+                    />
+                    <FileUpload
+                      v-else-if="field.type === 'multifile'"
+                      :multiple="field.multiple !== false"
+                      :accept="field.accept"
+                      :max-size="field.maxSize"
+                      :max-files="field.maxFiles"
+                      :variant="field.variant || 'default'"
+                      @files-selected="handleMultiFileSelected(field, $event)"
+                      @file-removed="handleMultiFileRemoved(field, $event)"
+                    />
 
-                    <Slider v-else-if="field.type === 'slider'" :model-value="getFieldValue(field.name)" :min="field.min" :max="field.max" :step="field.step" :disabled="isLoading || field.disabled" @update:model-value="handleSliderChange(field, $event)" />
+                    <Slider
+                      v-else-if="field.type === 'slider'"
+                      :model-value="getFieldValue(field.name)"
+                      :min="field.min"
+                      :max="field.max"
+                      :step="field.step"
+                      :disabled="isLoading || field.disabled"
+                      @update:model-value="handleSliderChange(field, $event)"
+                    />
 
-                    <div v-else-if="field.type === 'range'" class="space-y-2">
+                    <div
+                      v-else-if="field.type === 'range'"
+                      class="space-y-2"
+                    >
                       <div class="flex items-center gap-4">
-                        <Input :id="fieldId" :model-value="getFieldValue(field.name)" type="range" :min="field.min" :max="field.max" :step="field.step || 1" :disabled="isLoading || field.disabled" class="flex-1" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
+                        <Input
+                          :id="fieldId"
+                          :model-value="getFieldValue(field.name)"
+                          type="range"
+                          :min="field.min"
+                          :max="field.max"
+                          :step="field.step || 1"
+                          :disabled="isLoading || field.disabled"
+                          class="flex-1"
+                          :aria-describedby="ariaDescribedBy"
+                          @update:model-value="setFieldValue(field.name, $event)"
+                        />
                         <span class="min-w-12 text-right text-sm font-medium ui-text">{{ getFieldValue(field.name) }}</span>
                       </div>
                     </div>
 
-                    <DatePicker v-else-if="field.type === 'date'" :id="fieldId" :model-value="getFieldValue(field.name)" :disabled="isLoading || field.disabled" :required="field.required" :min="field.min" :max="field.max" :placeholder="field.placeholder || 'Select date'" :format="field.format || 'MM/DD/YYYY'" :clearable="field.clearable !== false" :show-today="field.showToday !== false" :calendar-position="field.calendarPosition || 'left-0 bottom-full'" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
+                    <DatePicker
+                      v-else-if="field.type === 'date'"
+                      :id="fieldId"
+                      :model-value="getFieldValue(field.name)"
+                      :disabled="isLoading || field.disabled"
+                      :required="field.required"
+                      :min="field.min"
+                      :max="field.max"
+                      :placeholder="field.placeholder || 'Select date'"
+                      :format="field.format || 'MM/DD/YYYY'"
+                      :clearable="field.clearable !== false"
+                      :show-today="field.showToday !== false"
+                      :calendar-position="field.calendarPosition || 'left-0 bottom-full'"
+                      :aria-describedby="ariaDescribedBy"
+                      @update:model-value="setFieldValue(field.name, $event)"
+                    />
 
-                    <Input v-else-if="field.type === 'time'" :id="fieldId" :model-value="getFieldValue(field.name)" type="time" :disabled="isLoading || field.disabled" :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
-                    <Input v-else-if="field.type === 'datetime-local'" :id="fieldId" :model-value="getFieldValue(field.name)" type="datetime-local" :disabled="isLoading || field.disabled" :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
-                    <Input v-else-if="field.type === 'month'" :id="fieldId" :model-value="getFieldValue(field.name)" type="month" :disabled="isLoading || field.disabled" :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
-                    <Input v-else-if="field.type === 'week'" :id="fieldId" :model-value="getFieldValue(field.name)" type="week" :disabled="isLoading || field.disabled" :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']" :aria-describedby="ariaDescribedBy" @update:model-value="setFieldValue(field.name, $event)" />
+                    <Input
+                      v-else-if="field.type === 'time'"
+                      :id="fieldId"
+                      :model-value="getFieldValue(field.name)"
+                      type="time"
+                      :disabled="isLoading || field.disabled"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
+                      :aria-describedby="ariaDescribedBy"
+                      @update:model-value="setFieldValue(field.name, $event)"
+                    />
+                    <Input
+                      v-else-if="field.type === 'datetime-local'"
+                      :id="fieldId"
+                      :model-value="getFieldValue(field.name)"
+                      type="datetime-local"
+                      :disabled="isLoading || field.disabled"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
+                      :aria-describedby="ariaDescribedBy"
+                      @update:model-value="setFieldValue(field.name, $event)"
+                    />
+                    <Input
+                      v-else-if="field.type === 'month'"
+                      :id="fieldId"
+                      :model-value="getFieldValue(field.name)"
+                      type="month"
+                      :disabled="isLoading || field.disabled"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
+                      :aria-describedby="ariaDescribedBy"
+                      @update:model-value="setFieldValue(field.name, $event)"
+                    />
+                    <Input
+                      v-else-if="field.type === 'week'"
+                      :id="fieldId"
+                      :model-value="getFieldValue(field.name)"
+                      type="week"
+                      :disabled="isLoading || field.disabled"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
+                      :aria-describedby="ariaDescribedBy"
+                      @update:model-value="setFieldValue(field.name, $event)"
+                    />
                   </slot>
                 </template>
               </FormField>
@@ -606,15 +787,49 @@ const handleCancel = () => emit('cancel')
         </div>
       </div>
 
-      <slot name="actions" :formData="formData" :isValid="isValid" :submit="submitInternal">
-        <div v-if="showSubmit" class="flex justify-end gap-3 pt-6">
-          <Button v-if="showReset" type="button" variant="outline" :disabled="isLoading" @click="handleReset">Reset</Button>
-          <Button v-if="showCancel" type="button" variant="outline" :disabled="isLoading" @click="handleCancel">Cancel</Button>
-          <Button type="submit" :disabled="isLoading" :loading="isLoading" variant="default">{{ submitLabel }}</Button>
+      <slot
+        name="actions"
+        :form-data="formData"
+        :is-valid="isValid"
+        :submit="submitInternal"
+      >
+        <div
+          v-if="showSubmit"
+          class="flex justify-end gap-3 pt-6"
+        >
+          <Button
+            v-if="showReset"
+            type="button"
+            variant="outline"
+            :disabled="isLoading"
+            @click="handleReset"
+          >
+            Reset
+          </Button>
+          <Button
+            v-if="showCancel"
+            type="button"
+            variant="outline"
+            :disabled="isLoading"
+            @click="handleCancel"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            :disabled="isLoading"
+            :loading="isLoading"
+            variant="default"
+          >
+            {{ submitLabel }}
+          </Button>
         </div>
       </slot>
 
-      <div v-if="showSubmit && hasActionsSlot" class="hidden" />
+      <div
+        v-if="showSubmit && hasActionsSlot"
+        class="hidden"
+      />
     </form>
   </div>
 </template>
