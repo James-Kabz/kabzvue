@@ -75,53 +75,194 @@ const componentPlaygroundPresets = {
       fallback: 'UI'
     }
   },
+  ReusableForm: {
+    props: {
+      title: 'Create Company',
+      description: 'Sectioned form with external actions',
+      entityName: 'Company',
+      showSubmit: false,
+      fields: [
+        {
+          name: 'company_name',
+          label: 'Company Name',
+          type: 'text',
+          required: true,
+          placeholder: 'Savannah Holdings',
+          wrapperClass: 'col-span-12 md:col-span-8'
+        },
+        {
+          name: 'company_code',
+          label: 'Company Code',
+          type: 'text',
+          required: true,
+          placeholder: 'SAV-001',
+          wrapperClass: 'col-span-12 md:col-span-4'
+        },
+        {
+          name: 'admin_email',
+          label: 'Admin Email',
+          type: 'email',
+          required: true,
+          placeholder: 'admin@savannah.com',
+          wrapperClass: 'col-span-12 md:col-span-6'
+        },
+        {
+          name: 'timezone',
+          label: 'Timezone',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Africa/Nairobi', value: 'Africa/Nairobi' },
+            { label: 'UTC', value: 'UTC' }
+          ],
+          wrapperClass: 'col-span-12 md:col-span-6'
+        }
+      ],
+      sections: [
+        {
+          id: 'identity',
+          title: 'Identity',
+          description: 'Core company information',
+          fields: [
+            {
+              name: 'company_name',
+              label: 'Company Name',
+              type: 'text',
+              required: true,
+              placeholder: 'Savannah Holdings',
+              wrapperClass: 'col-span-12 md:col-span-8'
+            },
+            {
+              name: 'company_code',
+              label: 'Company Code',
+              type: 'text',
+              required: true,
+              placeholder: 'SAV-001',
+              wrapperClass: 'col-span-12 md:col-span-4'
+            }
+          ]
+        },
+        {
+          id: 'settings',
+          title: 'Settings',
+          description: 'Default account setup',
+          fields: [
+            {
+              name: 'admin_email',
+              label: 'Admin Email',
+              type: 'email',
+              required: true,
+              placeholder: 'admin@savannah.com',
+              wrapperClass: 'col-span-12 md:col-span-6'
+            },
+            {
+              name: 'timezone',
+              label: 'Timezone',
+              type: 'select',
+              required: true,
+              options: [
+                { label: 'Africa/Nairobi', value: 'Africa/Nairobi' },
+                { label: 'UTC', value: 'UTC' }
+              ],
+              wrapperClass: 'col-span-12 md:col-span-6'
+            }
+          ]
+        }
+      ]
+    }
+  },
   ReusableFormModal: {
     props: {
       modelValue: false,
       modalType: 'create',
-      entityName: 'User',
+      entityName: 'Company',
+      showSubmit: false,
       fields: [
         {
-          name: 'name',
-          label: 'Full Name',
+          name: 'company_name',
+          label: 'Company Name',
           type: 'text',
           required: true,
-          placeholder: 'Jordan Blake',
-          wrapperClass: 'col-span-12 md:col-span-6'
+          placeholder: 'Savannah Holdings',
+          wrapperClass: 'col-span-12 md:col-span-8'
         },
         {
-          name: 'email',
-          label: 'Email Address',
+          name: 'company_code',
+          label: 'Company Code',
+          type: 'text',
+          required: true,
+          placeholder: 'SAV-001',
+          wrapperClass: 'col-span-12 md:col-span-4'
+        },
+        {
+          name: 'admin_email',
+          label: 'Admin Email',
           type: 'email',
           required: true,
-          placeholder: 'jordan@company.com',
+          placeholder: 'admin@savannah.com',
           wrapperClass: 'col-span-12 md:col-span-6'
         },
         {
-          name: 'role',
-          label: 'Role',
+          name: 'timezone',
+          label: 'Timezone',
           type: 'select',
           required: true,
-          placeholder: 'Select role',
           options: [
-            { label: 'Admin', value: 'Admin' },
-            { label: 'Manager', value: 'Manager' },
-            { label: 'Analyst', value: 'Analyst' },
-            { label: 'Reviewer', value: 'Reviewer' }
+            { label: 'Africa/Nairobi', value: 'Africa/Nairobi' },
+            { label: 'UTC', value: 'UTC' }
           ],
           wrapperClass: 'col-span-12 md:col-span-6'
+        }
+      ],
+      sections: [
+        {
+          id: 'identity',
+          title: 'Identity',
+          description: 'Core company information',
+          fields: [
+            {
+              name: 'company_name',
+              label: 'Company Name',
+              type: 'text',
+              required: true,
+              placeholder: 'Savannah Holdings',
+              wrapperClass: 'col-span-12 md:col-span-8'
+            },
+            {
+              name: 'company_code',
+              label: 'Company Code',
+              type: 'text',
+              required: true,
+              placeholder: 'SAV-001',
+              wrapperClass: 'col-span-12 md:col-span-4'
+            }
+          ]
         },
         {
-          name: 'status',
-          label: 'Status',
-          type: 'select',
-          required: true,
-          options: [
-            { label: 'Active', value: 'active' },
-            { label: 'Pending', value: 'pending' },
-            { label: 'Suspended', value: 'suspended' }
-          ],
-          wrapperClass: 'col-span-12 md:col-span-6'
+          id: 'settings',
+          title: 'Settings',
+          description: 'Default account setup',
+          fields: [
+            {
+              name: 'admin_email',
+              label: 'Admin Email',
+              type: 'email',
+              required: true,
+              placeholder: 'admin@savannah.com',
+              wrapperClass: 'col-span-12 md:col-span-6'
+            },
+            {
+              name: 'timezone',
+              label: 'Timezone',
+              type: 'select',
+              required: true,
+              options: [
+                { label: 'Africa/Nairobi', value: 'Africa/Nairobi' },
+                { label: 'UTC', value: 'UTC' }
+              ],
+              wrapperClass: 'col-span-12 md:col-span-6'
+            }
+          ]
         }
       ]
     }

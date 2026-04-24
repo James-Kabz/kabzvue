@@ -56,6 +56,59 @@ const sampleFields = [
   }
 ]
 
+const sectionedSampleFields = [
+  {
+    name: 'company_name',
+    label: 'Company Name',
+    type: 'text',
+    required: true,
+    placeholder: 'Savannah Holdings',
+    wrapperClass: 'col-span-12 md:col-span-8'
+  },
+  {
+    name: 'company_code',
+    label: 'Company Code',
+    type: 'text',
+    required: true,
+    placeholder: 'SAV-001',
+    wrapperClass: 'col-span-12 md:col-span-4'
+  },
+  {
+    name: 'admin_email',
+    label: 'Admin Email',
+    type: 'email',
+    required: true,
+    placeholder: 'admin@savannah.com',
+    wrapperClass: 'col-span-12 md:col-span-6'
+  },
+  {
+    name: 'timezone',
+    label: 'Timezone',
+    type: 'select',
+    required: true,
+    options: [
+      { label: 'Africa/Nairobi', value: 'Africa/Nairobi' },
+      { label: 'UTC', value: 'UTC' }
+    ],
+    wrapperClass: 'col-span-12 md:col-span-6'
+  }
+]
+
+const sampleSections = [
+  {
+    id: 'identity',
+    title: 'Identity',
+    description: 'Core company information',
+    fields: sectionedSampleFields.slice(0, 2)
+  },
+  {
+    id: 'settings',
+    title: 'Settings',
+    description: 'Default account setup',
+    fields: sectionedSampleFields.slice(2)
+  }
+]
+
 const componentExamplePresets = {
   Button: [
     { label: 'Primary', props: { variant: 'primary', size: 'default' }, slot: 'Save' },
@@ -111,8 +164,31 @@ const componentExamplePresets = {
   DataTable: [
     { label: 'DataTable', props: { data: sampleRows, columns: sampleColumns, showPagination: false } }
   ],
+  ReusableForm: [
+    {
+      label: 'Sectioned Form',
+      props: {
+        title: 'Create Company',
+        description: 'ReusableForm v2 section layout',
+        entityName: 'Company',
+        fields: sectionedSampleFields,
+        sections: sampleSections,
+        showSubmit: false
+      }
+    }
+  ],
   ReusableFormModal: [
-    { label: 'Modal Closed', props: { modelValue: false, modalType: 'create', entityName: 'User', fields: sampleFields } }
+    {
+      label: 'Sectioned Modal',
+      props: {
+        modelValue: false,
+        modalType: 'create',
+        entityName: 'Company',
+        fields: sectionedSampleFields,
+        sections: sampleSections,
+        showSubmit: false
+      }
+    }
   ],
   Breadcrumb: [
     {
@@ -142,6 +218,7 @@ const specialDefaults = {
   columns: () => sampleColumns,
   data: () => sampleRows,
   fields: () => sampleFields,
+  sections: () => sampleSections,
   modalType: () => 'create',
   entityName: () => 'Item',
   title: () => 'Sample title',

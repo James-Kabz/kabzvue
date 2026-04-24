@@ -899,6 +899,51 @@ const maxDate = '2023-12-31'
 </script>
 ```
 
+## ReusableForm (v2)
+
+A reusable inline form component with optional sectioned layout, field-level slot overrides, and cross-field validation.
+
+### New v2 Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `sections` | `Array` | `[]` | Section schema. If provided, form renders by sections |
+| `showSubmit` | `Boolean` | `true` | Toggle internal submit/cancel/reset actions row |
+| `crossValidate` | `Function` | `null` | Cross-field validator returning `{ [fieldName]: error }` |
+
+### New v2 Slots
+
+| Slot | Scope | Description |
+|------|-------|-------------|
+| `section-header` | `{ section }` | Custom section header |
+| `field-<name>` | `{ field, formData, error, update }` | Override a specific field renderer |
+| `actions` | `{ formData, isValid, submit }` | Custom footer actions |
+
+### New v2 Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `form-change` | `formData` | Emitted on any value change |
+
+### v2 Example
+
+```vue
+<ReusableForm
+  title="Create Company"
+  entity-name="Company"
+  :fields="fields"
+  :sections="sections"
+  :show-submit="false"
+  :cross-validate="crossValidate"
+  @form-change="onFormChange"
+  @submit="onSubmit"
+>
+  <template #actions="{ submit }">
+    <Button variant="default" @click="submit">Save Company</Button>
+  </template>
+</ReusableForm>
+```
+
 ## ReusableFormModal
 
 A reusable modal component for creating and editing forms with various field types.
@@ -911,9 +956,12 @@ A reusable modal component for creating and editing forms with various field typ
 | `modalType` | `String` | - | 'create' or 'edit' |
 | `entityName` | `String` | - | Name of the entity being created/edited |
 | `fields` | `Array` | - | Array of field configurations |
+| `sections` | `Array` | `[]` | Same section schema as `ReusableForm` |
 | `initialData` | `Object` | `null` | Initial form data for editing |
 | `loading` | `Boolean` | `false` | Loading state |
 | `customValidation` | `Function` | `null` | Custom validation function |
+| `crossValidate` | `Function` | `null` | Cross-field validation hook |
+| `showSubmit` | `Boolean` | `true` | Toggle internal actions row |
 | `modalSize` | `String` | `'4xl'` | Modal size |
 | `modalResizable` | `Boolean` | `false` | Whether modal is resizable |
 
@@ -924,6 +972,7 @@ A reusable modal component for creating and editing forms with various field typ
 | `update:modelValue` | `Boolean` | Modal visibility changes |
 | `submit` | `{ formData, modalType, originalData }` | Form submission |
 | `close` | - | Modal close |
+| `form-change` | `formData` | Emitted when field values change |
 
 ### Field Configuration
 
