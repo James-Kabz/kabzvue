@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onErrorCaptured, ref, watch } from 'vue'
+import { computed, markRaw, onErrorCaptured, ref, shallowRef, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getComponentDocBySlug, getComponentDocs, loadComponentBySlug } from '../componentDocs.js'
 
@@ -9,7 +9,7 @@ const copiedKey = ref('')
 const loading = ref(false)
 const loadError = ref('')
 const previewError = ref('')
-const loadedComponent = ref(null)
+const loadedComponent = shallowRef(null)
 const playgroundValues = ref({})
 const initialPlaygroundValues = ref({})
 const jsonDrafts = ref({})
@@ -588,7 +588,8 @@ const loadRuntimeComponent = async () => {
   }
 
   try {
-    loadedComponent.value = await loadComponentBySlug(componentSlug.value)
+    const componentModule = await loadComponentBySlug(componentSlug.value)
+    loadedComponent.value = componentModule ? markRaw(componentModule) : null
     initializePlayground()
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : 'Failed to load component metadata.'
