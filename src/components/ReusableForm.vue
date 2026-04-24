@@ -44,6 +44,7 @@ const isLoading = computed(() => props.loading)
 const formData = ref({})
 const errors = ref({})
 const uploadingFilesMap = ref({})
+const isHydratingFromProps = ref(false)
 
 const hasSections = computed(() => Array.isArray(props.sections) && props.sections.length > 0)
 const hasActionsSlot = computed(() => Boolean(slots.actions))
@@ -83,6 +84,14 @@ const normalizedSections = computed(() => {
 
 const allFields = computed(() => normalizedSections.value.flatMap((section) => section.fields || []))
 const isValid = computed(() => Object.keys(errors.value).length === 0)
+
+const getFormSignature = (data) => {
+  try {
+    return JSON.stringify(data ?? {})
+  } catch {
+    return ''
+  }
+}
 
 const getNestedValue = (obj, path) => {
   if (!obj || !path) return undefined
@@ -139,20 +148,33 @@ const populateFormData = (source) => {
 watch(
   () => props.initialData,
   (newData) => {
-    formData.value = newData ? populateFormData(newData) : initializeFormData()
+    const nextData = newData ? populateFormData(newData) : initializeFormData()
+    if (getFormSignature(nextData) === getFormSignature(formData.value)) return
+
+    isHydratingFromProps.value = true
+    formData.value = nextData
+    queueMicrotask(() => {
+      isHydratingFromProps.value = false
+    })
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 )
 
 watch(
   formData,
   (newData) => {
+    if (isHydratingFromProps.value) return
     emit('form-change', newData)
   },
   { deep: true },
 )
 
 const getFieldValue = (fieldName) => (fieldName.includes('.') ? getNestedValue(formData.value, fieldName) : formData.value[fieldName])
+const getFieldError = (fieldName) => {
+  const direct = errors.value?.[fieldName]
+  if (direct) return direct
+  return fieldName.includes('.') ? getNestedValue(errors.value, fieldName) : undefined
+}
 
 const setFieldValue = (fieldName, value) => {
   if (fieldName.includes('.')) setNestedValue(formData.value, fieldName, value)
@@ -468,9 +490,9 @@ const handleCancel = () => emit('cancel')
                 v-else
                 :id="`form-${entityName}-${field.name}`"
                 :label="field.label"
-                :required="field.required && !field.disabled"
-                :error="errors[field.name]"
-                :error-message="errors[field.name]"
+                :required="Boolean(field.required)"
+                :error="getFieldError(field.name)"
+                :error-message="getFieldError(field.name)"
                 :help-text="field.helpText"
                 :class="field.labelClass || ''"
               >
@@ -479,7 +501,7 @@ const handleCancel = () => emit('cancel')
                     :name="`field-${field.name}`"
                     :field="field"
                     :form-data="formData"
-                    :error="errors[field.name]"
+                    :error="getFieldError(field.name)"
                     :update="(value) => setFieldValue(field.name, value)"
                   >
                     <div
