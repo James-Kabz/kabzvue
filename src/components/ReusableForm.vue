@@ -13,7 +13,7 @@ import FileUpload from './FileUpload.vue'
 import { toast } from '../lib/toast'
 
 const props = defineProps({
-  title: { type: String, default: 'Form' },
+  title: { type: String, default: '' },
   description: { type: String, default: '' },
   entityName: { type: String, default: 'Item' },
   fields: {
