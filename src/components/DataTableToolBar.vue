@@ -88,6 +88,11 @@ const props = defineProps({
     type: String,
     default: 'normal',
     validator: (value) => ['compact', 'normal', 'comfortable'].includes(value)
+  },
+  themeScope: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'module'].includes(value)
   }
 })
 
@@ -204,10 +209,13 @@ const refreshButtonVariants = cva('px-3 py-2 text-sm border ui-border-strong rou
 
 // Computed Classes
 const toolbarClasses = computed(() => 
-  cn(toolbarVariants({ 
-    variant: props.variant, 
-    padding: props.padding 
-  }))
+  cn(
+    toolbarVariants({ 
+      variant: props.variant, 
+      padding: props.padding 
+    }),
+    props.themeScope === 'module' && 'kv-module-themed-toolbar'
+  )
 )
 
 const itemCountClasses = computed(() => 'text-md ui-text')
@@ -503,3 +511,18 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.kv-module-themed-toolbar {
+  border-color: var(--module-border, var(--ui-border-strong));
+  background: color-mix(
+    in oklab,
+    var(--module-soft, var(--ui-primary-soft)) 50%,
+    var(--ui-bg) 50%
+  );
+}
+
+.kv-module-themed-toolbar :deep(button) {
+  border-color: var(--module-border, var(--ui-border-strong));
+}
+</style>

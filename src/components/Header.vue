@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { cn } from '../utils/cn.js'
 import { getMode, setMode } from '../lib/theme'
 import Icon from './Icon.vue'
+import Search from './Search.vue'
 import Switch from './Switch.vue'
 
 const props = defineProps({
@@ -63,7 +64,6 @@ const emit = defineEmits([
 const searchQuery = ref('')
 const showNotificationsDropdown = ref(false)
 const showProfile = ref(false)
-const showMobileSearch = ref(false)
 const isMobile = ref(false)
 const showCompanyDropdown = ref(false)
 const currentThemeMode = ref('light')
@@ -508,45 +508,6 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
 
       <!-- Right side - Actions -->
       <div class="flex items-center gap-1 sm:gap-2 md:gap-3 pl-2">
-        <!-- Search - Mobile optimized -->
-        <div
-          v-if="showSearch && (!isMobile || showMobileSearch)"
-          class="relative"
-        >
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Icon
-              icon="search"
-              class="w-4 h-4 ui-text-soft"
-            />
-          </div>
-          <input
-            v-model="searchQuery"
-            type="text"
-            :placeholder="searchPlaceholder"
-            class="w-40 sm:w-52 md:w-64 rounded-xl border ui-border-strong ui-surface pl-9 sm:pl-10 pr-9 sm:pr-4 py-2 text-sm ui-text focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary) outline-none transition-all"
-          >
-          <button
-            v-if="isMobile"
-            class="absolute right-2 top-1/2 -translate-y-1/2 ui-text hover:text-(--ui-text) p-1"
-            @click="showMobileSearch = false"
-          >
-            <Icon
-              icon="times"
-              class="w-4 h-4"
-            />
-          </button>
-        </div>
-        <button
-          v-else-if="showSearch && isMobile"
-          class="p-2 ui-text rounded-xl hover:bg-(--ui-surface-muted) transition-colors"
-          @click="showMobileSearch = true"
-        >
-          <Icon
-            icon="search"
-            class="w-5 h-5"
-          />
-        </button>
-
         <!-- Notifications -->
         <button
           v-if="showNotifications"
@@ -760,18 +721,20 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
           </div>
         </div>
 
-        <router-link
-          v-if="showSettings && settingsRoute"
-          :to="settingsRoute"
-          class="relative p-2 ui-text rounded-xl hover:bg-(--ui-surface-muted) transition-colors"
-          :title="settingsLabel"
-          @click="handleNavigation({ name: 'settings', label: settingsLabel, route: settingsRoute })"
+        <div
+          v-if="showSearch"
+          class="w-40 sm:w-52 md:w-64"
         >
-          <Icon
-            icon="cog"
-            class="w-5 h-5"
+          <Search
+            v-model="searchQuery"
+            :placeholder="searchPlaceholder"
+            size="sm"
+            :show-no-results="false"
+            :min-length="0"
+            :debounce="200"
+            :results="[]"
           />
-        </router-link>
+        </div>
 
         <!-- Profile Dropdown -->
         <div class="relative">

@@ -37,6 +37,11 @@ const props = defineProps({
   searchableMenus: {
     type: Array,
     default: () => [] // Array of menu names that should have search (e.g., ['compliance', 'risks'])
+  },
+  themeScope: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'module'].includes(value)
   }
 })
 
@@ -183,6 +188,46 @@ const isItemActive = (item) => {
   return false
 }
 
+const getActiveCardClasses = (active) => {
+  if (!active) return 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
+  if (props.themeScope === 'module') return 'border shadow-sm'
+  return 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
+}
+
+const getActiveCardStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return {
+    backgroundColor: 'var(--module-soft, var(--ui-primary-soft))',
+    borderColor: 'var(--module-border, var(--ui-border-strong))',
+  }
+}
+
+const getActiveIconClasses = (active) => {
+  if (!active) return 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
+  if (props.themeScope === 'module') return 'shadow-sm'
+  return 'ui-primary-bg shadow-sm'
+}
+
+const getActiveIconStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return {
+    backgroundColor: 'var(--module-primary, var(--ui-primary))',
+    color: 'var(--ui-text-inverse, #fff)',
+    border: '1px solid var(--module-border, var(--ui-border-strong))',
+  }
+}
+
+const getActiveTextClasses = (active) => {
+  if (!active) return 'ui-text group-hover:text-(--ui-text)'
+  if (props.themeScope === 'module') return 'font-semibold'
+  return 'ui-primary font-semibold'
+}
+
+const getActiveTextStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return { color: 'var(--module-text, var(--ui-primary))' }
+}
+
 // Handle responsive behavior
 const checkMobile = () => {
   const wasMobile = isMobile.value
@@ -251,6 +296,7 @@ defineExpose({
       :class="cn(
         'fixed left-0 z-40 ui-surface border-r ui-border-strong overflow-visible flex flex-col shadow-xl shadow-black/5',
         'transition-transform duration-300 ease-out',
+        props.themeScope === 'module' && 'kv-module-sidebar',
         isMobile
           ? cn('transform h-screen', isMobileOpen ? 'translate-x-0' : '-translate-x-full')
           : 'translate-x-0 h-[calc(100vh-4rem)]'
@@ -302,10 +348,9 @@ defineExpose({
                 :to="item.route"
                 :class="cn(
                   'flex flex-col items-center justify-center rounded-xl transition-all duration-200 group relative py-3 px-2.5',
-                  isItemActive(item)
-                    ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
-                    : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
+                  getActiveCardClasses(isItemActive(item))
                 )"
+                :style="getActiveCardStyle(isItemActive(item))"
                 @click="handleNavigation(item)"
               >
                 <!-- Icon Container -->
@@ -313,10 +358,9 @@ defineExpose({
                   :class="cn(
                     'flex items-center justify-center rounded-lg transition-colors mb-2',
                     'w-10 h-10',
-                    isItemActive(item)
-                      ? 'ui-primary-bg shadow-sm'
-                      : 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
+                    getActiveIconClasses(isItemActive(item))
                   )"
+                  :style="getActiveIconStyle(isItemActive(item))"
                 >
                   <Icon
                     :icon="item.icon"
@@ -328,10 +372,9 @@ defineExpose({
                 <span
                   :class="cn(
                     'text-[11px] leading-tight font-medium text-center',
-                    isItemActive(item)
-                      ? 'ui-primary font-semibold'
-                      : 'ui-text group-hover:text-(--ui-text)'
+                    getActiveTextClasses(isItemActive(item))
                   )"
+                  :style="getActiveTextStyle(isItemActive(item))"
                 >
                   {{ item.label }}
                 </span>
@@ -354,10 +397,9 @@ defineExpose({
                 <div
                   :class="cn(
                     'flex flex-col items-center justify-center rounded-xl transition-all duration-200 cursor-pointer group relative py-3 px-2.5',
-                    isItemActive(item)
-                      ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
-                      : 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
+                    getActiveCardClasses(isItemActive(item))
                   )"
+                  :style="getActiveCardStyle(isItemActive(item))"
                   @click="handleSubmenuClick(item)"
                 >
                   <!-- Icon Container -->
@@ -365,10 +407,9 @@ defineExpose({
                     :class="cn(
                       'flex items-center justify-center rounded-lg transition-colors mb-2',
                       'w-10 h-10',
-                      isItemActive(item)
-                        ? 'ui-primary-bg shadow-sm'
-                        : 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
+                      getActiveIconClasses(isItemActive(item))
                     )"
+                    :style="getActiveIconStyle(isItemActive(item))"
                   >
                     <Icon
                       :icon="item.icon"
@@ -380,10 +421,9 @@ defineExpose({
                   <span
                     :class="cn(
                       'text-[11px] leading-tight font-medium text-center',
-                      isItemActive(item)
-                        ? 'ui-primary font-semibold'
-                        : 'ui-text group-hover:text-(--ui-text)'
+                      getActiveTextClasses(isItemActive(item))
                     )"
+                    :style="getActiveTextStyle(isItemActive(item))"
                   >
                     {{ item.label }}
                   </span>

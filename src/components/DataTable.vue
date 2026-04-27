@@ -208,6 +208,11 @@ const props = defineProps({
   showRefresh: {
     type: Boolean,
     default: true
+  },
+  themeScope: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'module'].includes(value)
   }
 })
 
@@ -546,7 +551,10 @@ const handlePageSizeChange = async (size) => {
 
 // Style classes using CVA
 const tableContainerClasses = computed(() =>
-  cn(tableContainerVariants({ variant: props.variant }))
+  cn(
+    tableContainerVariants({ variant: props.variant }),
+    props.themeScope === 'module' && 'kv-module-themed-table'
+  )
 )
 
 const tableClasses = computed(() =>
@@ -1063,6 +1071,24 @@ defineExpose({
 .table-loading-overlay {
   border-radius: 0.5rem;
   z-index: 10;
+}
+
+.kv-module-themed-table :deep(thead th) {
+  background: var(--module-soft, var(--ui-primary-soft));
+  color: var(--module-text, var(--ui-primary));
+  border-bottom-color: var(--module-border, var(--ui-border-strong));
+}
+
+.kv-module-themed-table :deep(tbody tr:nth-child(odd)) {
+  background: var(--module-soft-alt, transparent);
+}
+
+.kv-module-themed-table :deep(tbody tr:nth-child(even)) {
+  background: color-mix(
+    in oklab,
+    var(--module-soft-alt, transparent) 55%,
+    transparent 45%
+  );
 }
 
 /* Custom skeleton animation */

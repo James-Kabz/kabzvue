@@ -131,6 +131,11 @@ const props = defineProps({
     type: String,
     default: 'normal',
     validator: (value) => ['compact', 'normal', 'comfortable'].includes(value)
+  },
+  themeScope: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'module'].includes(value)
   }
 })
 
@@ -478,11 +483,18 @@ const activeFiltersDisplay = computed(() => {
 })
 
 // Computed Classes
-const filtersClasses = computed(() =>
-  cn(filtersVariants({
+const filtersClasses = computed(() => 
+  cn(filtersVariants({ 
     variant: props.variant,
     padding: props.padding
   }))
+)
+
+const rootContainerClasses = computed(() =>
+  cn(
+    'border ui-border rounded-2xl mb-2 ui-surface overflow-hidden',
+    props.themeScope === 'module' && 'kv-module-themed-filters'
+  )
 )
 
 const selectClasses = computed(() =>
@@ -639,7 +651,7 @@ const removeFilter = (filterKey) => {
 </script>
 
 <template>
-  <div class="border ui-border rounded-2xl mb-2 ui-surface overflow-hidden">
+  <div :class="rootContainerClasses">
     <!-- Main Filters Bar -->
     <div :class="filtersClasses">
       <!-- Dynamic Select Filters -->
@@ -1030,3 +1042,18 @@ const removeFilter = (filterKey) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.kv-module-themed-filters {
+  border-color: var(--module-border, var(--ui-border-strong));
+  background: color-mix(
+    in oklab,
+    var(--module-soft-alt, transparent) 65%,
+    var(--ui-bg) 35%
+  );
+}
+
+.kv-module-themed-filters :deep(button) {
+  border-color: var(--module-border, var(--ui-border-strong));
+}
+</style>
