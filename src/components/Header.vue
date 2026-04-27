@@ -778,29 +778,6 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
           </div>
         </transition>
 
-        <!-- Theme Switcher -->
-        <div
-          v-if="showThemeSwitcher"
-          class="relative"
-        >
-          <div
-            class="group flex items-center gap-2 rounded-xl border ui-border-strong px-2 py-1.5 ui-surface hover:bg-(--ui-surface-muted) transition-colors shadow-xs"
-            :title="`${themeSwitcherTitle}: ${currentThemeMode}`"
-            :aria-label="`${themeSwitcherTitle} switch`"
-          >
-            <Icon
-              :icon="currentThemeMode === 'dark' ? 'moon' : 'sun'"
-              class="w-4 h-4"
-              :class="currentThemeMode === 'dark' ? 'ui-primary' : 'ui-text'"
-            />
-            <Switch
-              v-model="isDarkTheme"
-              size="md"
-              :disabled="!canToggleTheme"
-            />
-          </div>
-        </div>
-
         <div
           v-if="showSearch"
           class="w-40 sm:w-52 md:w-64"
@@ -862,6 +839,28 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                 <p class="text-xs ui-text truncate">
                   {{ user.email }}
                 </p>
+              </div>
+              <div
+                v-if="showThemeSwitcher"
+                class="px-3 py-3 border-b ui-border-strong"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <Icon
+                      :icon="currentThemeMode === 'dark' ? 'moon' : 'sun'"
+                      class="w-4 h-4 shrink-0"
+                      :class="currentThemeMode === 'dark' ? 'ui-primary' : 'ui-text'"
+                    />
+                    <span class="text-sm font-medium ui-text truncate">
+                      {{ themeSwitcherTitle }}
+                    </span>
+                  </div>
+                  <Switch
+                    v-model="isDarkTheme"
+                    size="md"
+                    :disabled="!canToggleTheme"
+                  />
+                </div>
               </div>
               <div class="py-2">
                 <template

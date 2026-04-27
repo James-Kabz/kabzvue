@@ -209,7 +209,12 @@ const getActiveIconClasses = (active) => {
 }
 
 const getActiveIconStyle = (active) => {
-  if (!active || props.themeScope !== 'module') return null
+  if (!active) return null
+  if (props.themeScope !== 'module') {
+    return {
+      color: '#ffffff',
+    }
+  }
   return {
     backgroundColor: 'var(--module-primary, var(--ui-primary))',
     color: '#ffffff',
@@ -365,7 +370,7 @@ defineExpose({
                   <Icon
                     :icon="item.icon"
                     class="w-5 h-5"
-                    :style="isItemActive(item) && props.themeScope === 'module' ? { color: '#ffffff' } : null"
+                    :style="isItemActive(item) ? { color: '#ffffff' } : null"
                   />
                 </div>
 
@@ -415,7 +420,7 @@ defineExpose({
                     <Icon
                       :icon="item.icon"
                       class="w-5 h-5"
-                      :style="isItemActive(item) && props.themeScope === 'module' ? { color: '#ffffff' } : null"
+                      :style="isItemActive(item) ? { color: '#ffffff' } : null"
                     />
                   </div>
 
