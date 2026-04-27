@@ -46,7 +46,12 @@ const props = defineProps({
     default: () => ['light', 'dark']
   },
   userInitialsOverride: { type: String, default: '' },
-  userRoleDisplayOverride: { type: String, default: '' }
+  userRoleDisplayOverride: { type: String, default: '' },
+  themeScope: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'module'].includes(value)
+  }
 })
 
 const emit = defineEmits([
@@ -188,6 +193,80 @@ const isItemActive = (item) => {
   if (props.currentRoute === item.route) return true
   if (props.currentRoute.startsWith(item.route + '/')) return true
   return false
+}
+
+
+const getHeaderClass = () => {
+  if (props.themeScope === 'module') {
+    return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-surface)), transparent 10%)]'
+  }
+  return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--ui-surface), transparent 8%)]'
+}
+
+const getHeaderActiveItemClasses = (active) => {
+  if (!active) return 'ui-text hover:bg-(--ui-surface-muted) hover:text-(--ui-text) border border-transparent'
+  if (props.themeScope === 'module') return 'shadow-sm border'
+  return 'bg-linear-to-br from-(--ui-primary-soft) to-(--ui-primary-soft) ui-primary shadow-sm border border-(--ui-primary-soft)'
+}
+
+const getHeaderActiveItemStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return {
+    backgroundColor: 'var(--module-soft, var(--ui-primary-soft))',
+    borderColor: 'var(--module-border, var(--ui-border-strong))',
+  }
+}
+
+const getHeaderActiveIndicatorStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return { background: 'var(--module-primary, var(--ui-primary))' }
+}
+
+const getHeaderActiveIconClasses = (active) => {
+  if (!active) return 'ui-surface-muted ui-text group-hover:bg-(--ui-bg)'
+  if (props.themeScope === 'module') return 'shadow-md border'
+  return 'bg-linear-to-br from-(--ui-primary) to-(--ui-primary) ui-text shadow-md'
+}
+
+const getHeaderActiveIconStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return {
+    backgroundColor: 'var(--module-primary, var(--ui-primary))',
+    color: 'var(--ui-text-inverse, #fff)',
+    borderColor: 'var(--module-border, var(--ui-border-strong))',
+  }
+}
+
+const getHeaderActiveTextClasses = (active) => {
+  if (!active) return 'ui-text'
+  if (props.themeScope === 'module') return 'font-semibold'
+  return 'ui-primary'
+}
+
+const getHeaderActiveTextStyle = (active) => {
+  if (!active || props.themeScope !== 'module') return null
+  return { color: 'var(--module-text, var(--ui-primary))' }
+}
+
+
+const getCompanyRowClasses = (selected) => {
+  if (!selected) return 'ui-text border-transparent hover:bg-(--ui-surface-muted)'
+  if (props.themeScope === 'module') return 'border shadow-sm font-semibold'
+  return 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 25%)] ui-primary border-(--ui-primary-soft)'
+}
+
+const getCompanyRowStyle = (selected) => {
+  if (!selected || props.themeScope !== 'module') return null
+  return {
+    backgroundColor: 'var(--module-soft, var(--ui-primary-soft))',
+    borderColor: 'var(--module-border, var(--ui-border-strong))',
+    color: 'var(--module-text, var(--ui-primary))',
+  }
+}
+
+const getCompanyCheckStyle = (selected) => {
+  if (!selected || props.themeScope !== 'module') return null
+  return { color: 'var(--module-primary, var(--ui-primary))' }
 }
 
 const handleProfileAction = (item) => {
@@ -342,7 +421,8 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
 <template>
   <header
     :class="cn(
-      'fixed top-0 z-50 w-full border-b ui-border-strong bg-[color:color-mix(in oklab, var(--ui-surface), transparent 8%)] backdrop-blur-md transition-all duration-300 ease-out'
+      'fixed top-0 z-50 w-full backdrop-blur-md transition-all duration-300 ease-out',
+      getHeaderClass()
     )"
     :style="{ left: '0' }"
   >
@@ -451,11 +531,10 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                   :key="company.__id || company.__name"
                   :class="cn(
                     'mx-2 flex items-center w-[calc(100%-1rem)] rounded-xl px-3 sm:px-4 py-2.5 text-sm transition-all group border',
-                    company.__id === normalizedCurrentCompany?.__id
-                      ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 25%)] ui-primary border-(--ui-primary-soft)'
-                      : 'ui-text border-transparent hover:bg-(--ui-surface-muted)'
+                    getCompanyRowClasses(company.__id === normalizedCurrentCompany?.__id)
                   )"
                   @click="handleCompanyChange(company)"
+                  :style="getCompanyRowStyle(company.__id === normalizedCurrentCompany?.__id)"
                 >
                   <div
                     v-if="getCompanyLogoUrl(company)"
@@ -486,6 +565,7 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                     v-if="company.__id === normalizedCurrentCompany?.__id"
                     icon="check-circle"
                     class="w-4 h-4 sm:w-5 sm:h-5 ui-primary shrink-0 ml-2"
+                    :style="getCompanyCheckStyle(company.__id === normalizedCurrentCompany?.__id)"
                   />
                 </button>
               </div>
@@ -793,24 +873,23 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                     :to="item.route"
                     :class="cn(
                       'flex items-center px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
-                      isItemActive(item)
-                        ? 'bg-linear-to-br from-(--ui-primary-soft) to-(--ui-primary-soft) ui-primary shadow-sm border border-(--ui-primary-soft)'
-                        : 'ui-text hover:bg-(--ui-surface-muted) hover:text-(--ui-text) border border-transparent'
+                      getHeaderActiveItemClasses(isItemActive(item))
                     )"
                     @click="handleNavigation(item)"
+                  :style="getHeaderActiveItemStyle(isItemActive(item))"
                   >
                     <!-- Active indicator bar -->
                     <div
                       v-if="isItemActive(item)"
                       class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 sm:h-8 bg-linear-to-b from-(--ui-primary) to-(--ui-primary) rounded-r-full"
+                      :style="getHeaderActiveIndicatorStyle(isItemActive(item))"
                     />
                     <div
                       :class="cn(
                         'flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2',
-                        isItemActive(item)
-                          ? 'bg-linear-to-br from-(--ui-primary) to-(--ui-primary) ui-text shadow-md'
-                          : 'ui-surface-muted ui-text group-hover:bg-(--ui-bg)'
+                        getHeaderActiveIconClasses(isItemActive(item))
                       )"
+                      :style="getHeaderActiveIconStyle(isItemActive(item))"
                     >
                       <Icon
                         v-if="item.icon"
@@ -821,8 +900,9 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                     <span
                       :class="cn(
                         'flex-1 truncate font-semibold text-xs sm:text-md',
-                        isItemActive(item) ? 'ui-primary' : 'ui-text'
+                        getHeaderActiveTextClasses(isItemActive(item))
                       )"
+                      :style="getHeaderActiveTextStyle(isItemActive(item))"
                     >
                       {{ item.label }}
                     </span>

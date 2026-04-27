@@ -204,7 +204,7 @@ const getActiveCardStyle = (active) => {
 
 const getActiveIconClasses = (active) => {
   if (!active) return 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
-  if (props.themeScope === 'module') return 'shadow-sm'
+  if (props.themeScope === 'module') return 'shadow-sm text-white'
   return 'ui-primary-bg shadow-sm'
 }
 
@@ -212,7 +212,7 @@ const getActiveIconStyle = (active) => {
   if (!active || props.themeScope !== 'module') return null
   return {
     backgroundColor: 'var(--module-primary, var(--ui-primary))',
-    color: 'var(--ui-text-inverse, #fff)',
+    color: '#ffffff',
     border: '1px solid var(--module-border, var(--ui-border-strong))',
   }
 }
@@ -365,6 +365,7 @@ defineExpose({
                   <Icon
                     :icon="item.icon"
                     class="w-5 h-5"
+                    :style="isItemActive(item) && props.themeScope === 'module' ? { color: '#ffffff' } : null"
                   />
                 </div>
 
@@ -414,6 +415,7 @@ defineExpose({
                     <Icon
                       :icon="item.icon"
                       class="w-5 h-5"
+                      :style="isItemActive(item) && props.themeScope === 'module' ? { color: '#ffffff' } : null"
                     />
                   </div>
 
