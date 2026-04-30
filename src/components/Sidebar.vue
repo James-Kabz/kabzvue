@@ -143,14 +143,26 @@ const hasSubItems = (item) => {
   return item.subItems && item.subItems.length > 0
 }
 
+const hasNavigableRoute = (item) => {
+  return typeof item?.route === 'string' && item.route.length > 0
+}
+
 const handleSubmenuClick = (item) => {
-  if (!submenuOpen.value || currentSubmenu.value?.name !== item.name) {
-    currentSubmenu.value = item
-    submenuOpen.value = true
-    searchQuery.value = '' // Reset search when opening submenu
-  } else {
+  const isSameOpenMenu = submenuOpen.value && currentSubmenu.value?.name === item.name
+
+  if (isSameOpenMenu) {
     closeSubmenu()
+    return
   }
+
+  // UX: if a parent route exists, navigate there first, then open subitems.
+  if (hasNavigableRoute(item)) {
+    handleNavigation(item)
+  }
+
+  currentSubmenu.value = item
+  submenuOpen.value = true
+  searchQuery.value = ''
 }
 
 const closeSubmenu = () => {
@@ -239,13 +251,12 @@ const getActiveIconStyle = (active) => {
 
 const getActiveTextClasses = (active) => {
   if (!active) return 'ui-text group-hover:text-(--ui-text)'
-  if (props.themeScope === 'module') return 'font-semibold'
+  if (props.themeScope === 'module') return 'ui-text font-semibold'
   return 'ui-primary font-semibold'
 }
 
-const getActiveTextStyle = (active) => {
-  if (!active || props.themeScope !== 'module') return null
-  return { color: 'var(--module-text, var(--ui-primary))' }
+const getActiveTextStyle = () => {
+  return null
 }
 
 // Handle responsive behavior

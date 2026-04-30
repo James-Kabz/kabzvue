@@ -336,452 +336,471 @@ onMounted(() => {
     @logout="handleLogout"
     @sidebar-toggle="handleSidebarToggle"
   >
-  <!-- Demo Content -->
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold ui-text">
-          Dashboard Demo
-        </h1>
-        <p class="ui-text mt-1">
-          Welcome to the Vue UI Dashboard demo page
-        </p>
-      </div>
-      <div class="flex items-center space-x-3">
-        <button
-          class="px-4 py-2 ui-primary-bg ui-text rounded-lg hover:bg-(--ui-primary-strong) transition-colors"
-          @click="toggleSidebar"
-        >
-          {{ sidebarCollapsed ? 'Expand' : 'Collapse' }} Sidebar
-        </button>
-        <button
-          class="px-4 py-2 ui-surface-muted ui-text rounded-lg hover:bg-(--ui-bg) transition-colors"
-          @click="refreshData"
-        >
-          Refresh Data
-        </button>
-      </div>
-    </div>
-
-    <Card variant="elevated">
-      <div class="p-5 space-y-4">
-        <h3 class="text-lg font-semibold ui-text">
-          Theme Scope Showcase (Header + Sidebar Tokens)
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="rounded-xl border ui-border-strong p-4 ui-surface">
-            <p class="text-sm font-semibold ui-text mb-2">Default Scope</p>
-            <div class="border ui-border-strong rounded-lg overflow-hidden">
-              <div class="px-3 py-2 border-b ui-border-strong bg-[color:color-mix(in_oklab,var(--ui-primary-soft),transparent_10%)]">
-                Header fallback: `ui-primary-soft`
-              </div>
-              <div class="p-3">
-                <div class="flex items-center gap-3 rounded-lg border ui-border-strong px-3 py-2 bg-[color:color-mix(in_oklab,var(--ui-primary-soft),transparent_18%)]">
-                  <span class="w-7 h-7 rounded-lg ui-primary-bg text-white inline-flex items-center justify-center">I</span>
-                  <span class="font-semibold ui-primary">Sidebar active item</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-xl border ui-border-strong p-4 ui-surface" :style="moduleThemePreviewVars">
-            <p class="text-sm font-semibold ui-text mb-2">Module Scope</p>
-            <div class="border rounded-lg overflow-hidden" style="border-color: var(--module-border);">
-              <div class="px-3 py-2 border-b bg-[color:color-mix(in_oklab,var(--module-soft,var(--ui-primary-soft)),transparent_10%)]" style="border-color: var(--module-border); color: var(--module-text);">
-                Header fallback: `module-soft -> ui-primary-soft`
-              </div>
-              <div class="p-3">
-                <div class="flex items-center gap-3 rounded-lg border px-3 py-2" style="border-color: var(--module-border); background: var(--module-soft); color: var(--module-text);">
-                  <span class="w-7 h-7 rounded-lg text-white inline-flex items-center justify-center" style="background: var(--module-primary);">I</span>
-                  <span class="font-semibold">Sidebar active item</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <!-- Demo Content -->
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold ui-text">
+            Dashboard Demo
+          </h1>
+          <p class="ui-text mt-1">
+            Welcome to the Vue UI Dashboard demo page
+          </p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button
+            class="px-4 py-2 ui-primary-bg ui-text rounded-lg hover:bg-(--ui-primary-strong) transition-colors"
+            @click="toggleSidebar"
+          >
+            {{ sidebarCollapsed ? 'Expand' : 'Collapse' }} Sidebar
+          </button>
+          <button
+            class="px-4 py-2 ui-surface-muted ui-text rounded-lg hover:bg-(--ui-bg) transition-colors"
+            @click="refreshData"
+          >
+            Refresh Data
+          </button>
         </div>
       </div>
-    </Card>
 
-    <Card variant="elevated">
-      <div class="p-5 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-3">
+      <Card variant="elevated">
+        <div class="p-5 space-y-4">
           <h3 class="text-lg font-semibold ui-text">
-            Company Theme Configuration
+            Theme Scope Showcase (Header + Sidebar Tokens)
           </h3>
-          <span class="text-xs ui-text-muted">Primary + 3 secondary colors per company</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
-          <label class="lg:col-span-2">
-            <span class="block text-xs font-medium ui-text mb-1">Select Company</span>
-            <select
-              v-model.number="selectedCompanyId"
-              class="w-full rounded-lg border ui-border-strong ui-surface px-3 py-2 text-sm ui-text"
-              @change="handleSelectedCompanyChange"
-            >
-              <option
-                v-for="company in companySwitcherDemoData"
-                :key="company.company_id"
-                :value="company.company_id"
-              >
-                {{ company.company_name }}
-              </option>
-            </select>
-          </label>
-
-          <label class="lg:col-span-2">
-            <span class="block text-xs font-medium ui-text mb-1">Company Name</span>
-            <input
-              v-model="companyForm.company_name"
-              type="text"
-              class="w-full rounded-lg border ui-border-strong ui-surface px-3 py-2 text-sm ui-text"
-              placeholder="Company name"
-            >
-          </label>
-
-          <div class="lg:col-span-6">
-            <span class="block text-xs font-medium ui-text mb-2">Pick a Theme Colour</span>
-            <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
-              <button
-                v-for="preset in themePresets"
-                :key="preset.key"
-                class="relative rounded-xl border ui-border-strong p-2 ui-surface hover:bg-(--ui-surface-muted) transition-colors"
-                :class="companyForm.theme_preset === preset.key ? 'ring-2 ring-(--ui-primary) ring-offset-1' : ''"
-                :title="preset.name"
-                @click="applyThemePreset(preset.key)"
-              >
-                <span
-                  class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full overflow-hidden border border-black/10"
-                  :style="getPresetSwatchStyle(preset)"
-                >
-                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-left)]" />
-                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-right)]" />
-                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-left)]" />
-                  <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-right)]" />
-                </span>
-                <Icon
-                  v-if="companyForm.theme_preset === preset.key"
-                  icon="check"
-                  class="absolute -top-1 -right-1 w-4 h-4 ui-primary-bg rounded-full p-0.5"
-                />
-              </button>
-
-              <div class="rounded-xl border ui-border-strong p-2 ui-surface">
-                <span class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full border border-black/10 bg-[var(--ui-primary-soft)] relative">
-                  <span class="absolute inset-0 m-auto w-fit h-fit text-sm font-bold ui-primary">+</span>
-                </span>
-              </div>
-            </div>
-            <p class="text-xs ui-text-muted mt-2">
-              Selected: {{ selectedPreset.name }} (you can still tweak colors below)
-            </p>
-          </div>
-
-          <label>
-            <span class="block text-xs font-medium ui-text mb-1">Primary</span>
-            <input
-              v-model="companyForm.primary"
-              type="color"
-              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
-            >
-          </label>
-
-          <label>
-            <span class="block text-xs font-medium ui-text mb-1">Secondary 1</span>
-            <input
-              v-model="companyForm.secondary_1"
-              type="color"
-              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
-            >
-          </label>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <label>
-            <span class="block text-xs font-medium ui-text mb-1">Secondary 2</span>
-            <input
-              v-model="companyForm.secondary_2"
-              type="color"
-              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
-            >
-          </label>
-          <label>
-            <span class="block text-xs font-medium ui-text mb-1">Secondary 3</span>
-            <input
-              v-model="companyForm.secondary_3"
-              type="color"
-              class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
-            >
-          </label>
-
-          <button
-            class="self-end px-4 py-2 rounded-lg ui-primary-bg hover:bg-(--ui-primary-strong) transition-colors text-sm font-medium"
-            @click="upsertCompanyTheme(true)"
-          >
-            Save Theme (DB Payload)
-          </button>
-
-          <button
-            class="self-end px-4 py-2 rounded-lg border ui-border-strong ui-surface hover:bg-(--ui-surface-muted) transition-colors text-sm font-medium ui-text"
-            @click="createCompanyWithTheme"
-          >
-            Create Company With Theme
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="rounded-xl border ui-border-strong p-4 ui-surface-muted">
-            <p class="text-sm font-semibold ui-text mb-3">
-              Live Preview
-            </p>
-            <div
-              class="rounded-lg p-4 border ui-border-strong"
-              :style="{ background: 'var(--ui-surface)' }"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <div class="font-semibold ui-text">
-                  {{ companyForm.company_name || 'Company' }}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="rounded-xl border ui-border-strong p-4 ui-surface">
+              <p class="text-sm font-semibold ui-text mb-2">
+                Default Scope
+              </p>
+              <div class="border ui-border-strong rounded-lg overflow-hidden">
+                <div class="px-3 py-2 border-b ui-border-strong bg-[color:color-mix(in_oklab,var(--ui-primary-soft),transparent_10%)]">
+                  Header fallback: `ui-primary-soft`
                 </div>
-                <span
-                  class="px-2 py-1 rounded text-xs"
-                  :style="{ backgroundColor: companyForm.primary, color: '#fff' }"
-                >Primary</span>
+                <div class="p-3">
+                  <div class="flex items-center gap-3 rounded-lg border ui-border-strong px-3 py-2 bg-[color:color-mix(in_oklab,var(--ui-primary-soft),transparent_18%)]">
+                    <span class="w-7 h-7 rounded-lg ui-primary-bg text-white inline-flex items-center justify-center">I</span>
+                    <span class="font-semibold ui-primary">Sidebar active item</span>
+                  </div>
+                </div>
               </div>
-              <div class="flex gap-2 mb-3">
-                <span
-                  class="h-6 w-6 rounded-full border ui-border-strong"
-                  :style="{ backgroundColor: companyForm.secondary_1 }"
-                />
-                <span
-                  class="h-6 w-6 rounded-full border ui-border-strong"
-                  :style="{ backgroundColor: companyForm.secondary_2 }"
-                />
-                <span
-                  class="h-6 w-6 rounded-full border ui-border-strong"
-                  :style="{ backgroundColor: companyForm.secondary_3 }"
-                />
-              </div>
-              <button
-                class="px-3 py-1.5 rounded text-xs font-semibold"
-                :style="{ backgroundColor: companyForm.primary, color: '#fff' }"
+            </div>
+
+            <div
+              class="rounded-xl border ui-border-strong p-4 ui-surface"
+              :style="moduleThemePreviewVars"
+            >
+              <p class="text-sm font-semibold ui-text mb-2">
+                Module Scope
+              </p>
+              <div
+                class="border rounded-lg overflow-hidden"
+                style="border-color: var(--module-border);"
               >
-                Action Button
-              </button>
+                <div
+                  class="px-3 py-2 border-b bg-[color:color-mix(in_oklab,var(--module-soft,var(--ui-primary-soft)),transparent_10%)]"
+                  style="border-color: var(--module-border); color: var(--module-text);"
+                >
+                  Header fallback: `module-soft -> ui-primary-soft`
+                </div>
+                <div class="p-3">
+                  <div
+                    class="flex items-center gap-3 rounded-lg border px-3 py-2"
+                    style="border-color: var(--module-border); background: var(--module-soft); color: var(--module-text);"
+                  >
+                    <span
+                      class="w-7 h-7 rounded-lg text-white inline-flex items-center justify-center"
+                      style="background: var(--module-primary);"
+                    >I</span>
+                    <span class="font-semibold">Sidebar active item</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </Card>
 
-          <div class="rounded-xl border ui-border-strong p-4 ui-surface-muted">
-            <p class="text-sm font-semibold ui-text mb-3">
-              DB Payload
-            </p>
-            <pre class="text-xs ui-text overflow-auto">{{ JSON.stringify(latestThemePayload, null, 2) }}</pre>
+      <Card variant="elevated">
+        <div class="p-5 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <h3 class="text-lg font-semibold ui-text">
+              Company Theme Configuration
+            </h3>
+            <span class="text-xs ui-text-muted">Primary + 3 secondary colors per company</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+            <label class="lg:col-span-2">
+              <span class="block text-xs font-medium ui-text mb-1">Select Company</span>
+              <select
+                v-model.number="selectedCompanyId"
+                class="w-full rounded-lg border ui-border-strong ui-surface px-3 py-2 text-sm ui-text"
+                @change="handleSelectedCompanyChange"
+              >
+                <option
+                  v-for="company in companySwitcherDemoData"
+                  :key="company.company_id"
+                  :value="company.company_id"
+                >
+                  {{ company.company_name }}
+                </option>
+              </select>
+            </label>
+
+            <label class="lg:col-span-2">
+              <span class="block text-xs font-medium ui-text mb-1">Company Name</span>
+              <input
+                v-model="companyForm.company_name"
+                type="text"
+                class="w-full rounded-lg border ui-border-strong ui-surface px-3 py-2 text-sm ui-text"
+                placeholder="Company name"
+              >
+            </label>
+
+            <div class="lg:col-span-6">
+              <span class="block text-xs font-medium ui-text mb-2">Pick a Theme Colour</span>
+              <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                <button
+                  v-for="preset in themePresets"
+                  :key="preset.key"
+                  class="relative rounded-xl border ui-border-strong p-2 ui-surface hover:bg-(--ui-surface-muted) transition-colors"
+                  :class="companyForm.theme_preset === preset.key ? 'ring-2 ring-(--ui-primary) ring-offset-1' : ''"
+                  :title="preset.name"
+                  @click="applyThemePreset(preset.key)"
+                >
+                  <span
+                    class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full overflow-hidden border border-black/10"
+                    :style="getPresetSwatchStyle(preset)"
+                  >
+                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-left)]" />
+                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-right)]" />
+                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-left)]" />
+                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-right)]" />
+                  </span>
+                  <Icon
+                    v-if="companyForm.theme_preset === preset.key"
+                    icon="check"
+                    class="absolute -top-1 -right-1 w-4 h-4 ui-primary-bg rounded-full p-0.5"
+                  />
+                </button>
+
+                <div class="rounded-xl border ui-border-strong p-2 ui-surface">
+                  <span class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full border border-black/10 bg-[var(--ui-primary-soft)] relative">
+                    <span class="absolute inset-0 m-auto w-fit h-fit text-sm font-bold ui-primary">+</span>
+                  </span>
+                </div>
+              </div>
+              <p class="text-xs ui-text-muted mt-2">
+                Selected: {{ selectedPreset.name }} (you can still tweak colors below)
+              </p>
+            </div>
+
+            <label>
+              <span class="block text-xs font-medium ui-text mb-1">Primary</span>
+              <input
+                v-model="companyForm.primary"
+                type="color"
+                class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+              >
+            </label>
+
+            <label>
+              <span class="block text-xs font-medium ui-text mb-1">Secondary 1</span>
+              <input
+                v-model="companyForm.secondary_1"
+                type="color"
+                class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+              >
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <label>
+              <span class="block text-xs font-medium ui-text mb-1">Secondary 2</span>
+              <input
+                v-model="companyForm.secondary_2"
+                type="color"
+                class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+              >
+            </label>
+            <label>
+              <span class="block text-xs font-medium ui-text mb-1">Secondary 3</span>
+              <input
+                v-model="companyForm.secondary_3"
+                type="color"
+                class="w-full h-10 rounded-lg border ui-border-strong ui-surface p-1 cursor-pointer"
+              >
+            </label>
+
+            <button
+              class="self-end px-4 py-2 rounded-lg ui-primary-bg hover:bg-(--ui-primary-strong) transition-colors text-sm font-medium"
+              @click="upsertCompanyTheme(true)"
+            >
+              Save Theme (DB Payload)
+            </button>
+
+            <button
+              class="self-end px-4 py-2 rounded-lg border ui-border-strong ui-surface hover:bg-(--ui-surface-muted) transition-colors text-sm font-medium ui-text"
+              @click="createCompanyWithTheme"
+            >
+              Create Company With Theme
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="rounded-xl border ui-border-strong p-4 ui-surface-muted">
+              <p class="text-sm font-semibold ui-text mb-3">
+                Live Preview
+              </p>
+              <div
+                class="rounded-lg p-4 border ui-border-strong"
+                :style="{ background: 'var(--ui-surface)' }"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <div class="font-semibold ui-text">
+                    {{ companyForm.company_name || 'Company' }}
+                  </div>
+                  <span
+                    class="px-2 py-1 rounded text-xs"
+                    :style="{ backgroundColor: companyForm.primary, color: '#fff' }"
+                  >Primary</span>
+                </div>
+                <div class="flex gap-2 mb-3">
+                  <span
+                    class="h-6 w-6 rounded-full border ui-border-strong"
+                    :style="{ backgroundColor: companyForm.secondary_1 }"
+                  />
+                  <span
+                    class="h-6 w-6 rounded-full border ui-border-strong"
+                    :style="{ backgroundColor: companyForm.secondary_2 }"
+                  />
+                  <span
+                    class="h-6 w-6 rounded-full border ui-border-strong"
+                    :style="{ backgroundColor: companyForm.secondary_3 }"
+                  />
+                </div>
+                <button
+                  class="px-3 py-1.5 rounded text-xs font-semibold"
+                  :style="{ backgroundColor: companyForm.primary, color: '#fff' }"
+                >
+                  Action Button
+                </button>
+              </div>
+            </div>
+
+            <div class="rounded-xl border ui-border-strong p-4 ui-surface-muted">
+              <p class="text-sm font-semibold ui-text mb-3">
+                DB Payload
+              </p>
+              <pre class="text-xs ui-text overflow-auto">{{ JSON.stringify(latestThemePayload, null, 2) }}</pre>
+            </div>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Card
-        v-for="stat in stats"
-        :key="stat.label"
-        variant="elevated"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium ui-text">
-              {{ stat.label }}
-            </p>
-            <p class="text-2xl font-bold ui-text mt-1">
-              {{ stat.value }}
-            </p>
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card
+          v-for="stat in stats"
+          :key="stat.label"
+          variant="elevated"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium ui-text">
+                {{ stat.label }}
+              </p>
+              <p class="text-2xl font-bold ui-text mt-1">
+                {{ stat.value }}
+              </p>
+            </div>
+            <div :class="`w-12 h-12 rounded-lg flex items-center justify-center ${stat.bgColor}`">
+              <Icon
+                :icon="stat.icon"
+                :class="`w-6 h-6 ${stat.iconColor}`"
+              />
+            </div>
           </div>
-          <div :class="`w-12 h-12 rounded-lg flex items-center justify-center ${stat.bgColor}`">
-            <Icon
-              :icon="stat.icon"
-              :class="`w-6 h-6 ${stat.iconColor}`"
+          <div class="flex items-center mt-4">
+            <span :class="`text-sm font-medium ${stat.trend === 'up' ? 'ui-success' : 'ui-danger'}`">
+              {{ stat.trend === 'up' ? '+' : '-' }}{{ stat.change }}%
+            </span>
+            <span class="text-sm ui-text ml-2">from last month</span>
+          </div>
+        </Card>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart 1 -->
+        <Card variant="elevated">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold ui-text">
+              Revenue Overview
+            </h3>
+            <select class="text-sm border ui-border-strong rounded-lg px-3 py-2">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+          </div>
+          <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center">
+            <LineChart
+              :data="revenueData"
+              :labels="revenueLabels"
+              :width="560"
+              :height="260"
+              line-color="var(--ui-primary)"
+              value-suffix="%"
+              x-axis-label="Month"
+              y-axis-label="Revenue Growth %"
             />
           </div>
-        </div>
-        <div class="flex items-center mt-4">
-          <span :class="`text-sm font-medium ${stat.trend === 'up' ? 'ui-success' : 'ui-danger'}`">
-            {{ stat.trend === 'up' ? '+' : '-' }}{{ stat.change }}%
-          </span>
-          <span class="text-sm ui-text ml-2">from last month</span>
-        </div>
-      </Card>
-    </div>
+        </Card>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Chart 1 -->
+        <!-- Chart 2 -->
+        <Card variant="elevated">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold ui-text">
+              User Activity
+            </h3>
+            <div class="flex items-center space-x-2">
+              <span class="inline-flex items-center w-3 h-3 ui-primary-bg rounded-full" />
+              <span class="text-sm ui-text">Active Users</span>
+            </div>
+          </div>
+          <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center">
+            <BarChart
+              :data="userActivityData"
+              :labels="userActivityLabels"
+              :width="560"
+              :height="260"
+              :colors="['#22c55e', '#34d399', '#4ade80', '#86efac', '#16a34a', '#15803d', '#166534']"
+              series-label="Active Users"
+              value-suffix=""
+              x-axis-label="Day"
+              y-axis-label="Users"
+            />
+          </div>
+        </Card>
+      </div>
+
+      <!-- Zero value demonstration -->
       <Card variant="elevated">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-semibold ui-text">
-            Revenue Overview
+            Risk Status (0% Visibility Demo)
           </h3>
-          <select class="text-sm border ui-border-strong rounded-lg px-3 py-2">
-            <option>Last 7 days</option>
-            <option>Last 30 days</option>
-            <option>Last 90 days</option>
-          </select>
+          <span class="text-sm ui-text">Only one status has value</span>
         </div>
-        <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center">
-          <LineChart
-            :data="revenueData"
-            :labels="revenueLabels"
+        <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center p-2">
+          <StackedBarChart
+            :data="riskStatusData"
+            :labels="riskStatusLabels"
             :width="560"
             :height="260"
-            line-color="var(--ui-primary)"
+            :colors="['#ef4444', '#f59e0b', '#22c55e']"
+            :group-keys="['open', 'inProgress', 'mitigated']"
+            :legend-labels="['Open', 'In Progress', 'Mitigated']"
+            :max-value="100"
             value-suffix="%"
-            x-axis-label="Month"
-            y-axis-label="Revenue Growth %"
+            y-axis-label="Percentage (%)"
           />
         </div>
       </Card>
 
-      <!-- Chart 2 -->
+      <!-- Recent Activity Table -->
       <Card variant="elevated">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-semibold ui-text">
-            User Activity
-          </h3>
-          <div class="flex items-center space-x-2">
-            <span class="inline-flex items-center w-3 h-3 ui-primary-bg rounded-full" />
-            <span class="text-sm ui-text">Active Users</span>
+        <div class="p-6 border-b ui-border-strong">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold ui-text">
+              Recent Activity
+            </h3>
+            <button class="text-sm ui-primary hover:text-(--ui-primary)">
+              View all
+            </button>
           </div>
         </div>
-        <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center">
-          <BarChart
-            :data="userActivityData"
-            :labels="userActivityLabels"
-            :width="560"
-            :height="260"
-            :colors="['#22c55e', '#34d399', '#4ade80', '#86efac', '#16a34a', '#15803d', '#166534']"
-            series-label="Active Users"
-            value-suffix=""
-            x-axis-label="Day"
-            y-axis-label="Users"
-          />
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="ui-surface-muted">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
+                  User
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
+                  Action
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
+                  Status
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
+                  Time
+                </th>
+              </tr>
+            </thead>
+            <tbody class="ui-surface divide-y divide-gray-200">
+              <tr
+                v-for="activity in recentActivities"
+                :key="activity.id"
+                class="hover:bg-(--ui-surface)"
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 ui-bg rounded-full flex items-center justify-center">
+                      <span class="text-xs font-medium ui-text">{{ activity.user.initials }}</span>
+                    </div>
+                    <div class="ml-3">
+                      <div class="text-sm font-medium ui-text">
+                        {{ activity.user.name }}
+                      </div>
+                      <div class="text-sm ui-text">
+                        {{ activity.user.email }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm ui-text">
+                    {{ activity.action }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(activity.status)}`">
+                    {{ activity.status }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ui-text">
+                  {{ activity.time }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      <!-- Debug Info -->
+      <Card variant="filled">
+        <h4 class="font-medium ui-text mb-2">
+          Layout Debug Info
+        </h4>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="font-medium">Sidebar Collapsed:</span> {{ sidebarCollapsed }}
+          </div>
+          <div>
+            <span class="font-medium">Sidebar Width:</span> {{ sidebarWidth }}px
+          </div>
+          <div>
+            <span class="font-medium">Current Section:</span> {{ currentSection }}
+          </div>
+          <div>
+            <span class="font-medium">Current Page:</span> {{ currentPage }}
+          </div>
         </div>
       </Card>
     </div>
-
-    <!-- Zero value demonstration -->
-    <Card variant="elevated">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold ui-text">
-          Risk Status (0% Visibility Demo)
-        </h3>
-        <span class="text-sm ui-text">Only one status has value</span>
-      </div>
-      <div class="h-64 ui-surface-muted rounded-lg flex items-center justify-center p-2">
-        <StackedBarChart
-          :data="riskStatusData"
-          :labels="riskStatusLabels"
-          :width="560"
-          :height="260"
-          :colors="['#ef4444', '#f59e0b', '#22c55e']"
-          :group-keys="['open', 'inProgress', 'mitigated']"
-          :legend-labels="['Open', 'In Progress', 'Mitigated']"
-          :max-value="100"
-          value-suffix="%"
-          y-axis-label="Percentage (%)"
-        />
-      </div>
-    </Card>
-
-    <!-- Recent Activity Table -->
-    <Card variant="elevated">
-      <div class="p-6 border-b ui-border-strong">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold ui-text">
-            Recent Activity
-          </h3>
-          <button class="text-sm ui-primary hover:text-(--ui-primary)">
-            View all
-          </button>
-        </div>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="ui-surface-muted">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
-                User
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
-                Action
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
-                Status
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium ui-text uppercase tracking-wider">
-                Time
-              </th>
-            </tr>
-          </thead>
-          <tbody class="ui-surface divide-y divide-gray-200">
-            <tr
-              v-for="activity in recentActivities"
-              :key="activity.id"
-              class="hover:bg-(--ui-surface)"
-            >
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="w-8 h-8 ui-bg rounded-full flex items-center justify-center">
-                    <span class="text-xs font-medium ui-text">{{ activity.user.initials }}</span>
-                  </div>
-                  <div class="ml-3">
-                    <div class="text-sm font-medium ui-text">
-                      {{ activity.user.name }}
-                    </div>
-                    <div class="text-sm ui-text">
-                      {{ activity.user.email }}
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm ui-text">
-                  {{ activity.action }}
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(activity.status)}`">
-                  {{ activity.status }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm ui-text">
-                {{ activity.time }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </Card>
-
-    <!-- Debug Info -->
-    <Card variant="filled">
-      <h4 class="font-medium ui-text mb-2">
-        Layout Debug Info
-      </h4>
-      <div class="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <span class="font-medium">Sidebar Collapsed:</span> {{ sidebarCollapsed }}
-        </div>
-        <div>
-          <span class="font-medium">Sidebar Width:</span> {{ sidebarWidth }}px
-        </div>
-        <div>
-          <span class="font-medium">Current Section:</span> {{ currentSection }}
-        </div>
-        <div>
-          <span class="font-medium">Current Page:</span> {{ currentPage }}
-        </div>
-      </div>
-    </Card>
-  </div>
   </DashboardLayout>
 </template>
