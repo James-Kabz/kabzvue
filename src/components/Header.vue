@@ -198,9 +198,9 @@ const isItemActive = (item) => {
 
 const getHeaderClass = () => {
   if (props.themeScope === 'module') {
-    return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-surface)), transparent 10%)]'
+    return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-bg)), transparent 10%)]'
   }
-  return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--ui-surface), transparent 8%)]'
+  return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-bg)), transparent 8%)]'
 }
 
 const getHeaderActiveItemClasses = (active) => {
@@ -533,8 +533,8 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                     'mx-2 flex items-center w-[calc(100%-1rem)] rounded-xl px-3 sm:px-4 py-2.5 text-sm transition-all group border',
                     getCompanyRowClasses(company.__id === normalizedCurrentCompany?.__id)
                   )"
-                  @click="handleCompanyChange(company)"
                   :style="getCompanyRowStyle(company.__id === normalizedCurrentCompany?.__id)"
+                  @click="handleCompanyChange(company)"
                 >
                   <div
                     v-if="getCompanyLogoUrl(company)"
@@ -874,8 +874,8 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
                       'flex items-center px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
                       getHeaderActiveItemClasses(isItemActive(item))
                     )"
+                    :style="getHeaderActiveItemStyle(isItemActive(item))"
                     @click="handleNavigation(item)"
-                  :style="getHeaderActiveItemStyle(isItemActive(item))"
                   >
                     <!-- Active indicator bar -->
                     <div
