@@ -281,6 +281,13 @@ const riskStatusData = [
   }
 ]
 
+const moduleThemePreviewVars = {
+  '--module-primary': '#dc2626',
+  '--module-soft': 'rgba(220, 38, 38, 0.11)',
+  '--module-border': 'rgba(220, 38, 38, 0.30)',
+  '--module-text': '#991b1b'
+}
+
 // Computed properties to track layout state
 const sidebarCollapsed = computed(() => layoutRef.value?.sidebarCollapsed || false)
 const sidebarWidth = computed(() => layoutRef.value?.sidebarWidth || 256)
@@ -356,6 +363,45 @@ onMounted(() => {
         </button>
       </div>
     </div>
+
+    <Card variant="elevated">
+      <div class="p-5 space-y-4">
+        <h3 class="text-lg font-semibold ui-text">
+          Theme Scope Showcase (Header + Sidebar Tokens)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl border ui-border-strong p-4 ui-surface">
+            <p class="text-sm font-semibold ui-text mb-2">Default Scope</p>
+            <div class="border ui-border-strong rounded-lg overflow-hidden">
+              <div class="px-3 py-2 border-b ui-border-strong bg-[color:color-mix(in_oklab,var(--ui-primary-soft),transparent_10%)]">
+                Header fallback: `ui-primary-soft`
+              </div>
+              <div class="p-3">
+                <div class="flex items-center gap-3 rounded-lg border ui-border-strong px-3 py-2 bg-[color:color-mix(in_oklab,var(--ui-primary-soft),transparent_18%)]">
+                  <span class="w-7 h-7 rounded-lg ui-primary-bg text-white inline-flex items-center justify-center">I</span>
+                  <span class="font-semibold ui-primary">Sidebar active item</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-xl border ui-border-strong p-4 ui-surface" :style="moduleThemePreviewVars">
+            <p class="text-sm font-semibold ui-text mb-2">Module Scope</p>
+            <div class="border rounded-lg overflow-hidden" style="border-color: var(--module-border);">
+              <div class="px-3 py-2 border-b bg-[color:color-mix(in_oklab,var(--module-soft,var(--ui-primary-soft)),transparent_10%)]" style="border-color: var(--module-border); color: var(--module-text);">
+                Header fallback: `module-soft -> ui-primary-soft`
+              </div>
+              <div class="p-3">
+                <div class="flex items-center gap-3 rounded-lg border px-3 py-2" style="border-color: var(--module-border); background: var(--module-soft); color: var(--module-text);">
+                  <span class="w-7 h-7 rounded-lg text-white inline-flex items-center justify-center" style="background: var(--module-primary);">I</span>
+                  <span class="font-semibold">Sidebar active item</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
 
     <Card variant="elevated">
       <div class="p-5 space-y-4">

@@ -198,9 +198,9 @@ const isItemActive = (item) => {
 
 const getHeaderClass = () => {
   if (props.themeScope === 'module') {
-    return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-bg)), transparent 10%)]'
+    return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-primary-soft)), transparent 10%)]'
   }
-  return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-bg)), transparent 8%)]'
+  return 'border-b ui-border-strong bg-[color:color-mix(in oklab, var(--module-soft, var(--ui-primary-soft)), transparent 8%)]'
 }
 
 const getHeaderActiveItemClasses = (active) => {

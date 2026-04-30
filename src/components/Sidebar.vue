@@ -203,7 +203,7 @@ const getActiveCardStyle = (active) => {
 }
 
 const getActiveIconClasses = (active) => {
-  if (!active) return 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-bg)'
+  if (!active) return 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-primary-soft)'
   if (props.themeScope === 'module') return 'shadow-sm text-white'
   return 'ui-primary-bg shadow-sm'
 }
