@@ -104,6 +104,21 @@ const submenuDrawerStyle = computed(() => ({
   maxWidth: `calc(100vw - ${props.sidebarWidth}px)`,
   top: '0px',
   height: '100vh',
+  ...(props.themeScope === 'module'
+    ? {
+      background: 'color-mix(in oklab, var(--module-soft-alt, var(--ui-accent-soft)) 50%, var(--ui-surface) 50%)',
+    }
+    : {}),
+}))
+
+const sidebarStyle = computed(() => ({
+  width: `${props.sidebarWidth}px`,
+  top: isMobile.value ? '0px' : '4rem',
+  ...(props.themeScope === 'module'
+    ? {
+      background: 'color-mix(in oklab, var(--module-soft, var(--ui-primary-soft)) 45%, var(--ui-background) 55%)',
+    }
+    : {}),
 }))
 
 // Methods
@@ -306,7 +321,7 @@ defineExpose({
           ? cn('transform h-screen', isMobileOpen ? 'translate-x-0' : '-translate-x-full')
           : 'translate-x-0 h-[calc(100vh-4rem)]'
       )"
-      :style="{ width: sidebarWidth + 'px', top: isMobile ? '0px' : '4rem' }"
+      :style="sidebarStyle"
     >
       <!-- Mobile Header with Close Button -->
       <div
