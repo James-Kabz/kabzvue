@@ -549,3 +549,21 @@ defineExpose({
     </aside>
   </div>
 </template>
+
+<style scoped>
+.kv-module-sidebar {
+  background: color-mix(
+    in oklab,
+    var(--module-soft, var(--ui-primary-soft)) 45%,
+    var(--ui-background) 55%
+  );
+}
+
+.kv-module-sidebar :deep([data-submenu-dropdown]) {
+  background: color-mix(
+    in oklab,
+    var(--module-soft-alt, var(--ui-accent-soft)) 50%,
+    var(--ui-surface) 50%
+  );
+}
+</style>

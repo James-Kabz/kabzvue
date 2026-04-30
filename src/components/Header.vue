@@ -422,6 +422,7 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
   <header
     :class="cn(
       'fixed top-0 z-50 w-full backdrop-blur-md transition-all duration-300 ease-out',
+      props.themeScope === 'module' && 'kv-module-header',
       getHeaderClass()
     )"
     :style="{ left: '0' }"
@@ -951,3 +952,13 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
     </div>
   </header>
 </template>
+
+<style scoped>
+.kv-module-header {
+  background: color-mix(
+    in oklab,
+    var(--module-soft, var(--ui-primary-soft)) 62%,
+    var(--ui-surface) 38%
+  );
+}
+</style>

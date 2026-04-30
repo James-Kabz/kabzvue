@@ -105,9 +105,19 @@ const handleMobileSidebarToggle = () => {
 </script>
 
 <template>
-  <div class="min-h-screen  bg-(--ui-bg) overflow-hidden">
+  <div
+    class="min-h-screen  bg-(--ui-bg) overflow-hidden"
+    :style="{
+      '--module-primary': '#dc2626',
+      '--module-soft': 'rgba(220, 38, 38, 0.11)',
+      '--module-soft-alt': 'rgba(220, 38, 38, 0.055)',
+      '--module-border': 'rgba(220, 38, 38, 0.30)',
+      '--module-text': '#991b1b',
+    }"
+  >
     <Sidebar
       ref="sidebarRef"
+      theme-scope="module"
       :sidebar-width="sidebarWidth"
       :header="{ title: 'STL Horizon' }"
       :navigation-items="navigationItems"
@@ -118,6 +128,7 @@ const handleMobileSidebarToggle = () => {
     />
 
     <Header
+      theme-scope="module"
       :sidebar-width="sidebarWidth"
       :current-section="currentSection"
       :current-page="currentPage"

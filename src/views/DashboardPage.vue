@@ -325,7 +325,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- <DashboardLayout
+  <DashboardLayout
     ref="layoutRef"
     :user="user"
     initial-section="Dashboard"
@@ -335,7 +335,7 @@ onMounted(() => {
     @profile-action="handleProfileAction"
     @logout="handleLogout"
     @sidebar-toggle="handleSidebarToggle"
-  > -->
+  >
   <!-- Demo Content -->
   <div class="space-y-6">
     <!-- Page Header -->
@@ -783,5 +783,5 @@ onMounted(() => {
       </div>
     </Card>
   </div>
-  <!-- </DashboardLayout> -->
+  </DashboardLayout>
 </template>
