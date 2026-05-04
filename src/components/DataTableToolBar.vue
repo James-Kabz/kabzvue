@@ -54,6 +54,7 @@ export default {
 <script setup>
 import Button from './Button.vue'
 import Icon from './Icon.vue'
+import KvFilterDrawer from './KvFilterDrawer.vue'
 import { ref, computed, onMounted, onUnmounted, h } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
@@ -93,6 +94,22 @@ const props = defineProps({
     type: String,
     default: 'default',
     validator: (value) => ['default', 'module'].includes(value)
+  },
+  activeFilters: {
+    type: Array,
+    default: () => []
+  },
+  enableFilters: {
+    type: Boolean,
+    default: false
+  },
+  filterFields: {
+    type: Array,
+    default: () => []
+  },
+  filterRules: {
+    type: Object,
+    default: () => ({ logic: 'all', rules: [] })
   }
 })
 
@@ -103,11 +120,13 @@ const emit = defineEmits([
   'refresh',
   'update:search-query',
   'add',
-  'add-button-click'
+  'add-button-click',
+  'update:filterRules'
 ])
 
 // Refs
 const showColumnMenu = ref(false)
+const showFilterDrawer = ref(false)
 const columnToggleButton = ref(null)
 const columnMenu = ref(null)
 const columnMenuStyle = ref({})
@@ -322,6 +341,16 @@ const handleAddButtonClick = () => {
   }
 }
 
+const internalActiveFilters = computed(() =>
+  (props.filterRules?.rules || []).map((rule) => ({
+    id: rule.id,
+    label: rule.label,
+    value: typeof rule.value === 'object'
+      ? `${rule.value.from || ''}${rule.value.from || rule.value.to ? ' to ' : ''}${rule.value.to || ''}`
+      : String(rule.value ?? '')
+  }))
+)
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -507,7 +536,58 @@ onUnmounted(() => {
           />
           <span>{{ addButton.label || 'Add' }}</span>
         </Button>
+
+        <button
+          v-if="enableFilters"
+          class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2"
+          @click="showFilterDrawer = true"
+        >
+          <font-awesome-icon icon="filter" />
+          Filter
+          <span
+            v-if="(filterRules.rules || []).length"
+            class="inline-flex items-center justify-center min-w-5 h-5 rounded-full text-xs ui-primary-bg text-white px-1"
+          >
+            {{ (filterRules.rules || []).length }}
+          </span>
+        </button>
+
+        <div
+          v-if="$slots['actions-after-add']"
+          class="flex items-center gap-2"
+        >
+          <slot name="actions-after-add" />
+        </div>
       </div>
+    </div>
+    <KvFilterDrawer
+      v-if="enableFilters"
+      :open="showFilterDrawer"
+      :fields="filterFields"
+      :model-value="filterRules"
+      @update:modelValue="$emit('update:filterRules', $event)"
+      @close="showFilterDrawer = false"
+    />
+    <div
+      v-if="(enableFilters ? internalActiveFilters.length > 0 : activeFilters.length > 0)"
+      class="mt-2 px-3 py-2 border ui-border-strong rounded-lg flex flex-wrap items-center gap-2 ui-surface"
+    >
+      <span class="text-sm ui-text-soft">Filters:</span>
+      <span
+        v-for="filter in (enableFilters ? internalActiveFilters : activeFilters)"
+        :key="filter.id || `${filter.label}-${filter.value}`"
+        class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm border ui-border-strong ui-text"
+      >
+        {{ filter.label }}: {{ filter.value }}
+      </span>
+      <button
+        v-if="enableFilters"
+        class="ml-1 px-2 py-1 text-sm border border-(--ui-primary) rounded-md ui-primary hover:bg-(--ui-primary-soft)"
+        @click="$emit('update:filterRules', { logic: 'all', rules: [] })"
+      >
+        Clear filter
+      </button>
+      <slot name="active-filter-actions" />
     </div>
   </div>
 </template>

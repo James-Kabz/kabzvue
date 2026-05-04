@@ -8,6 +8,17 @@ import Icon from './Icon.vue'
 import KvFilterDrawer from './KvFilterDrawer.vue'
 
 const props = defineProps({
+  drawerOpen: {
+    type: Boolean,
+    default: undefined
+  },
+  showFilterButton: {
+    type: Boolean,
+    default: true
+  },
+  searchQuery: { type: String, default: '' },
+  showSearch: { type: Boolean, default: false },
+  searchPlaceholder: { type: String, default: 'Search...' },
   drilldownFilters: {
     type: Object,
     default: () => ({ logic: 'all', rules: [] })
@@ -61,6 +72,7 @@ const emit = defineEmits([
   'update:numberFilters',
   'update:multiSelectFilters',
   'update:drilldownFilters',
+  'update:drawerOpen',
   'export',
   'clear-filters',
   'files-selected',
@@ -69,6 +81,9 @@ const emit = defineEmits([
 
 const isFileUploadModalOpen = ref(false)
 const showDrilldownPanel = ref(false)
+const isDrawerOpen = computed(() =>
+  typeof props.drawerOpen === 'boolean' ? props.drawerOpen : showDrilldownPanel.value
+)
 
 const openFileUploadModal = () => { isFileUploadModalOpen.value = true }
 const closeFileUploadModal = () => { isFileUploadModalOpen.value = false }
@@ -182,8 +197,15 @@ const clearFilters = () => {
   emit('clear-filters')
 }
 
-const toggleDrilldownPanel = () => { showDrilldownPanel.value = !showDrilldownPanel.value }
-const closeDrilldownPanel = () => { showDrilldownPanel.value = false }
+const toggleDrilldownPanel = () => {
+  const next = !isDrawerOpen.value
+  showDrilldownPanel.value = next
+  emit('update:drawerOpen', next)
+}
+const closeDrilldownPanel = () => {
+  showDrilldownPanel.value = false
+  emit('update:drawerOpen', false)
+}
 
 const syncLegacyFiltersFromRules = (payload) => {
   const rules = Array.isArray(payload?.rules) ? payload.rules : []
@@ -258,11 +280,11 @@ const removeFilter = (filterKey) => {
 <template>
   <div :class="rootContainerClasses">
     <div :class="filtersClasses">
-      <button v-if="showFilters" :class="filterButtonClasses" @click="toggleDrilldownPanel">
+      <button v-if="showFilters && showFilterButton" :class="filterButtonClasses" @click="toggleDrilldownPanel">
         <Icon icon="filter" class="w-4 h-4" />
         Filter
         <span v-if="drilldownRules.length > 0" :class="filterCountBadgeClasses">{{ drilldownRules.length }}</span>
-        <Icon :icon="showDrilldownPanel ? 'chevron-up' : 'chevron-down'" class="w-4 h-4 ml-1" />
+        <Icon :icon="isDrawerOpen ? 'chevron-up' : 'chevron-down'" class="w-4 h-4 ml-1" />
       </button>
 
       <div class="flex items-center gap-3 ml-auto">
@@ -286,7 +308,7 @@ const removeFilter = (filterKey) => {
     </div>
 
     <KvFilterDrawer
-      :open="showFilters && showDrilldownPanel"
+      :open="showFilters && isDrawerOpen"
       :fields="drilldownFields"
       :model-value="drilldownFilters"
       @update:modelValue="handleDrilldownModelUpdate"

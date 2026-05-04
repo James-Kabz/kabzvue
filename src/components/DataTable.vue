@@ -7,6 +7,7 @@ import DataTableHeader from './DataTableHeader.vue'
 import DataTableRow from './DataTableRow.vue'
 import DataTableToolBar from './DataTableToolBar.vue'
 import DataTablePagination from './DataTablePagination.vue'
+import KvFilterDrawer from './KvFilterDrawer.vue'
 import Icon from './Icon.vue'
 import Loader from './Loader.vue'
 import Button from './Button.vue'
@@ -209,6 +210,18 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  showFilterDrawer: {
+    type: Boolean,
+    default: false
+  },
+  filterFields: {
+    type: Array,
+    default: () => []
+  },
+  filterRules: {
+    type: Object,
+    default: () => ({ logic: 'all', rules: [] })
+  },
   themeScope: {
     type: String,
     default: 'default',
@@ -227,7 +240,8 @@ const emit = defineEmits([
   'update:density',
   'toggle-column',
   'add',
-  'add-button-click'
+  'add-button-click',
+  'update:filterRules'
 ])
 const slots = useSlots()
 
@@ -238,6 +252,24 @@ const sortColumn = ref(props.sortBy)
 const sortDirection = ref(props.sortOrder)
 const showModal = ref(false)
 const modalContent = ref('')
+const showFilterDrawerPanel = ref(false)
+const activeRuleCount = computed(() => Array.isArray(props.filterRules?.rules) ? props.filterRules.rules.length : 0)
+const formatRuleValue = (value) => {
+  if (value && typeof value === 'object') {
+    const from = value.from || ''
+    const to = value.to || ''
+    return from && to ? `${from} to ${to}` : (from || to || '')
+  }
+  return String(value ?? '')
+}
+const clearFilterRules = () => emit('update:filterRules', { logic: 'all', rules: [] })
+const toolbarActiveFilters = computed(() =>
+  (props.filterRules?.rules || []).map((rule) => ({
+    id: rule.id,
+    label: rule.label,
+    value: formatRuleValue(rule.value)
+  }))
+)
 
 // CVA variants
 const tableContainerVariants = cva('border ui-border-strong rounded-2xl relative overflow-hidden flex flex-col gap-y-2 px-2 pb-2', {
@@ -749,6 +781,7 @@ defineExpose({
       :show-density-toggle="showDensityToggle"
       :show-column-toggle="showColumnToggle"
       :show-refresh="showRefresh"
+      :active-filters="showFilterDrawer ? toolbarActiveFilters : []"
       :add-button="addButton"
       :density="density"
       :toggleable-columns="toggleableColumns"
@@ -762,7 +795,41 @@ defineExpose({
       <template #actions>
         <slot name="toolbar-actions" />
       </template>
+      <template #actions-after-add>
+        <button
+          v-if="showFilterDrawer"
+          class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2"
+          @click="showFilterDrawerPanel = true"
+        >
+          <font-awesome-icon icon="filter" />
+          Filter
+          <span
+            v-if="activeRuleCount > 0"
+            class="inline-flex items-center justify-center min-w-5 h-5 rounded-full text-xs ui-primary-bg text-white px-1"
+          >
+            {{ activeRuleCount }}
+          </span>
+        </button>
+        <slot name="toolbar-actions-after-add" />
+      </template>
+      <template #active-filter-actions>
+        <button
+          v-if="showFilterDrawer && activeRuleCount > 0"
+          class="ml-1 px-2 py-1 text-sm border border-(--ui-primary) rounded-md ui-primary hover:bg-(--ui-primary-soft)"
+          @click="clearFilterRules"
+        >
+          Clear filter
+        </button>
+      </template>
     </DataTableToolBar>
+    <KvFilterDrawer
+      v-if="showFilterDrawer"
+      :open="showFilterDrawerPanel"
+      :fields="filterFields"
+      :model-value="filterRules"
+      @update:modelValue="$emit('update:filterRules', $event)"
+      @close="showFilterDrawerPanel = false"
+    />
 
     <!-- Loading Overlay for entire table -->
     <div class="relative">

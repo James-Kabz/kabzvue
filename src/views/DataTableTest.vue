@@ -1,52 +1,10 @@
 <template>
   <div class="p-2">
-    <DataTableFilters
-      v-model:search-query="searchQuery"
-      v-model:date-from="dateFrom"
-      v-model:date-to="dateTo"
-      v-model:drilldown-filters="drilldownFilters"
-      :select-filters="drilldownSelectFilters"
-      :date-filters="drilldownDateFilters"
-      :number-filters="drilldownNumberFilters"
-      :multi-select-filters="drilldownMultiSelectFilters"
-      :status-options="statusOptions"
-      :show-file-upload="true"
-      :show-date-filter="true"
-      :show-export="true"
-      :show-search="false"
-      search-placeholder="Search users..."
-      @export="handleExport"
-      @clear-filters="clearAllFilters"
-    >
-      <template #filters>
-        <!-- Custom filters -->
-        <select
-          v-model="departmentFilter"
-          class="px-3 py-2 border ui-border-strong rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-(--ui-primary)"
-        >
-          <option value="">
-            All Departments
-          </option>
-          <option value="Engineering">
-            Engineering
-          </option>
-          <option value="Marketing">
-            Marketing
-          </option>
-          <option value="Sales">
-            Sales
-          </option>
-          <option value="Design">
-            Design
-          </option>
-        </select>
-      </template>
-    </DataTableFilters>
 
     <DataTableToolBar
       :selected-items="selectedUsers"
       :total-items="filteredUsers.length"
-      :bulk-actions="bulkActions"
+            :bulk-actions="bulkActions"
       :add-button="addButtonConfig"
       :density="density"
       :toggleable-columns="allColumns"
@@ -55,6 +13,10 @@
       :show-density-toggle="true"
       :show-column-toggle="true"
       :show-refresh="true"
+      :show-search="false"
+      :enable-filters="true"
+      :filter-fields="toolbarFilterFields"
+      v-model:filter-rules="filterRules"
       :search-query="searchQuery"
       search-placeholder="Search users..."
       @bulk-action="handleBulkAction"
@@ -77,6 +39,7 @@
         </button>
       </template>
     </DataTableToolBar>
+
 
     <DataTable
       :data="filteredUsers"
@@ -150,7 +113,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import DataTableFilters from '../components/DataTableFilters.vue'
 import DataTableToolBar from '../components/DataTableToolBar.vue'
 import DataTable from '../components/DataTable.vue'
 
@@ -338,7 +300,7 @@ const selectedStatus = ref('')
 const departmentFilter = ref('')
 const dateFrom = ref('')
 const dateTo = ref('')
-const drilldownFilters = ref({ logic: 'all', rules: [] })
+const filterRules = ref({ logic: 'all', rules: [] })
 
 // Table state
 const selectedUsers = ref([])
@@ -373,14 +335,20 @@ const statusOptions = [
   { value: 'inactive', label: 'Inactive' }
 ]
 
-const drilldownSelectFilters = ref([
+const selectFilterDefs = ref([
   { key: 'status', label: 'Status', options: statusOptions, value: '' },
   { key: 'role', label: 'Role', options: [{ value: 'Admin', label: 'Admin' }, { value: 'Editor', label: 'Editor' }, { value: 'Viewer', label: 'Viewer' }], value: '' },
   { key: 'department', label: 'Department', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Sales', label: 'Sales' }, { value: 'Design', label: 'Design' }], value: '' }
 ])
-const drilldownDateFilters = ref([{ key: 'joinDate', label: 'Join Date', from: '', to: '' }])
-const drilldownNumberFilters = ref([{ key: 'salary', label: 'Salary', min: '', max: '', step: 1000 }])
-const drilldownMultiSelectFilters = ref([{ key: 'departmentList', label: 'Departments', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Sales', label: 'Sales' }, { value: 'Design', label: 'Design' }], selected: [] }])
+const dateFilterDefs = ref([{ key: 'joinDate', label: 'Join Date', from: '', to: '' }])
+const numberFilterDefs = ref([{ key: 'salary', label: 'Salary', min: '', max: '', step: 1000 }])
+const multiSelectFilterDefs = ref([{ key: 'departmentList', label: 'Departments', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Sales', label: 'Sales' }, { value: 'Design', label: 'Design' }], selected: [] }])
+const toolbarFilterFields = computed(() => ([
+  ...selectFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'select', options: f.options || [] })),
+  ...dateFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'date', options: f.options || [] })),
+  ...numberFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'number', options: f.options || [] })),
+  ...multiSelectFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'multi', options: f.options || [] })),
+]))
 
 const evaluateRule = (user, rule) => {
   const fieldValue = user[rule.field]
@@ -488,9 +456,9 @@ const filteredUsers = computed(() => {
     })
   }
 
-  const rules = drilldownFilters.value?.rules || []
+  const rules = filterRules.value?.rules || []
   if (rules.length > 0) {
-    const isAll = (drilldownFilters.value?.logic || 'all') === 'all'
+    const isAll = (filterRules.value?.logic || 'all') === 'all'
     filtered = filtered.filter(user => {
       const checks = rules.map(rule => evaluateRule(user, rule))
       return isAll ? checks.every(Boolean) : checks.some(Boolean)
@@ -679,9 +647,10 @@ const clearAllFilters = () => {
   departmentFilter.value = ''
   dateFrom.value = ''
   dateTo.value = ''
-  drilldownFilters.value = { logic: 'all', rules: [] }
+  filterRules.value = { logic: 'all', rules: [] }
   showStatusMessage('All filters cleared')
 }
+
 
 // Handle actions from the actions prop
 const handleAction = ({ action, item }) => {
