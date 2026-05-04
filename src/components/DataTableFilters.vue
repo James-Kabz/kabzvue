@@ -185,6 +185,59 @@ const clearFilters = () => {
 const toggleDrilldownPanel = () => { showDrilldownPanel.value = !showDrilldownPanel.value }
 const closeDrilldownPanel = () => { showDrilldownPanel.value = false }
 
+const syncLegacyFiltersFromRules = (payload) => {
+  const rules = Array.isArray(payload?.rules) ? payload.rules : []
+
+  const nextSelect = props.selectFilters.map((f) => ({ ...f, value: '' }))
+  const nextDate = props.dateFilters.map((f) => ({ ...f, from: '', to: '' }))
+  const nextNumber = props.numberFilters.map((f) => ({ ...f, min: '', max: '' }))
+  const nextMulti = props.multiSelectFilters.map((f) => ({ ...f, selected: [] }))
+
+  for (const rule of rules) {
+    const selectMatch = nextSelect.find((f) => f.key === rule.field)
+    if (selectMatch && (rule.operator === 'equals' || rule.operator === 'contains')) {
+      selectMatch.value = rule.value ?? ''
+      continue
+    }
+
+    const dateMatch = nextDate.find((f) => f.key === rule.field)
+    if (dateMatch) {
+      if (rule.operator === 'between' && rule.value && typeof rule.value === 'object') {
+        dateMatch.from = rule.value.from || ''
+        dateMatch.to = rule.value.to || ''
+      }
+      continue
+    }
+
+    const numberMatch = nextNumber.find((f) => f.key === rule.field)
+    if (numberMatch) {
+      if (rule.operator === 'between' && rule.value && typeof rule.value === 'object') {
+        numberMatch.min = rule.value.from ?? ''
+        numberMatch.max = rule.value.to ?? ''
+      } else if (rule.operator === 'equals') {
+        numberMatch.min = rule.value ?? ''
+        numberMatch.max = rule.value ?? ''
+      }
+      continue
+    }
+
+    const multiMatch = nextMulti.find((f) => f.key === rule.field)
+    if (multiMatch) {
+      multiMatch.selected = rule.value == null ? [] : [rule.value]
+    }
+  }
+
+  emit('update:selectFilters', nextSelect)
+  emit('update:dateFilters', nextDate)
+  emit('update:numberFilters', nextNumber)
+  emit('update:multiSelectFilters', nextMulti)
+}
+
+const handleDrilldownModelUpdate = (payload) => {
+  emit('update:drilldownFilters', payload)
+  syncLegacyFiltersFromRules(payload)
+}
+
 const removeFilter = (filterKey) => {
   if (filterKey.startsWith('select-')) {
     const key = filterKey.replace('select-', '')
@@ -236,7 +289,7 @@ const removeFilter = (filterKey) => {
       :open="showFilters && showDrilldownPanel"
       :fields="drilldownFields"
       :model-value="drilldownFilters"
-      @update:modelValue="$emit('update:drilldownFilters', $event)"
+      @update:modelValue="handleDrilldownModelUpdate"
       @close="closeDrilldownPanel"
     />
 
