@@ -4,6 +4,7 @@
     <DataTableToolBar
       :selected-items="selectedUsers"
       :total-items="filteredUsers.length"
+      v-model:filter-rules="filterRules"
             :bulk-actions="bulkActions"
       :add-button="addButtonConfig"
       :density="density"
@@ -16,7 +17,6 @@
       :show-search="false"
       :enable-filters="true"
       :filter-fields="toolbarFilterFields"
-      v-model:filter-rules="filterRules"
       :search-query="searchQuery"
       search-placeholder="Search users..."
       @bulk-action="handleBulkAction"
@@ -526,11 +526,6 @@ const handleRowClick = (rowInfo) => {
   showStatusMessage(`Clicked on ${rowInfo.item.name}`)
 }
 
-const handleExport = () => {
-  console.log('Export clicked - exporting', filteredUsers.value.length, 'users')
-  showStatusMessage(`Exporting ${filteredUsers.value.length} users...`)
-}
-
 // Handle add button click
 const handleAddButtonClick = (buttonConfig) => {
   console.log('Add button clicked:', buttonConfig)
@@ -640,17 +635,6 @@ const handleBulkExport = () => {
   console.log('Bulk export selected users:', selectedUsers.value)
   showStatusMessage(`Exporting ${selectedUsers.value.length} selected users...`)
 }
-
-const clearAllFilters = () => {
-  searchQuery.value = ''
-  selectedStatus.value = ''
-  departmentFilter.value = ''
-  dateFrom.value = ''
-  dateTo.value = ''
-  filterRules.value = { logic: 'all', rules: [] }
-  showStatusMessage('All filters cleared')
-}
-
 
 // Handle actions from the actions prop
 const handleAction = ({ action, item }) => {
