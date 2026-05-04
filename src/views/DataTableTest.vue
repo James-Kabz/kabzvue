@@ -4,6 +4,11 @@
       v-model:search-query="searchQuery"
       v-model:date-from="dateFrom"
       v-model:date-to="dateTo"
+      v-model:drilldown-filters="drilldownFilters"
+      :select-filters="drilldownSelectFilters"
+      :date-filters="drilldownDateFilters"
+      :number-filters="drilldownNumberFilters"
+      :multi-select-filters="drilldownMultiSelectFilters"
       :status-options="statusOptions"
       :show-file-upload="true"
       :show-date-filter="true"
@@ -333,6 +338,7 @@ const selectedStatus = ref('')
 const departmentFilter = ref('')
 const dateFrom = ref('')
 const dateTo = ref('')
+const drilldownFilters = ref({ logic: 'all', rules: [] })
 
 // Table state
 const selectedUsers = ref([])
@@ -366,6 +372,50 @@ const statusOptions = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
 ]
+
+const drilldownSelectFilters = ref([
+  { key: 'status', label: 'Status', options: statusOptions, value: '' },
+  { key: 'role', label: 'Role', options: [{ value: 'Admin', label: 'Admin' }, { value: 'Editor', label: 'Editor' }, { value: 'Viewer', label: 'Viewer' }], value: '' },
+  { key: 'department', label: 'Department', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Sales', label: 'Sales' }, { value: 'Design', label: 'Design' }], value: '' }
+])
+const drilldownDateFilters = ref([{ key: 'joinDate', label: 'Join Date', from: '', to: '' }])
+const drilldownNumberFilters = ref([{ key: 'salary', label: 'Salary', min: '', max: '', step: 1000 }])
+const drilldownMultiSelectFilters = ref([{ key: 'departmentList', label: 'Departments', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Sales', label: 'Sales' }, { value: 'Design', label: 'Design' }], selected: [] }])
+
+const evaluateRule = (user, rule) => {
+  const fieldValue = user[rule.field]
+  const op = rule.operator
+  const value = rule.value
+  if (op === 'equals') return String(fieldValue) === String(value)
+  if (op === 'not_equals') return String(fieldValue) !== String(value)
+  if (op === 'gte') return Number(fieldValue) >= Number(value)
+  if (op === 'lte') return Number(fieldValue) <= Number(value)
+  if (op === 'between') {
+    if (rule.type === 'date') {
+      const d = new Date(fieldValue)
+      const from = value?.from ? new Date(value.from) : null
+      const to = value?.to ? new Date(value.to) : null
+      if (from && to) return d >= from && d <= to
+      if (from) return d >= from
+      if (to) return d <= to
+      return true
+    }
+    const n = Number(fieldValue)
+    const from = value?.from !== '' ? Number(value?.from) : null
+    const to = value?.to !== '' ? Number(value?.to) : null
+    if (from !== null && to !== null) return n >= from && n <= to
+    if (from !== null) return n >= from
+    if (to !== null) return n <= to
+    return true
+  }
+  if (op === 'includes_any' || op === 'includes_all') {
+    const arr = Array.isArray(fieldValue) ? fieldValue : [fieldValue]
+    const vals = Array.isArray(value) ? value : [value]
+    if (op === 'includes_all') return vals.every(v => arr.map(String).includes(String(v)))
+    return vals.some(v => arr.map(String).includes(String(v)))
+  }
+  return true
+}
 
 // Updated bulk actions with proper structure
 const bulkActions = [
@@ -435,6 +485,15 @@ const filteredUsers = computed(() => {
         return joinDate <= to
       }
       return true
+    })
+  }
+
+  const rules = drilldownFilters.value?.rules || []
+  if (rules.length > 0) {
+    const isAll = (drilldownFilters.value?.logic || 'all') === 'all'
+    filtered = filtered.filter(user => {
+      const checks = rules.map(rule => evaluateRule(user, rule))
+      return isAll ? checks.every(Boolean) : checks.some(Boolean)
     })
   }
 
@@ -620,6 +679,7 @@ const clearAllFilters = () => {
   departmentFilter.value = ''
   dateFrom.value = ''
   dateTo.value = ''
+  drilldownFilters.value = { logic: 'all', rules: [] }
   showStatusMessage('All filters cleared')
 }
 
