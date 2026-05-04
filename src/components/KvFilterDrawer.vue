@@ -2,12 +2,12 @@
   <div v-if="open" class="fixed inset-0 z-[70]">
     <div class="absolute inset-0 bg-black/35" @click="$emit('close')" />
     <aside class="absolute right-0 top-0 h-full w-full sm:w-[520px] ui-surface border-l ui-border-strong shadow-2xl flex flex-col">
-      <div class="px-5 py-4 flex items-center justify-between border-b ui-border-strong">
+      <div class="px-4 py-3 flex items-center justify-between border-b ui-border-strong">
         <h2 class="text-xl font-semibold ui-text">Filter</h2>
         <button class="ui-primary font-semibold" @click="resetAll">Reset</button>
       </div>
 
-      <div class="px-5 py-4 border-b ui-border-strong">
+      <div class="px-2 py-2 border-b ui-border-strong">
         <div class="flex items-center gap-3 ui-text">
           <Icon icon="search" class="w-4 h-4 ui-primary" />
           <input v-model="search" placeholder="Filter Search" class="w-full bg-transparent outline-none text-base placeholder:ui-text" />
@@ -16,8 +16,8 @@
 
       <div class="flex-1 overflow-auto">
         <div v-for="field in visibleFields" :key="field.key" class="border-b ui-border-strong">
-          <button class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-(--ui-surface-muted)" @click="toggleField(field.key)">
-            <span class="text-base ui-text font-medium flex items-center gap-2">
+          <button class="w-full px-4 py-2.5 flex items-center justify-between text-left hover:bg-(--ui-surface-muted)" @click="toggleField(field.key)">
+            <span class="text-base ui-text font-medium flex items-center gap-1">
               {{ field.label }}
               <span v-if="fieldRuleCount(field.key) > 0" class="inline-flex items-center justify-center min-w-5 h-5 rounded-full text-xs ui-primary-bg text-white px-1">
                 {{ fieldRuleCount(field.key) }}
@@ -36,8 +36,8 @@
             </span>
           </button>
 
-          <div v-if="expandedField === field.key" class="ui-surface-muted px-5 pb-5">
-            <div class="flex items-center gap-3 py-3">
+          <div v-if="expandedField === field.key" class="ui-surface-muted px-4 pb-3">
+            <div class="flex items-center gap-2 py-2">
               <span class="text-sm font-semibold ui-text">{{ field.label }}</span>
               <select v-model="operator" class="ml-auto rounded-md ui-surface border ui-border-strong px-3 py-2 text-sm ui-text">
                 <option value="equals">Is</option>
@@ -46,27 +46,35 @@
               </select>
             </div>
 
-            <div class="flex items-center gap-3 border-b border-(--ui-primary) pb-2 mb-3">
+            <div class="flex items-center gap-2 border-b border-(--ui-primary) pb-1.5 mb-2">
               <Icon icon="search" class="w-4 h-4 ui-primary" />
               <input v-model="valueSearch" placeholder="Search" class="w-full bg-transparent outline-none text-sm ui-text" />
             </div>
 
-            <div v-if="field.type === 'date'" class="space-y-3">
-              <label v-for="option in filteredFieldOptions(field)" :key="String(option.value)" class="flex items-center gap-2 text-sm ui-text cursor-pointer">
-                <input type="radio" :name="`field-${field.key}`" :value="option.value" @change="addRule(field, option.value)">
+            <div v-if="field.type === 'date'" class="space-y-2">
+              <label v-for="option in filteredFieldOptions(field)" :key="String(option.value)" class="flex items-center gap-2 text-sm ui-text cursor-pointer py-0.5">
+                <input
+                  type="checkbox"
+                  :checked="isOptionChecked(field.key, option.value)"
+                  @change="toggleOptionRule(field, option.value)"
+                >
                 <span>{{ option.label }}</span>
               </label>
 
-              <div class="grid grid-cols-2 gap-2">
+              <div class="grid grid-cols-2 gap-1.5">
                 <input v-model="dateFrom" type="date" class="w-full ui-surface border ui-border-strong rounded-md px-2 py-1 text-sm ui-text">
                 <input v-model="dateTo" type="date" class="w-full ui-surface border ui-border-strong rounded-md px-2 py-1 text-sm ui-text">
               </div>
               <button class="px-3 py-1.5 rounded-md ui-primary-bg text-white text-sm" @click="addDateRangeRule(field)">Apply Date Range</button>
             </div>
 
-            <div v-else class="space-y-2 max-h-56 overflow-auto">
-              <label v-for="option in filteredFieldOptions(field)" :key="String(option.value)" class="flex items-center gap-2 text-sm ui-text cursor-pointer">
-                <input type="radio" :name="`field-${field.key}`" :value="option.value" @change="addRule(field, option.value)">
+            <div v-else class="space-y-1.5 max-h-56 overflow-auto">
+              <label v-for="option in filteredFieldOptions(field)" :key="String(option.value)" class="flex items-center gap-2 text-sm ui-text cursor-pointer py-0.5">
+                <input
+                  type="checkbox"
+                  :checked="isOptionChecked(field.key, option.value)"
+                  @change="toggleOptionRule(field, option.value)"
+                >
                 <span>{{ option.label }}</span>
               </label>
             </div>
@@ -77,10 +85,12 @@
       <div class="px-5 py-4 border-t ui-border-strong">
         <div class="flex gap-6 text-sm mb-4 ui-text">
           <button class="flex items-center gap-2" @click="setLogic('any')">
-            <span class="w-4 h-4 rounded-full border-2" :class="logic === 'any' ? 'border-(--ui-primary)' : 'ui-border-strong'" /> Any of these
+            <input type="checkbox" :checked="logic === 'any'" class="accent-(--ui-primary)">
+            Any of these
           </button>
           <button class="flex items-center gap-2" @click="setLogic('all')">
-            <span class="w-4 h-4 rounded-full border-2" :class="logic === 'all' ? 'border-(--ui-primary)' : 'ui-border-strong'" /> All of these
+            <input type="checkbox" :checked="logic === 'all'" class="accent-(--ui-primary)">
+            All of these
           </button>
         </div>
         <div class="flex gap-3">
@@ -144,8 +154,30 @@ const filteredFieldOptions = (field) => {
   return options.filter(o => String(o.label).toLowerCase().includes(q))
 }
 
-const toggleField = (key) => { expandedField.value = expandedField.value === key ? '' : key }
+const toggleField = (key) => {
+  const next = expandedField.value === key ? '' : key
+  expandedField.value = next
+  valueSearch.value = ''
+}
 const setLogic = (v) => { logic.value = v }
+
+const isOptionChecked = (fieldKey, optionValue) =>
+  localRules.value.some((r) => r.field === fieldKey && String(r.value) === String(optionValue))
+
+const toggleOptionRule = (field, value) => {
+  const idx = localRules.value.findIndex((r) => r.field === field.key && String(r.value) === String(value))
+  if (idx >= 0) {
+    localRules.value.splice(idx, 1)
+    return
+  }
+  localRules.value.push({
+    id: `${field.key}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    field: field.key,
+    label: field.label,
+    operator: operator.value,
+    value,
+  })
+}
 
 const addRule = (field, value) => {
   localRules.value = localRules.value.filter(r => r.field !== field.key)
