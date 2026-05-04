@@ -64,6 +64,7 @@ const props = defineProps({
   totalItems: { type: Number, default: 0 },
   itemLabel: { type: String, default: 'items' },
   showTableInfo: { type: Boolean, default: false },
+  showItemCount: { type: Boolean, default: false },
   bulkActions: { type: Array, default: () => defaultBulkActions },
   showDensityToggle: { type: Boolean, default: true },
   showColumnToggle: { type: Boolean, default: true },
@@ -351,6 +352,14 @@ const internalActiveFilters = computed(() =>
   }))
 )
 
+const removeOneFilter = (filterId) => {
+  const rules = Array.isArray(props.filterRules?.rules) ? props.filterRules.rules : []
+  emit('update:filterRules', {
+    logic: props.filterRules?.logic || 'all',
+    rules: rules.filter((rule) => rule.id !== filterId)
+  })
+}
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -399,7 +408,7 @@ onUnmounted(() => {
 
         <!-- Default info when no selection -->
         <div
-          v-else-if="totalItems > 0"
+          v-else-if="showItemCount && totalItems > 0"
           :class="itemCountClasses"
         >
           {{ totalItems }} {{ itemLabel }}
@@ -579,6 +588,13 @@ onUnmounted(() => {
         class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm border ui-border-strong ui-text"
       >
         {{ filter.label }}: {{ filter.value }}
+        <button
+          v-if="enableFilters && filter.id"
+          class="ml-1 ui-text-soft hover:ui-primary"
+          @click="removeOneFilter(filter.id)"
+        >
+          <Icon icon="xmark" class="w-3 h-3" />
+        </button>
       </span>
       <button
         v-if="enableFilters"
