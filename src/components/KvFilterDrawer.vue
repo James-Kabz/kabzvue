@@ -179,17 +179,6 @@ const toggleOptionRule = (field, value) => {
   })
 }
 
-const addRule = (field, value) => {
-  localRules.value = localRules.value.filter(r => r.field !== field.key)
-  localRules.value.push({
-    id: `${field.key}-${Date.now()}`,
-    field: field.key,
-    label: field.label,
-    operator: operator.value,
-    value
-  })
-}
-
 const addDateRangeRule = (field) => {
   if (!dateFrom.value && !dateTo.value) return
   localRules.value = localRules.value.filter(r => r.field !== field.key)
