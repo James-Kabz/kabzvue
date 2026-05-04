@@ -345,6 +345,12 @@ const numberFilterDefs = ref([{ key: 'salary', label: 'Salary', min: '', max: ''
 const multiSelectFilterDefs = ref([{ key: 'departmentList', label: 'Departments', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Sales', label: 'Sales' }, { value: 'Design', label: 'Design' }], selected: [] }])
 const toolbarFilterFields = computed(() => ([
   ...selectFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'select', options: f.options || [] })),
+  {
+    key: 'name',
+    label: 'Users',
+    type: 'multiselect',
+    options: users.value.map((u) => ({ value: u.name, label: u.name }))
+  },
   ...dateFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'date', options: f.options || [] })),
   ...numberFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'number', options: f.options || [] })),
   ...multiSelectFilterDefs.value.map(f => ({ key: f.key, label: f.label, type: 'multi', options: f.options || [] })),
@@ -381,6 +387,10 @@ const evaluateRule = (user, rule) => {
     const vals = Array.isArray(value) ? value : [value]
     if (op === 'includes_all') return vals.every(v => arr.map(String).includes(String(v)))
     return vals.some(v => arr.map(String).includes(String(v)))
+  }
+  if (op === 'in') {
+    const vals = Array.isArray(value) ? value.map(String) : [String(value)]
+    return vals.includes(String(fieldValue))
   }
   return true
 }

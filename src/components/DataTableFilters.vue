@@ -245,7 +245,9 @@ const syncLegacyFiltersFromRules = (payload) => {
 
     const multiMatch = nextMulti.find((f) => f.key === rule.field)
     if (multiMatch) {
-      multiMatch.selected = rule.value == null ? [] : [rule.value]
+      multiMatch.selected = Array.isArray(rule.value)
+        ? rule.value
+        : (rule.value == null ? [] : [rule.value])
     }
   }
 

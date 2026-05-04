@@ -68,6 +68,47 @@
               <button class="px-3 py-1.5 rounded-md ui-primary-bg text-white text-sm" @click="addDateRangeRule(field)">Apply Date Range</button>
             </div>
 
+            <div
+              v-else-if="field.type === 'multiselect' || (field.type === 'select' && field.multiple)"
+              class="space-y-2"
+            >
+              <div
+                v-if="getFieldSelectedValues(field.key).length > 0"
+                class="flex flex-wrap gap-1.5"
+              >
+                <span
+                  v-for="selectedValue in getFieldSelectedValues(field.key)"
+                  :key="`${field.key}-${selectedValue}`"
+                  class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs border ui-border-strong ui-text"
+                >
+                  {{ getOptionLabel(field, selectedValue) }}
+                  <button
+                    class="ui-text-soft hover:ui-primary"
+                    @click="toggleOptionRule(field, selectedValue)"
+                  >
+                    <Icon icon="xmark" class="w-3 h-3" />
+                  </button>
+                </span>
+                <button
+                  class="text-xs ui-primary hover:underline ml-1"
+                  @click="clearFieldRules(field.key)"
+                >
+                  Clear all
+                </button>
+              </div>
+
+              <div class="space-y-1.5 max-h-56 overflow-auto">
+                <label v-for="option in filteredFieldOptions(field)" :key="String(option.value)" class="flex items-center gap-2 text-sm ui-text cursor-pointer py-0.5">
+                  <input
+                    type="checkbox"
+                    :checked="isMultiOptionChecked(field.key, option.value)"
+                    @change="toggleMultiSelectValue(field, option.value)"
+                  >
+                  <span>{{ option.label }}</span>
+                </label>
+              </div>
+            </div>
+
             <div v-else class="space-y-1.5 max-h-56 overflow-auto">
               <label v-for="option in filteredFieldOptions(field)" :key="String(option.value)" class="flex items-center gap-2 text-sm ui-text cursor-pointer py-0.5">
                 <input
@@ -137,6 +178,17 @@ const fieldRuleCount = (fieldKey) => localRules.value.filter(r => r.field === fi
 const clearFieldRules = (fieldKey) => {
   localRules.value = localRules.value.filter(r => r.field !== fieldKey)
 }
+const getFieldRule = (fieldKey) => localRules.value.find((r) => r.field === fieldKey)
+const getFieldSelectedValues = (fieldKey) => {
+  const rule = getFieldRule(fieldKey)
+  if (!rule) return []
+  if (Array.isArray(rule.value)) return rule.value
+  return rule.value == null ? [] : [rule.value]
+}
+const getOptionLabel = (field, value) => {
+  const option = (field.options || []).find((opt) => String(opt.value) === String(value))
+  return option ? option.label : value
+}
 
 const filteredFieldOptions = (field) => {
   const fallbackDateOptions = [
@@ -163,6 +215,28 @@ const setLogic = (v) => { logic.value = v }
 
 const isOptionChecked = (fieldKey, optionValue) =>
   localRules.value.some((r) => r.field === fieldKey && String(r.value) === String(optionValue))
+
+const isMultiOptionChecked = (fieldKey, optionValue) =>
+  getFieldSelectedValues(fieldKey).map(String).includes(String(optionValue))
+
+const toggleMultiSelectValue = (field, value) => {
+  const selected = getFieldSelectedValues(field.key)
+  const exists = selected.map(String).includes(String(value))
+  const nextSelected = exists
+    ? selected.filter((v) => String(v) !== String(value))
+    : [...selected, value]
+
+  localRules.value = localRules.value.filter((r) => r.field !== field.key)
+  if (nextSelected.length > 0) {
+    localRules.value.push({
+      id: `${field.key}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      field: field.key,
+      label: field.label,
+      operator: 'in',
+      value: nextSelected
+    })
+  }
+}
 
 const toggleOptionRule = (field, value) => {
   const idx = localRules.value.findIndex((r) => r.field === field.key && String(r.value) === String(value))
