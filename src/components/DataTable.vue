@@ -222,6 +222,10 @@ const props = defineProps({
     type: Object,
     default: () => ({ logic: 'all', rules: [] })
   },
+  defaultFilterRules: {
+    type: Object,
+    default: () => ({ logic: 'all', rules: [] })
+  },
   themeScope: {
     type: String,
     default: 'default',
@@ -782,6 +786,7 @@ defineExpose({
       :show-column-toggle="showColumnToggle"
       :show-refresh="showRefresh"
       :active-filters="showFilterDrawer ? toolbarActiveFilters : []"
+      :default-filter-rules="defaultFilterRules"
       :add-button="addButton"
       :density="density"
       :toggleable-columns="toggleableColumns"

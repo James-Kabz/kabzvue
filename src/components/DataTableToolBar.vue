@@ -55,7 +55,7 @@ export default {
 import Button from './Button.vue'
 import Icon from './Icon.vue'
 import KvFilterDrawer from './KvFilterDrawer.vue'
-import { ref, computed, onMounted, onUnmounted, h } from 'vue'
+import { ref, computed, onMounted, onUnmounted, h, watch } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 
@@ -111,6 +111,10 @@ const props = defineProps({
   filterRules: {
     type: Object,
     default: () => ({ logic: 'all', rules: [] })
+  },
+  defaultFilterRules: {
+    type: Object,
+    default: () => ({ logic: 'all', rules: [] })
   }
 })
 
@@ -128,6 +132,7 @@ const emit = defineEmits([
 // Refs
 const showColumnMenu = ref(false)
 const showFilterDrawer = ref(false)
+const defaultRulesApplied = ref(false)
 const columnToggleButton = ref(null)
 const columnMenu = ref(null)
 const columnMenuStyle = ref({})
@@ -359,6 +364,21 @@ const removeOneFilter = (filterId) => {
     rules: rules.filter((rule) => rule.id !== filterId)
   })
 }
+
+watch(
+  () => props.defaultFilterRules,
+  (value) => {
+    if (defaultRulesApplied.value || !props.enableFilters) return
+    const rules = Array.isArray(value?.rules) ? value.rules : []
+    if (rules.length === 0) return
+    emit('update:filterRules', {
+      logic: value?.logic || 'all',
+      rules
+    })
+    defaultRulesApplied.value = true
+  },
+  { immediate: true, deep: true }
+)
 
 // Lifecycle
 onMounted(() => {
@@ -599,7 +619,7 @@ onUnmounted(() => {
       <button
         v-if="enableFilters"
         class="ml-1 px-2 py-1 text-sm border border-(--ui-primary) rounded-md ui-primary hover:bg-(--ui-primary-soft)"
-        @click="$emit('update:filterRules', { logic: 'all', rules: [] })"
+        @click="$emit('update:filterRules', { logic: defaultFilterRules?.logic || 'all', rules: defaultFilterRules?.rules || [] })"
       >
         Clear filter
       </button>
