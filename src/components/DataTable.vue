@@ -81,6 +81,10 @@ const props = defineProps({
     default: 'all',
     validator: (value) => ['all', 'new-only'].includes(value)
   },
+  unreadPersistKey: {
+    type: String,
+    default: ''
+  },
   emptyText: {
     type: String,
     default: 'No data available'
@@ -272,6 +276,11 @@ const modalContent = ref('')
 const showFilterDrawerPanel = ref(false)
 const viewedRowKeys = ref(new Set())
 const tableLoadedAt = ref(Date.now())
+
+const getNestedValue = (obj, path) => {
+  if (!obj || !path) return undefined
+  return String(path).split('.').reduce((acc, key) => acc?.[key], obj)
+}
 const activeRuleCount = computed(() => Array.isArray(props.filterRules?.rules) ? props.filterRules.rules.length : 0)
 const formatRuleValue = (value) => {
   if (value && typeof value === 'object') {
@@ -585,6 +594,7 @@ const handleRowClick = (payload) => {
   if (props.highlightUnreadRows) {
     const key = getRowKey(payload.item, payload.index)
     viewedRowKeys.value.add(String(key))
+    persistReadKeys()
   }
   emit('row-click', payload)
 }
@@ -599,7 +609,7 @@ const isUnreadRow = (item, index) => {
 
   const field = props.unreadCreatedAtField
   if (!field) return false
-  const createdAtValue = item?.[field]
+  const createdAtValue = field.includes('.') ? getNestedValue(item, field) : item?.[field]
   if (!createdAtValue) return false
 
   const rawValue = String(createdAtValue).trim()
@@ -623,6 +633,27 @@ const isUnreadRow = (item, index) => {
   }
 
   return createdAt >= tableLoadedAt.value
+}
+
+const loadPersistedReadKeys = () => {
+  if (!props.unreadPersistKey || typeof window === 'undefined') return
+  try {
+    const raw = window.localStorage.getItem(props.unreadPersistKey)
+    if (!raw) return
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) viewedRowKeys.value = new Set(parsed.map(String))
+  } catch {
+    // no-op
+  }
+}
+
+const persistReadKeys = () => {
+  if (!props.unreadPersistKey || typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(props.unreadPersistKey, JSON.stringify(Array.from(viewedRowKeys.value)))
+  } catch {
+    // no-op
+  }
 }
 
 const handlePageChange = async (page) => {
@@ -812,6 +843,8 @@ defineExpose({
   getTotalPages: () => totalPages.value,
   getSelectedItems: () => props.selectedItems
 })
+
+loadPersistedReadKeys()
 </script>
 
 <template>
