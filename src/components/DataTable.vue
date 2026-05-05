@@ -68,6 +68,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  highlightUnreadRows: {
+    type: Boolean,
+    default: true
+  },
   emptyText: {
     type: String,
     default: 'No data available'
@@ -257,6 +261,7 @@ const sortDirection = ref(props.sortOrder)
 const showModal = ref(false)
 const modalContent = ref('')
 const showFilterDrawerPanel = ref(false)
+const viewedRowKeys = ref(new Set())
 const activeRuleCount = computed(() => Array.isArray(props.filterRules?.rules) ? props.filterRules.rules.length : 0)
 const formatRuleValue = (value) => {
   if (value && typeof value === 'object') {
@@ -567,6 +572,10 @@ const handleSort = async (column) => {
 
 const handleRowClick = (payload) => {
   if (props.loading) return
+  if (props.highlightUnreadRows) {
+    const key = getRowKey(payload.item, payload.index)
+    viewedRowKeys.value.add(String(key))
+  }
   emit('row-click', payload)
 }
 
@@ -1002,6 +1011,7 @@ defineExpose({
                 :striped="striped"
                 :hoverable="hoverable"
                 :clickable-rows="clickableRows"
+                :unread="highlightUnreadRows && !viewedRowKeys.has(String(getRowKey(item, index)))"
                 :density="density"
                 :variant="variant"
                 @toggle-selection="toggleRowSelection"
