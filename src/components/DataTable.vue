@@ -635,6 +635,16 @@ const isUnreadRow = (item, index) => {
   return createdAt >= tableLoadedAt.value
 }
 
+const getUnreadRowClass = (item, index) => {
+  if (!props.highlightUnreadRows) return ''
+
+  if (isUnreadRow(item, index)) {
+    return 'font-bold !bg-[color:color-mix(in_oklab,var(--ui-primary-soft)_55%,var(--ui-surface)_45%)]'
+  }
+
+  return 'font-normal !bg-(--ui-surface-soft)'
+}
+
 const loadPersistedReadKeys = () => {
   if (!props.unreadPersistKey || typeof window === 'undefined') return
   try {
@@ -1090,7 +1100,7 @@ loadPersistedReadKeys()
                 :striped="striped"
                 :hoverable="hoverable"
                 :clickable-rows="clickableRows"
-                :row-class="isUnreadRow(item, index) ? 'font-bold' : ''"
+                :row-class="getUnreadRowClass(item, index)"
                 :density="density"
                 :variant="variant"
                 @toggle-selection="toggleRowSelection"
