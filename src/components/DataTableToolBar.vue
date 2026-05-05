@@ -54,7 +54,7 @@ export default {
 <script setup>
 import Button from './Button.vue'
 import Icon from './Icon.vue'
-import KvFilterDrawer from './KvFilterDrawer.vue'
+import FilterDrawer from './FilterDrawer.vue'
 import { ref, computed, onMounted, onUnmounted, h, watch } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
@@ -589,7 +589,7 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-    <KvFilterDrawer
+    <FilterDrawer
       v-if="enableFilters"
       :open="showFilterDrawer"
       :fields="filterFields"

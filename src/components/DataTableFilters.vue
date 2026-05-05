@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 import Icon from './Icon.vue'
-import KvFilterDrawer from './KvFilterDrawer.vue'
+import FilterDrawer from './FilterDrawer.vue'
 
 const props = defineProps({
   drawerOpen: {
@@ -309,7 +309,7 @@ const removeFilter = (filterKey) => {
       </div>
     </div>
 
-    <KvFilterDrawer
+    <FilterDrawer
       :open="showFilters && isDrawerOpen"
       :fields="drilldownFields"
       :model-value="drilldownFilters"

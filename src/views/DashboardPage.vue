@@ -5,7 +5,7 @@ import Card from '../components/Card.vue'
 import LineChart from '../components/charts/LineChart.vue'
 import BarChart from '../components/charts/BarChart.vue'
 import StackedBarChart from '../components/charts/StackedBarChart.vue'
-import KvRailNav from '../components/KvRailNav.vue'
+import RailNav from '../components/RailNav.vue'
 import { THEME_PRESETS, getThemePreset } from '../lib/theme'
 
 // Layout reference
@@ -387,7 +387,7 @@ onMounted(() => {
             Rail Navigation Demo
           </h3>
           <div class="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-4">
-            <KvRailNav
+            <RailNav
               :items="railItems"
               :active-key="activeRailKey"
               title="Regulatory Bodies"

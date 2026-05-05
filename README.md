@@ -2173,14 +2173,14 @@ import Icon from '@/components/Icon.vue'
 
 <!-- Additional components (DataTableCell, DataTableFilters, DataTableHeader, DataTablePagination, DataTableRow, DataTableToolBar, FileUpload, Footer, Header, InputGroup, Link, ListItem, Logo, MainNavigation, MenuItem, ModalBody, ModalFooter, ModalHeader, Notification, Option, ProgressBar, RiskModal, Search, Sidebar, Stepper, StepperItem, Loader, Tab, TabPanel, Text, Timeline, TimelineItem, Toast, Tooltip, Typography) follow the same pattern. For these components, refer to their source code for props, events, and slots. -->
 
-## KvRailNav
+## RailNav
 
 Secondary rail navigation with active state, sticky viewport-fit layout, and logo caching.
 
 ### Basic usage
 
 ```vue
-<KvRailNav
+<RailNav
   :items="complianceBodies"
   :active-key="activeCode"
   @select="onSelectBody"
@@ -2190,7 +2190,7 @@ Secondary rail navigation with active state, sticky viewport-fit layout, and log
 ### Compliance layout usage
 
 ```vue
-<KvRailNav
+<RailNav
   v-if="route.meta.module === 'compliance'"
   :items="filteredBodies"
   :active-key="route.params.code"

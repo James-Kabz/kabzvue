@@ -7,7 +7,7 @@ import DataTableHeader from './DataTableHeader.vue'
 import DataTableRow from './DataTableRow.vue'
 import DataTableToolBar from './DataTableToolBar.vue'
 import DataTablePagination from './DataTablePagination.vue'
-import KvFilterDrawer from './KvFilterDrawer.vue'
+import FilterDrawer from './FilterDrawer.vue'
 import Icon from './Icon.vue'
 import Loader from './Loader.vue'
 import Button from './Button.vue'
@@ -925,7 +925,7 @@ loadPersistedReadKeys()
         </button>
       </template>
     </DataTableToolBar>
-    <KvFilterDrawer
+    <FilterDrawer
       v-if="showFilterDrawer"
       :open="showFilterDrawerPanel"
       :fields="filterFields"

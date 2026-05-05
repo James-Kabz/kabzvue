@@ -33,7 +33,15 @@ const normalizeItemLabel = (item) => {
 }
 
 const normalizeLogoId = (item) => {
-  return item?.logo_id ?? item?.logoId ?? item?.company_logo_id ?? item?.companyLogoId ?? null
+  return (
+    item?.logo_id ??
+    item?.logoId ??
+    item?.company_logo_id ??
+    item?.companyLogoId ??
+    item?.logo?.id ??
+    item?.logo?.data?.id ??
+    null
+  )
 }
 
 const getInitials = (item) => {
@@ -91,8 +99,8 @@ watch(
 )
 
 const getLogoSrc = (item, index) => {
-  const direct = item?.logo_url ?? item?.logoUrl ?? item?.logo
-  if (direct) return direct
+  const direct = item?.logo_url ?? item?.logoUrl
+  if (typeof direct === 'string' && direct.trim()) return direct
 
   const logoId = normalizeLogoId(item)
   if (logoId) {
