@@ -52,6 +52,9 @@
       :page-size="pageSize"
       :show-pagination="true"
       :density="density"
+      :highlight-unread-rows="true"
+      unread-mode="new-only"
+      unread-created-at-field="created_at"
       :actions="userActions"
       empty-text="No users found"
       @selection-change="selectedUsers = $event"
@@ -225,6 +228,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 75000,
     joinDate: '2023-03-15',
+    created_at: '2023-03-15T09:00:00.000Z',
     company_id: 1
   },
   {
@@ -238,6 +242,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b332c3c7?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 65000,
     joinDate: '2023-05-22',
+    created_at: '2023-05-22T09:00:00.000Z',
     company_id: 1
   },
   {
@@ -251,6 +256,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 55000,
     joinDate: '2023-07-08',
+    created_at: '2023-07-08T09:00:00.000Z',
     company_id: 2
   },
   {
@@ -264,6 +270,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 70000,
     joinDate: '2023-02-14',
+    created_at: '2023-02-14T09:00:00.000Z',
     company_id: 2
   },
   {
@@ -277,6 +284,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 80000,
     joinDate: '2023-01-10',
+    created_at: '2023-01-10T09:00:00.000Z',
     company_id: 1
   },
   {
@@ -290,6 +298,7 @@ const users = ref([
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=32&h=32&fit=crop&crop=face&auto=format',
     salary: 62000,
     joinDate: '2023-06-20',
+    created_at: '2023-06-20T09:00:00.000Z',
     company_id: 2
   }
 ])
@@ -558,6 +567,7 @@ const handleAddUser = () => {
     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`Test User ${nextId}`)}&background=e2e8f0&color=334155&size=32`,
     salary: 50000 + (nextId * 500),
     joinDate: new Date().toISOString().slice(0, 10),
+    created_at: new Date().toISOString(),
     company_id: companyId
   }
 

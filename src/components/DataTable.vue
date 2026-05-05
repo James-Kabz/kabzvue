@@ -602,8 +602,25 @@ const isUnreadRow = (item, index) => {
   const createdAtValue = item?.[field]
   if (!createdAtValue) return false
 
-  const createdAt = new Date(createdAtValue).getTime()
+  const rawValue = String(createdAtValue).trim()
+  let createdAt = new Date(rawValue).getTime()
+
+  // Accept dd-mm-yyyy or dd/mm/yyyy formats.
+  if (Number.isNaN(createdAt)) {
+    const match = rawValue.match(/^(\d{2})[-/](\d{2})[-/](\d{4})$/)
+    if (match) {
+      const [, dd, mm, yyyy] = match
+      createdAt = new Date(`${yyyy}-${mm}-${dd}T00:00:00`).getTime()
+    }
+  }
   if (Number.isNaN(createdAt)) return false
+
+  // If field is date-only (YYYY-MM-DD), compare by day boundary.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) {
+    const loadedDayStart = new Date(tableLoadedAt.value)
+    loadedDayStart.setHours(0, 0, 0, 0)
+    return createdAt >= loadedDayStart.getTime()
+  }
 
   return createdAt >= tableLoadedAt.value
 }
@@ -1040,7 +1057,7 @@ defineExpose({
                 :striped="striped"
                 :hoverable="hoverable"
                 :clickable-rows="clickableRows"
-                :unread="isUnreadRow(item, index)"
+                :row-class="isUnreadRow(item, index) ? 'font-bold' : ''"
                 :density="density"
                 :variant="variant"
                 @toggle-selection="toggleRowSelection"

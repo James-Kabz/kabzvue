@@ -48,9 +48,9 @@ const props = defineProps({
     default: 'default',
     validator: (value) => ['default', 'bordered', 'minimal'].includes(value)
   },
-  unread: {
-    type: Boolean,
-    default: false
+  rowClass: {
+    type: [String, Array, Object],
+    default: ''
   }
 })
 
@@ -187,7 +187,7 @@ const rowClasses = computed(() =>
     clickable: props.clickableRows,
     selected: props.isSelected,
     variant: props.variant
-  }), props.unread && 'font-bold')
+  }), props.rowClass)
 )
 
 // const getCellClasses = (column) => {
