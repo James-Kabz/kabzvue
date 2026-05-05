@@ -2173,6 +2173,37 @@ import Icon from '@/components/Icon.vue'
 
 <!-- Additional components (DataTableCell, DataTableFilters, DataTableHeader, DataTablePagination, DataTableRow, DataTableToolBar, FileUpload, Footer, Header, InputGroup, Link, ListItem, Logo, MainNavigation, MenuItem, ModalBody, ModalFooter, ModalHeader, Notification, Option, ProgressBar, RiskModal, Search, Sidebar, Stepper, StepperItem, Loader, Tab, TabPanel, Text, Timeline, TimelineItem, Toast, Tooltip, Typography) follow the same pattern. For these components, refer to their source code for props, events, and slots. -->
 
+## KvRailNav
+
+Secondary rail navigation with active state, sticky viewport-fit layout, and logo caching.
+
+### Basic usage
+
+```vue
+<KvRailNav
+  :items="complianceBodies"
+  :active-key="activeCode"
+  @select="onSelectBody"
+/>
+```
+
+### Compliance layout usage
+
+```vue
+<KvRailNav
+  v-if="route.meta.module === 'compliance'"
+  :items="filteredBodies"
+  :active-key="route.params.code"
+  :show-setup="true"
+  setup-label="Compliance Setup"
+  :resolve-logo="resolveCompanyLogo"
+  @select="(item) => router.push(`/compliance/${item.code}`)"
+  @setup-click="() => router.push('/compliance-settings')"
+/>
+```
+
+Note: when `resolveLogo` is provided, logo previews are cached by `logoId` and in-flight requests are deduped to prevent repeated fetches and visible flicker during compliance route navigation in the same session.
+
 ## Testing
 
 This library includes comprehensive testing with both unit and integration tests to ensure reliability and maintainability.

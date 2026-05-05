@@ -73,6 +73,7 @@ import DataTableCell from "./components/DataTableCell.vue"
 import DataTablePagination from "./components/DataTablePagination.vue"
 import DataTableFilters from "./components/DataTableFilters.vue"
 import DataTableToolBar from "./components/DataTableToolBar.vue"
+import KvRailNav from "./components/KvRailNav.vue"
 
 import Footer from "./components/Footer.vue"
 import Header from "./components/Header.vue"
@@ -177,6 +178,7 @@ const components = {
   DataTablePagination,
   DataTableFilters,
   DataTableToolBar,
+  KvRailNav,
   Footer,
   Header,
   ReusableFormModal,
@@ -372,6 +374,7 @@ export {
   DataTablePagination,
   DataTableFilters,
   DataTableToolBar,
+  KvRailNav,
   Footer,
   Header,
   ReusableFormModal,

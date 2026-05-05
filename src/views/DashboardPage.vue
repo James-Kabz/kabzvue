@@ -5,6 +5,7 @@ import Card from '../components/Card.vue'
 import LineChart from '../components/charts/LineChart.vue'
 import BarChart from '../components/charts/BarChart.vue'
 import StackedBarChart from '../components/charts/StackedBarChart.vue'
+import KvRailNav from '../components/KvRailNav.vue'
 import { THEME_PRESETS, getThemePreset } from '../lib/theme'
 
 // Layout reference
@@ -288,6 +289,22 @@ const moduleThemePreviewVars = {
   '--module-text': '#991b1b'
 }
 
+const railItems = ref([
+  { id: 1, code: 'CBK', name: 'Central Bank' },
+  { id: 2, code: 'CMA', name: 'Capital Markets' },
+  { id: 3, code: 'KRA', name: 'Tax Authority' },
+  { id: 4, code: 'NSSF', name: 'Social Security' }
+])
+const activeRailKey = ref('CBK')
+
+const handleRailSelect = (item) => {
+  activeRailKey.value = item?.code ?? item?.id
+}
+
+const handleRailSetupClick = () => {
+  console.log('Setup clicked')
+}
+
 // Computed properties to track layout state
 const sidebarCollapsed = computed(() => layoutRef.value?.sidebarCollapsed || false)
 const sidebarWidth = computed(() => layoutRef.value?.sidebarWidth || 256)
@@ -363,6 +380,33 @@ onMounted(() => {
           </button>
         </div>
       </div>
+
+      <Card variant="elevated">
+        <div class="p-5 space-y-4">
+          <h3 class="text-lg font-semibold ui-text">
+            Rail Navigation Demo
+          </h3>
+          <div class="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-4">
+            <KvRailNav
+              :items="railItems"
+              :active-key="activeRailKey"
+              title="Regulatory Bodies"
+              setup-label="Open Setup"
+              :show-setup="true"
+              :desktop-only="false"
+              height-offset="18rem"
+              @select="handleRailSelect"
+              @setup-click="handleRailSetupClick"
+            />
+            <div class="rounded-xl border ui-border-strong p-4 ui-surface">
+              <p class="text-sm ui-text">
+                Active Body:
+                <span class="font-semibold">{{ activeRailKey }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card variant="elevated">
         <div class="p-5 space-y-4">
