@@ -187,7 +187,7 @@ const rowClasses = computed(() =>
     clickable: props.clickableRows,
     selected: props.isSelected,
     variant: props.variant
-  }), props.unread && 'font-semibold')
+  }), props.unread && 'font-bold')
 )
 
 // const getCellClasses = (column) => {

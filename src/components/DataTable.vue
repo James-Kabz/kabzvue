@@ -72,6 +72,15 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  unreadCreatedAtField: {
+    type: String,
+    default: ''
+  },
+  unreadMode: {
+    type: String,
+    default: 'all',
+    validator: (value) => ['all', 'new-only'].includes(value)
+  },
   emptyText: {
     type: String,
     default: 'No data available'
@@ -262,6 +271,7 @@ const showModal = ref(false)
 const modalContent = ref('')
 const showFilterDrawerPanel = ref(false)
 const viewedRowKeys = ref(new Set())
+const tableLoadedAt = ref(Date.now())
 const activeRuleCount = computed(() => Array.isArray(props.filterRules?.rules) ? props.filterRules.rules.length : 0)
 const formatRuleValue = (value) => {
   if (value && typeof value === 'object') {
@@ -577,6 +587,25 @@ const handleRowClick = (payload) => {
     viewedRowKeys.value.add(String(key))
   }
   emit('row-click', payload)
+}
+
+const isUnreadRow = (item, index) => {
+  if (!props.highlightUnreadRows) return false
+
+  const key = String(getRowKey(item, index))
+  if (viewedRowKeys.value.has(key)) return false
+
+  if (props.unreadMode === 'all') return true
+
+  const field = props.unreadCreatedAtField
+  if (!field) return false
+  const createdAtValue = item?.[field]
+  if (!createdAtValue) return false
+
+  const createdAt = new Date(createdAtValue).getTime()
+  if (Number.isNaN(createdAt)) return false
+
+  return createdAt >= tableLoadedAt.value
 }
 
 const handlePageChange = async (page) => {
@@ -1011,7 +1040,7 @@ defineExpose({
                 :striped="striped"
                 :hoverable="hoverable"
                 :clickable-rows="clickableRows"
-                :unread="highlightUnreadRows && !viewedRowKeys.has(String(getRowKey(item, index)))"
+                :unread="isUnreadRow(item, index)"
                 :density="density"
                 :variant="variant"
                 @toggle-selection="toggleRowSelection"
