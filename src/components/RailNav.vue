@@ -113,13 +113,10 @@ const getLogoSrc = (item, index) => {
 </script>
 
 <template>
-  <aside
-    :class="[
-      'sticky top-16 w-72 rounded-xl border ui-border-strong ui-surface shadow-sm overflow-hidden',
-      desktopOnly ? 'hidden lg:flex' : 'flex'
-    ]"
-    :style="railHeight"
-  >
+  <aside :class="[
+    'sticky top-16 w-72 rounded-xl border ui-border-strong ui-surface shadow-sm overflow-hidden',
+    desktopOnly ? 'hidden lg:flex' : 'flex'
+  ]" :style="railHeight">
     <div class="w-full flex flex-col">
       <div class="px-4 py-3 border-b ui-border-strong">
         <h3 class="text-sm font-semibold uppercase tracking-wide ui-text">{{ title }}</h3>
@@ -129,22 +126,14 @@ const getLogoSrc = (item, index) => {
         <div v-if="loading" class="px-4 py-3 text-sm ui-text">Loading...</div>
         <div v-else-if="!items.length" class="px-4 py-3 text-sm ui-text">No compliance bodies</div>
         <nav v-else class="py-1" aria-label="Rail navigation">
-          <button
-            v-for="(item, index) in items"
-            :key="String(normalizeItemKey(item, index))"
-            type="button"
+          <button v-for="(item, index) in items" :key="String(normalizeItemKey(item, index))" type="button"
             class="w-full px-3 py-2 flex items-center gap-3 text-left transition-colors border-l-2 border-transparent hover:bg-(--ui-surface-muted) ui-text"
             :class="isActive(item, index) ? 'ui-primary-soft border-(--ui-primary) font-semibold' : ''"
-            :aria-current="isActive(item, index) ? 'page' : undefined"
-            @click="emit('select', item)"
-          >
-            <span class="h-8 w-8 rounded-full overflow-hidden border ui-border-strong ui-surface-muted flex items-center justify-center text-xs font-semibold ui-text">
-              <img
-                v-if="getLogoSrc(item, index)"
-                :src="getLogoSrc(item, index)"
-                :alt="normalizeItemLabel(item)"
-                class="h-full w-full object-cover"
-              >
+            :aria-current="isActive(item, index) ? 'page' : undefined" @click="emit('select', item)">
+            <span
+              class="h-8 w-8 rounded-full overflow-hidden border ui-border-strong ui-surface-muted flex items-center justify-center text-xs font-semibold ui-text">
+              <img v-if="getLogoSrc(item, index)" :src="getLogoSrc(item, index)" :alt="normalizeItemLabel(item)"
+                class="h-full w-full object-cover">
               <span v-else>{{ getInitials(item) }}</span>
             </span>
             <span class="truncate text-sm">{{ normalizeItemLabel(item) }}</span>
@@ -153,11 +142,9 @@ const getLogoSrc = (item, index) => {
       </div>
 
       <div v-if="showSetup" class="px-3 py-3 border-t ui-border-strong">
-        <button
-          type="button"
+        <button type="button"
           class="w-full px-3 py-2 rounded-md border ui-border-strong ui-primary hover:bg-(--ui-primary-soft) text-sm font-medium"
-          @click="emit('setup-click')"
-        >
+          @click="emit('setup-click')">
           {{ setupLabel }}
         </button>
       </div>
