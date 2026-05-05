@@ -29,7 +29,7 @@ const normalizeItemKey = (item, index) => {
 }
 
 const normalizeItemLabel = (item) => {
-  return item?.body ?? item?.name ?? item?.label ?? item?.company_name ?? item?.code ?? 'Item'
+  return item?.code ?? item?.body ?? item?.name ?? item?.label ?? item?.company_name ?? 'Item'
 }
 
 const normalizeLogoId = (item) => {
@@ -52,6 +52,8 @@ const getInitials = (item) => {
 }
 
 const isActive = (item, index) => String(normalizeItemKey(item, index)) === String(props.activeKey ?? '')
+
+const getItemColor = (item) => String(item?.color_code || item?.colorCode || '#94A3B8')
 
 const preloadLogo = async (item, index) => {
   if (typeof props.resolveLogo !== 'function') return
@@ -120,13 +122,20 @@ const getLogoSrc = (item, index) => {
     <div class="w-full flex flex-col">
       <div class="px-4 py-3 border-b ui-border-strong">
         <h3 class="text-sm font-semibold uppercase tracking-wide ui-text">{{ title }}</h3>
+        <button v-if="showSetup" type="button"
+          class="mt-3 w-full px-3 py-2 rounded-md border ui-border-strong ui-primary hover:bg-(--ui-primary-soft) text-sm font-medium"
+          @click="emit('setup-click')">
+          {{ setupLabel }}
+        </button>
       </div>
 
       <div class="flex-1 overflow-y-auto">
-        <div v-if="loading" class="px-4 py-3 text-sm ui-text">Loading...</div>
+        <div v-if="loading" class="px-3 py-2 space-y-2">
+          <div v-for="n in 6" :key="n" class="h-10 rounded-md ui-surface-muted animate-pulse"></div>
+        </div>
         <div v-else-if="!items.length" class="px-4 py-3 text-sm ui-text">No compliance bodies</div>
         <nav v-else class="py-1" aria-label="Rail navigation">
-          <button v-for="(item, index) in items" :key="String(normalizeItemKey(item, index))" type="button"
+          <button v-for="(item, index) in items" :key="String(normalizeItemKey(item, index))" type="button" :title="item?.body || item?.name || normalizeItemLabel(item)"
             class="w-full px-3 py-2 flex items-center gap-3 text-left transition-colors border-l-2 border-transparent hover:bg-(--ui-surface-muted) ui-text"
             :class="isActive(item, index) ? 'ui-primary-soft border-(--ui-primary) font-semibold' : ''"
             :aria-current="isActive(item, index) ? 'page' : undefined" @click="emit('select', item)">
@@ -136,17 +145,10 @@ const getLogoSrc = (item, index) => {
                 class="h-full w-full object-cover">
               <span v-else>{{ getInitials(item) }}</span>
             </span>
+            <span class="inline-block h-2.5 w-2.5 rounded-full shrink-0" :style="{ backgroundColor: getItemColor(item) }"></span>
             <span class="truncate text-sm">{{ normalizeItemLabel(item) }}</span>
           </button>
         </nav>
-      </div>
-
-      <div v-if="showSetup" class="px-3 py-3 border-t ui-border-strong">
-        <button type="button"
-          class="w-full px-3 py-2 rounded-md border ui-border-strong ui-primary hover:bg-(--ui-primary-soft) text-sm font-medium"
-          @click="emit('setup-click')">
-          {{ setupLabel }}
-        </button>
       </div>
     </div>
   </aside>
