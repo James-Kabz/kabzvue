@@ -639,10 +639,10 @@ const getUnreadRowClass = (item, index) => {
   if (!props.highlightUnreadRows) return ''
 
   if (isUnreadRow(item, index)) {
-    return 'font-bold !bg-[color:color-mix(in_oklab,var(--ui-primary-soft)_55%,var(--ui-surface)_45%)]'
+    return 'font-bold !bg-[color:color-mix(in_oklab,var(--module-soft,var(--ui-primary-soft))_62%,var(--ui-surface)_38%)]'
   }
 
-  return 'font-normal !bg-(--ui-surface-soft)'
+  return 'font-normal !bg-[color:color-mix(in_oklab,var(--module-soft-alt,var(--ui-surface-soft))_42%,var(--ui-surface)_58%)]'
 }
 
 const loadPersistedReadKeys = () => {
