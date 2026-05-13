@@ -35,6 +35,14 @@ const props = defineProps({
   disabledDates: {
     type: [Array, Function],
     default: null
+  },
+  enableTime: {
+    type: Boolean,
+    default: false
+  },
+  minuteInterval: {
+    type: Number,
+    default: 1
   }
 })
 
@@ -49,6 +57,7 @@ const currentMonth = ref(today.getMonth())
 const currentYear = ref(today.getFullYear())
 const selectedDate = ref(null)
 const hasValidationError = ref(false)
+const selectedTime = ref('00:00')
 
 const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
@@ -80,7 +89,20 @@ const trailingDays = computed(() => {
 
 const displayValue = computed(() => {
   if (!selectedDate.value) return ''
-  return formatDate(selectedDate.value)
+  return props.enableTime ? formatDateTime(selectedDate.value) : formatDate(selectedDate.value)
+})
+
+const timeOptions = computed(() => {
+  const step = Math.min(60, Math.max(1, Number(props.minuteInterval) || 1))
+  const options = []
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += step) {
+      const hh = String(hour).padStart(2, '0')
+      const mm = String(minute).padStart(2, '0')
+      options.push(`${hh}:${mm}`)
+    }
+  }
+  return options
 })
 
 function formatDate(date) {
@@ -96,11 +118,26 @@ function formatDate(date) {
     .replace('YYYY', year)
 }
 
+function formatDateTime(date) {
+  const base = formatDate(date)
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${base} ${hours}:${minutes}`
+}
+
 function parseDate(value) {
   if (!value) return null
   if (value instanceof Date) return value
 
   if (typeof value === 'string') {
+    if (value.includes('T')) {
+      const [datePart, timePart] = value.split('T')
+      const date = parseDate(datePart)
+      if (!date) return null
+      const [hours = '00', minutes = '00'] = (timePart || '').slice(0, 5).split(':')
+      date.setHours(parseInt(hours, 10) || 0, parseInt(minutes, 10) || 0, 0, 0)
+      return date
+    }
     const parts = value.split('-')
     if (parts.length === 3) {
       const year = parseInt(parts[0], 10)
@@ -275,17 +312,27 @@ function selectDate(day) {
   }
 
   selectedDate.value = date
-  
+
+  emitDateValue(date)
+
+  setTimeout(() => {
+    if (!props.enableTime) isOpen.value = false
+  }, 150)
+}
+
+function emitDateValue(date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const dayStr = String(date.getDate()).padStart(2, '0')
-  const dateString = `${year}-${month}-${dayStr}`
-  
-  emit('update:modelValue', dateString)
 
-  setTimeout(() => {
-    isOpen.value = false
-  }, 150)
+  if (!props.enableTime) {
+    emit('update:modelValue', `${year}-${month}-${dayStr}`)
+    return
+  }
+
+  const [hours = '00', minutes = '00'] = selectedTime.value.split(':')
+  const dateTimeString = `${year}-${month}-${dayStr}T${hours}:${minutes}`
+  emit('update:modelValue', dateTimeString)
 }
 
 function selectToday() {
@@ -296,6 +343,7 @@ function selectToday() {
 
 function clearDate() {
   selectedDate.value = null
+  selectedTime.value = '00:00'
   hasValidationError.value = false
   emit('update:modelValue', '')
   emit('validation-error', null)
@@ -307,6 +355,9 @@ watch(() => props.modelValue, (newVal) => {
     const date = parseDate(newVal)
     if (date) {
       selectedDate.value = date
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      selectedTime.value = `${hours}:${minutes}`
       currentMonth.value = date.getMonth()
       currentYear.value = date.getFullYear()
       validateDate(date)
@@ -316,6 +367,13 @@ watch(() => props.modelValue, (newVal) => {
     hasValidationError.value = false
   }
 }, { immediate: true })
+
+watch(selectedTime, (newTime) => {
+  if (!props.enableTime || !selectedDate.value) return
+  const [hours = '00', minutes = '00'] = (newTime || '00:00').split(':')
+  selectedDate.value.setHours(parseInt(hours, 10) || 0, parseInt(minutes, 10) || 0, 0, 0)
+  emitDateValue(selectedDate.value)
+})
 
 // Recalculate position on window resize
 function handleResize() {
@@ -420,60 +478,63 @@ onBeforeUnmount(() => {
           v-if="isOpen"
           ref="calendarRef"
           :style="calendarStyle"
-          class="fixed z-10000 rounded-lg shadow-xl p-3 w-64 ui-surface ui-border-strong"
+          class="fixed z-10000 rounded-lg shadow-xl p-3 ui-surface ui-border-strong"
+          :class="enableTime ? 'w-[420px]' : 'w-64'"
           @click.stop
         >
-          <!-- Header -->
-          <div class="flex items-center justify-between mb-3">
-            <button
-              type="button"
-              class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
-              aria-label="Previous Month"
-              @click="prevMonth"
-            >
-              <svg
-                class="w-4 h-4 ui-text"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 18l-6-6 6-6"
-                />
-              </svg>
-            </button>
+          <div :class="enableTime ? 'grid grid-cols-[1fr_124px] gap-3' : 'block'">
+            <div>
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-3">
+                <button
+                  type="button"
+                  class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
+                  aria-label="Previous Month"
+                  @click="prevMonth"
+                >
+                  <svg
+                    class="w-4 h-4 ui-text"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 18l-6-6 6-6"
+                    />
+                  </svg>
+                </button>
 
-            <div class="text-sm font-semibold ui-text">
-              {{ monthName }} {{ currentYear }}
-            </div>
+                <div class="text-sm font-semibold ui-text">
+                  {{ monthName }} {{ currentYear }}
+                </div>
 
-            <button
-              type="button"
-              class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
-              aria-label="Next Month"
-              @click="nextMonth"
-            >
-              <svg
-                class="w-4 h-4 ui-text"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 18l6-6-6-6"
-                />
-              </svg>
-            </button>
-          </div>
+                <button
+                  type="button"
+                  class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
+                  aria-label="Next Month"
+                  @click="nextMonth"
+                >
+                  <svg
+                    class="w-4 h-4 ui-text"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 18l6-6-6-6"
+                    />
+                  </svg>
+                </button>
+              </div>
 
-          <!-- Weekdays -->
-          <div class="grid grid-cols-7 gap-1 mb-1">
+              <!-- Weekdays -->
+              <div class="grid grid-cols-7 gap-1 mb-1">
             <div
               v-for="day in weekdays"
               :key="day"
@@ -481,10 +542,10 @@ onBeforeUnmount(() => {
             >
               {{ day }}
             </div>
-          </div>
+              </div>
 
-          <!-- Calendar Grid -->
-          <div class="grid grid-cols-7 gap-1">
+              <!-- Calendar Grid -->
+              <div class="grid grid-cols-7 gap-1">
             <!-- Previous month days -->
             <div
               v-for="(day, index) in leadingDays"
@@ -519,20 +580,41 @@ onBeforeUnmount(() => {
             >
               {{ day }}
             </div>
-          </div>
+              </div>
 
-          <!-- Footer with Today button -->
-          <div
-            v-if="showToday"
-            class="mt-3 pt-2 border-t ui-border"
-          >
-            <button
-              type="button"
-              class="w-full px-3 py-1.5 text-xs font-medium ui-primary hover:bg-(--ui-primary-soft) rounded transition-colors"
-              @click="selectToday"
+              <!-- Footer with Today button -->
+              <div
+                v-if="showToday"
+                class="mt-3 pt-2 border-t ui-border"
+              >
+                <button
+                  type="button"
+                  class="w-full px-3 py-1.5 text-xs font-medium ui-primary hover:bg-(--ui-primary-soft) rounded transition-colors"
+                  @click="selectToday"
+                >
+                  Today
+                </button>
+              </div>
+            </div>
+
+            <div
+              v-if="enableTime"
+              class="border-l pl-3 ui-border"
             >
-              Today
-            </button>
+              <div class="text-xs font-semibold ui-text mb-2">Time</div>
+              <div class="max-h-[260px] overflow-y-auto pr-1 space-y-1">
+                <button
+                  v-for="time in timeOptions"
+                  :key="time"
+                  type="button"
+                  class="w-full px-2 py-1.5 text-left text-sm rounded transition-colors"
+                  :class="time === selectedTime ? 'ui-primary-bg ui-text' : 'ui-text hover:bg-(--ui-bg)'"
+                  @click="selectedTime = time"
+                >
+                  {{ time }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </transition>

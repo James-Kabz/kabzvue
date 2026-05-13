@@ -754,6 +754,8 @@ const handleCancel = () => emit('cancel')
                       :max="field.max"
                       :placeholder="field.placeholder || 'Select date'"
                       :format="field.format || 'MM/DD/YYYY'"
+                      :enable-time="field.enableTime === true"
+                      :minute-interval="field.minuteInterval || 1"
                       :clearable="field.clearable !== false"
                       :show-today="field.showToday !== false"
                       :calendar-position="field.calendarPosition || 'left-0 bottom-full'"
@@ -771,13 +773,20 @@ const handleCancel = () => emit('cancel')
                       :aria-describedby="ariaDescribedBy"
                       @update:model-value="setFieldValue(field.name, $event)"
                     />
-                    <Input
+                    <DatePicker
                       v-else-if="field.type === 'datetime-local'"
                       :id="fieldId"
                       :model-value="getFieldValue(field.name)"
-                      type="datetime-local"
                       :disabled="isLoading || field.disabled"
-                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
+                      :required="field.required"
+                      :min="field.min"
+                      :max="field.max"
+                      :placeholder="field.placeholder || 'Select date and time'"
+                      :format="field.format || 'MM/DD/YYYY'"
+                      :enable-time="true"
+                      :minute-interval="field.minuteInterval || 1"
+                      :clearable="field.clearable !== false"
+                      :show-today="field.showToday !== false"
                       :aria-describedby="ariaDescribedBy"
                       @update:model-value="setFieldValue(field.name, $event)"
                     />
