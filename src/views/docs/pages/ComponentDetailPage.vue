@@ -91,6 +91,11 @@ const componentPlaygroundPresets = {
         { id: 6, name: 'Farah Noor', role: 'Customer Success', department: 'Operations', status: 'Inactive', location: 'Garissa' },
         { id: 7, name: 'George Maina', role: 'Backend Engineer', department: 'Engineering', status: 'Active', location: 'Thika' },
         { id: 8, name: 'Halima Yusuf', role: 'HR Partner', department: 'People', status: 'Active', location: 'Nairobi' }
+      ],
+      actions: [
+        { key: 'view', label: 'View', icon: 'eye', variant: 'info', tooltip: 'Inspect this record', permission: true },
+        { key: 'edit', label: 'Edit', icon: 'pen', variant: 'secondary', tooltip: 'Update this record', permission: true },
+        { key: 'archive', label: 'Archive', icon: 'archive', variant: 'warning', tooltip: 'Archive this record', permission: true }
       ]
     }
   },
