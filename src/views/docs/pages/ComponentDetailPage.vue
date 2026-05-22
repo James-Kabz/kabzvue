@@ -65,6 +65,35 @@ const componentPlaygroundPresets = {
       variant: 'info'
     }
   },
+  DataTable: {
+    props: {
+      title: 'Team Directory',
+      description: 'Sample records for sorting, selection, and pagination.',
+      selectable: true,
+      striped: true,
+      hoverable: true,
+      showPagination: true,
+      pageSize: 5,
+      rowKey: 'id',
+      columns: [
+        { key: 'name', label: 'Name', sortable: true },
+        { key: 'role', label: 'Role', sortable: true },
+        { key: 'department', label: 'Department', sortable: true },
+        { key: 'status', label: 'Status', sortable: true },
+        { key: 'location', label: 'Location', sortable: true }
+      ],
+      data: [
+        { id: 1, name: 'Amina Njeri', role: 'Product Manager', department: 'Product', status: 'Active', location: 'Nairobi' },
+        { id: 2, name: 'Brian Otieno', role: 'Frontend Engineer', department: 'Engineering', status: 'Active', location: 'Kisumu' },
+        { id: 3, name: 'Clara Wanjiku', role: 'UX Designer', department: 'Design', status: 'On Leave', location: 'Mombasa' },
+        { id: 4, name: 'Daniel Kiptoo', role: 'Data Analyst', department: 'Analytics', status: 'Active', location: 'Eldoret' },
+        { id: 5, name: 'Esther Muthoni', role: 'Finance Lead', department: 'Finance', status: 'Active', location: 'Nakuru' },
+        { id: 6, name: 'Farah Noor', role: 'Customer Success', department: 'Operations', status: 'Inactive', location: 'Garissa' },
+        { id: 7, name: 'George Maina', role: 'Backend Engineer', department: 'Engineering', status: 'Active', location: 'Thika' },
+        { id: 8, name: 'Halima Yusuf', role: 'HR Partner', department: 'People', status: 'Active', location: 'Nairobi' }
+      ]
+    }
+  },
   Progress: {
     props: {
       value: 45
