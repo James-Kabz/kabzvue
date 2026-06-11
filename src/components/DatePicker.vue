@@ -14,7 +14,7 @@ const props = defineProps({
   },
   format: {
     type: String,
-    default: 'MM/DD/YYYY'
+    default: 'DD/MM/YYYY'
   },
   clearable: {
     type: Boolean,
