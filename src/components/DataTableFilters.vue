@@ -1,6 +1,7 @@
 <script setup>
 import Button from './Button.vue'
 import FileUpload from './FileUpload.vue'
+import Select from './Select.vue'
 import { computed, ref } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
@@ -15,6 +16,11 @@ const props = defineProps({
   showFilterButton: {
     type: Boolean,
     default: true
+  },
+  filterUi: {
+    type: String,
+    default: 'auto',
+    validator: (value) => ['auto', 'drawer', 'toolbar'].includes(value)
   },
   searchQuery: { type: String, default: '' },
   showSearch: { type: Boolean, default: false },
@@ -33,6 +39,8 @@ const props = defineProps({
   numberFilters: { type: Array, default: () => [] },
   multiSelectFilters: { type: Array, default: () => [] },
   showExport: { type: Boolean, default: false },
+  showAdd: { type: Boolean, default: false },
+  addButton: { type: Object, default: () => ({}) },
   showTableInfo: { type: Boolean, default: true },
   showFilters: { type: Boolean, default: true },
   showFileUpload: { type: Boolean, default: false },
@@ -64,6 +72,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'update:searchQuery',
   'update:selectedStatus',
   'update:dateFrom',
   'update:dateTo',
@@ -74,6 +83,8 @@ const emit = defineEmits([
   'update:drilldownFilters',
   'update:drawerOpen',
   'export',
+  'add',
+  'add-button-click',
   'clear-filters',
   'files-selected',
   'file-removed'
@@ -81,6 +92,7 @@ const emit = defineEmits([
 
 const isFileUploadModalOpen = ref(false)
 const showDrilldownPanel = ref(false)
+const showToolbarFilters = ref(false)
 const isDrawerOpen = computed(() =>
   typeof props.drawerOpen === 'boolean' ? props.drawerOpen : showDrilldownPanel.value
 )
@@ -89,6 +101,24 @@ const openFileUploadModal = () => { isFileUploadModalOpen.value = true }
 const closeFileUploadModal = () => { isFileUploadModalOpen.value = false }
 const handleFilesSelected = (files) => { emit('files-selected', files) }
 const handleFileRemoved = (files) => { emit('file-removed', files) }
+const hasAddButton = computed(() => Object.keys(props.addButton || {}).length > 0)
+const isAddVisible = computed(() => props.showAdd || hasAddButton.value)
+const addButtonLabel = computed(() => props.addButton?.label || 'Add')
+
+const usesLegacyToolbarContract = computed(() =>
+  props.showSearch ||
+  props.showAdd ||
+  hasAddButton.value ||
+  props.statusOptions.length > 0 ||
+  props.showDateFilter ||
+  Boolean(props.dateFrom || props.dateTo)
+)
+
+const resolvedFilterUi = computed(() => {
+  if (props.filterUi === 'toolbar') return 'toolbar'
+  if (props.filterUi === 'drawer') return 'drawer'
+  return usesLegacyToolbarContract.value ? 'toolbar' : 'drawer'
+})
 
 const filtersVariants = cva('flex flex-wrap items-center gap-4', {
   variants: {
@@ -131,17 +161,32 @@ const drilldownFields = computed(() => {
 const drilldownRules = computed(() => Array.isArray(props.drilldownFilters?.rules) ? props.drilldownFilters.rules : [])
 
 const hasActiveFilters = computed(() => {
+  const hasSearch = props.searchQuery
   const hasStatus = props.selectedStatus
   const hasLegacyDates = props.dateFrom || props.dateTo
   const hasSelectFilters = props.selectFilters.some(f => f.value)
   const hasDynamicDates = props.dateFilters.some(f => f.from || f.to)
   const hasNumberFilters = props.numberFilters.some(f => f.min || f.max)
   const hasMultiSelectFilters = props.multiSelectFilters.some(f => f.selected && f.selected.length > 0)
-  return hasStatus || hasLegacyDates || hasSelectFilters || hasDynamicDates || hasNumberFilters || hasMultiSelectFilters || drilldownRules.value.length > 0
+  return hasSearch || hasStatus || hasLegacyDates || hasSelectFilters || hasDynamicDates || hasNumberFilters || hasMultiSelectFilters || drilldownRules.value.length > 0
 })
 
 const activeFiltersDisplay = computed(() => {
   const filters = []
+
+  if (props.searchQuery && props.searchQuery.trim()) {
+    filters.push({ key: 'search', label: 'Search', value: `"${props.searchQuery}"`, icon: 'search' })
+  }
+
+  if (props.selectedStatus) {
+    const option = props.statusOptions.find(opt => opt.value === props.selectedStatus)
+    filters.push({ key: 'status', label: 'Status', value: option?.label || props.selectedStatus, icon: 'filter' })
+  }
+
+  if (props.dateFrom || props.dateTo) {
+    const value = props.dateFrom && props.dateTo ? `${props.dateFrom} to ${props.dateTo}` : (props.dateFrom ? `From ${props.dateFrom}` : `Until ${props.dateTo}`)
+    filters.push({ key: 'legacy-date', label: 'Date Range', value, icon: 'calendar' })
+  }
 
   props.selectFilters.forEach(filter => {
     if (filter.value) {
@@ -179,13 +224,18 @@ const rootContainerClasses = computed(() => cn('border ui-border rounded-2xl mb-
 const filterButtonClasses = computed(() => cn(buttonVariants({ variant: hasActiveFilters.value ? 'default' : 'default', size: 'lg' }), 'gap-2'))
 const clearFiltersButtonClasses = computed(() => cn(buttonVariants({ variant: 'ghost', size: 'md' })))
 const exportButtonClasses = computed(() => cn(buttonVariants({ variant: 'default', size: 'lg' })))
+const toolbarPanelClasses = computed(() => 'px-6 py-4 border-t ui-border-strong bg-(--ui-surface)')
 const filterCountBadgeClasses = computed(() => 'ui-surface ui-primary text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center font-semibold')
 const activeFiltersContainerClasses = computed(() => 'px-6 py-3 ui-primary-soft border-t border-(--ui-primary-soft)')
 const activeFiltersLabelClasses = computed(() => 'text-sm font-semibold ui-primary')
 const activeFilterTagClasses = computed(() => 'flex items-center gap-1.5 ui-bg border border-(--ui-primary-soft) ui-text px-3 py-1.5 rounded-full text-sm font-medium')
 const activeFilterRemoveButtonClasses = computed(() => 'ui-primary hover:text-(--ui-primary) ml-1 hover:bg-(--ui-primary-soft) rounded-full p-0.5 transition-all')
+const searchInputClasses = computed(() => 'w-full pl-10 pr-10 py-2.5 text-sm border ui-border-strong rounded-lg ui-surface ui-text placeholder:text-(--ui-text-muted) focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all')
+const selectClasses = computed(() => 'w-full pr-8 py-2.5 text-sm border ui-border-strong rounded-lg ui-surface ui-text appearance-none focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all')
+const dateInputClasses = computed(() => 'w-full pl-10 pr-3 py-2.5 text-sm border ui-border-strong rounded-lg ui-surface ui-text focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all')
 
 const clearFilters = () => {
+  emit('update:searchQuery', '')
   emit('update:selectedStatus', '')
   emit('update:dateFrom', '')
   emit('update:dateTo', '')
@@ -205,6 +255,24 @@ const toggleDrilldownPanel = () => {
 const closeDrilldownPanel = () => {
   showDrilldownPanel.value = false
   emit('update:drawerOpen', false)
+}
+const toggleToolbarFilters = () => {
+  showToolbarFilters.value = !showToolbarFilters.value
+}
+
+const handleAddClick = () => {
+  emit('add')
+  emit('add-button-click', props.addButton)
+  if (typeof props.addButton?.onClick === 'function') {
+    props.addButton.onClick()
+  }
+}
+
+const updateDateFilter = (key, type, value) => {
+  const updatedFilters = props.dateFilters.map((filter) =>
+    filter.key === key ? { ...filter, [type]: value } : filter
+  )
+  emit('update:dateFilters', updatedFilters)
 }
 
 const syncLegacyFiltersFromRules = (payload) => {
@@ -263,7 +331,14 @@ const handleDrilldownModelUpdate = (payload) => {
 }
 
 const removeFilter = (filterKey) => {
-  if (filterKey.startsWith('select-')) {
+  if (filterKey === 'search') {
+    emit('update:searchQuery', '')
+  } else if (filterKey === 'status') {
+    emit('update:selectedStatus', '')
+  } else if (filterKey === 'legacy-date') {
+    emit('update:dateFrom', '')
+    emit('update:dateTo', '')
+  } else if (filterKey.startsWith('select-')) {
     const key = filterKey.replace('select-', '')
     emit('update:selectFilters', props.selectFilters.map(filter => filter.key === key ? { ...filter, value: '' } : filter))
   } else if (filterKey.startsWith('date-')) {
@@ -282,11 +357,60 @@ const removeFilter = (filterKey) => {
 <template>
   <div :class="rootContainerClasses">
     <div :class="filtersClasses">
-      <button v-if="showFilters && showFilterButton" :class="filterButtonClasses" @click="toggleDrilldownPanel">
+      <div
+        v-if="resolvedFilterUi === 'toolbar' && showSearch"
+        class="flex-1 min-w-80 max-w-md"
+      >
+        <div class="relative group">
+          <Icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
+          <input
+            :value="searchQuery"
+            :placeholder="searchPlaceholder"
+            :class="searchInputClasses"
+            @input="emit('update:searchQuery', $event.target.value)"
+          >
+          <button
+            v-if="searchQuery"
+            class="absolute right-3 top-1/2 -translate-y-1/2 ui-text hover:text-(--ui-text)"
+            @click="emit('update:searchQuery', '')"
+          >
+            <Icon icon="xmark" class="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+
+      <div
+        v-if="resolvedFilterUi === 'toolbar' && showFilters && statusOptions.length > 0"
+        class="min-w-36"
+      >
+        <div class="relative">
+          <Select
+            :model-value="selectedStatus"
+            :class="selectClasses"
+            @change="emit('update:selectedStatus', $event.target.value)"
+          >
+            <option value="">All Status</option>
+            <option
+              v-for="option in statusOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </Select>
+          <Icon icon="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 ui-text pointer-events-none" />
+        </div>
+      </div>
+
+      <button
+        v-if="showFilters && showFilterButton"
+        :class="filterButtonClasses"
+        @click="resolvedFilterUi === 'toolbar' ? toggleToolbarFilters() : toggleDrilldownPanel()"
+      >
         <Icon icon="filter" class="w-4 h-4" />
         Filter
-        <span v-if="drilldownRules.length > 0" :class="filterCountBadgeClasses">{{ drilldownRules.length }}</span>
-        <Icon :icon="isDrawerOpen ? 'chevron-up' : 'chevron-down'" class="w-4 h-4 ml-1" />
+        <span v-if="hasActiveFilters" :class="filterCountBadgeClasses">{{ activeFiltersDisplay.length }}</span>
+        <Icon :icon="resolvedFilterUi === 'toolbar' ? (showToolbarFilters ? 'chevron-up' : 'chevron-down') : (isDrawerOpen ? 'chevron-up' : 'chevron-down')" class="w-4 h-4 ml-1" />
       </button>
 
       <div class="flex items-center gap-3 ml-auto">
@@ -306,11 +430,60 @@ const removeFilter = (filterKey) => {
           <Icon icon="download" class="w-4 h-4 mr-2" />
           Export
         </Button>
+
+        <Button v-if="isAddVisible" :class="exportButtonClasses" @click="handleAddClick">
+          <Icon icon="plus" class="w-4 h-4 mr-2" />
+          {{ addButtonLabel }}
+        </Button>
+      </div>
+    </div>
+
+    <div
+      v-if="resolvedFilterUi === 'toolbar' && showFilters && showToolbarFilters"
+      :class="toolbarPanelClasses"
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+          v-if="showDateFilter"
+          class="space-y-3"
+        >
+          <label class="text-sm font-semibold ui-text">Date Range</label>
+          <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
+              <input :value="dateFrom" type="date" :class="dateInputClasses" @input="emit('update:dateFrom', $event.target.value)">
+            </div>
+            <span class="ui-text text-sm font-medium">to</span>
+            <div class="relative flex-1">
+              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
+              <input :value="dateTo" type="date" :class="dateInputClasses" @input="emit('update:dateTo', $event.target.value)">
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-for="dateFilter in dateFilters"
+          :key="dateFilter.key"
+          class="space-y-3"
+        >
+          <label class="text-sm font-semibold ui-text">{{ dateFilter.label }}</label>
+          <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
+              <input :value="dateFilter.from" type="date" :class="dateInputClasses" @input="updateDateFilter(dateFilter.key, 'from', $event.target.value)">
+            </div>
+            <span class="ui-text text-sm font-medium">to</span>
+            <div class="relative flex-1">
+              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
+              <input :value="dateFilter.to" type="date" :class="dateInputClasses" @input="updateDateFilter(dateFilter.key, 'to', $event.target.value)">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <FilterDrawer
-      :open="showFilters && isDrawerOpen"
+      :open="resolvedFilterUi === 'drawer' && showFilters && isDrawerOpen"
       :fields="drilldownFields"
       :model-value="drilldownFilters"
       @update:modelValue="handleDrilldownModelUpdate"
