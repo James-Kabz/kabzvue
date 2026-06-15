@@ -40,13 +40,20 @@
             <div class="flex items-center gap-2 py-2">
               <span class="text-sm font-semibold ui-text">{{ field.label }}</span>
               <select v-model="operator" class="ml-auto rounded-md ui-surface border ui-border-strong px-3 py-2 text-sm ui-text">
-                <option value="equals">Is</option>
-                <option value="not_equals">Is not</option>
-                <option value="contains">Contains</option>
+                <option
+                  v-for="option in getOperatorOptions(field)"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
               </select>
             </div>
 
-            <div class="flex items-center gap-2 border-b border-(--ui-primary) pb-1.5 mb-2">
+            <div
+              v-if="usesOptionSearch(field)"
+              class="flex items-center gap-2 border-b border-(--ui-primary) pb-1.5 mb-2"
+            >
               <Icon icon="search" class="w-4 h-4 ui-primary" />
               <input v-model="valueSearch" placeholder="Search" class="w-full bg-transparent outline-none text-sm ui-text" />
             </div>
@@ -66,6 +73,36 @@
                 <input v-model="dateTo" type="date" class="w-full ui-surface border ui-border-strong rounded-md px-2 py-1 text-sm ui-text">
               </div>
               <button class="px-3 py-1.5 rounded-md ui-primary-bg text-white text-sm" @click="addDateRangeRule(field)">Apply Date Range</button>
+            </div>
+
+            <div v-else-if="isDirectInputField(field)" class="space-y-2">
+              <div v-if="operator === 'between' && field.type === 'number'" class="grid grid-cols-2 gap-2">
+                <input
+                  :value="getRangeValue(field.key, 'from')"
+                  type="number"
+                  :step="field.step || 'any'"
+                  :placeholder="field.minLabel || 'Min'"
+                  class="w-full ui-surface border ui-border-strong rounded-md px-3 py-2 text-sm ui-text"
+                  @input="setRangeValue(field, 'from', $event.target.value)"
+                >
+                <input
+                  :value="getRangeValue(field.key, 'to')"
+                  type="number"
+                  :step="field.step || 'any'"
+                  :placeholder="field.maxLabel || 'Max'"
+                  class="w-full ui-surface border ui-border-strong rounded-md px-3 py-2 text-sm ui-text"
+                  @input="setRangeValue(field, 'to', $event.target.value)"
+                >
+              </div>
+              <input
+                v-else
+                :value="getDirectValue(field.key)"
+                :type="field.type === 'number' ? 'number' : 'text'"
+                :step="field.type === 'number' ? (field.step || 'any') : undefined"
+                :placeholder="field.placeholder || `Enter ${field.label}`"
+                class="w-full ui-surface border ui-border-strong rounded-md px-3 py-2 text-sm ui-text"
+                @input="setDirectValue(field, $event.target.value)"
+              >
             </div>
 
             <div
@@ -190,6 +227,36 @@ const getOptionLabel = (field, value) => {
   return option ? option.label : value
 }
 
+const textOperatorOptions = [
+  { value: 'equals', label: 'Is' },
+  { value: 'not_equals', label: 'Is not' },
+  { value: 'contains', label: 'Contains' }
+]
+
+const numberOperatorOptions = [
+  { value: 'equals', label: 'Is' },
+  { value: 'not_equals', label: 'Is not' },
+  { value: 'gte', label: 'At least' },
+  { value: 'lte', label: 'At most' },
+  { value: 'between', label: 'Between' }
+]
+
+const isDirectInputField = (field) => {
+  if (field.type === 'number' || field.type === 'text') return true
+  return !['date', 'multiselect', 'multi', 'select'].includes(field.type) && !(field.options || []).length
+}
+
+const usesOptionSearch = (field) => {
+  if (field.type === 'date') return true
+  if (isDirectInputField(field)) return false
+  return true
+}
+
+const getOperatorOptions = (field) => {
+  if (field.type === 'number') return numberOperatorOptions
+  return textOperatorOptions
+}
+
 const filteredFieldOptions = (field) => {
   const fallbackDateOptions = [
     { value: 'today', label: 'Today' },
@@ -210,6 +277,8 @@ const toggleField = (key) => {
   const next = expandedField.value === key ? '' : key
   expandedField.value = next
   valueSearch.value = ''
+  const currentRule = getFieldRule(key)
+  operator.value = currentRule?.operator || 'equals'
 }
 const setLogic = (v) => { logic.value = v }
 
@@ -252,6 +321,90 @@ const toggleOptionRule = (field, value) => {
     value,
   })
 }
+
+const getDirectValue = (fieldKey) => {
+  const rule = getFieldRule(fieldKey)
+  if (!rule || rule.operator === 'between') return ''
+  return rule.value ?? ''
+}
+
+const setDirectValue = (field, value) => {
+  const normalizedValue = field.type === 'number' ? value.trim() : value
+  localRules.value = localRules.value.filter((r) => r.field !== field.key)
+  if (normalizedValue === '') return
+  localRules.value.push({
+    id: `${field.key}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    field: field.key,
+    label: field.label,
+    operator: operator.value,
+    value: normalizedValue
+  })
+}
+
+const getRangeValue = (fieldKey, key) => {
+  const rule = getFieldRule(fieldKey)
+  if (!rule || rule.operator !== 'between' || typeof rule.value !== 'object' || rule.value === null) return ''
+  return rule.value[key] ?? ''
+}
+
+const setRangeValue = (field, key, value) => {
+  const currentValue = {
+    from: getRangeValue(field.key, 'from'),
+    to: getRangeValue(field.key, 'to')
+  }
+  currentValue[key] = value.trim()
+  localRules.value = localRules.value.filter((r) => r.field !== field.key)
+  if (!currentValue.from && !currentValue.to) return
+  localRules.value.push({
+    id: `${field.key}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    field: field.key,
+    label: field.label,
+    operator: 'between',
+    value: currentValue
+  })
+}
+
+watch(operator, (nextOperator) => {
+  const fieldKey = expandedField.value
+  if (!fieldKey) return
+  const field = props.fields.find((item) => item.key === fieldKey)
+  if (!field || !isDirectInputField(field)) return
+
+  const existingRule = getFieldRule(fieldKey)
+  if (!existingRule) return
+
+  localRules.value = localRules.value.filter((rule) => rule.field !== fieldKey)
+
+  if (nextOperator === 'between' && field.type === 'number') {
+    const nextValue = typeof existingRule.value === 'object' && existingRule.value !== null
+      ? {
+          from: existingRule.value.from ?? '',
+          to: existingRule.value.to ?? ''
+        }
+      : { from: existingRule.value ?? '', to: '' }
+
+    if (!nextValue.from && !nextValue.to) return
+
+    localRules.value.push({
+      ...existingRule,
+      operator: 'between',
+      value: nextValue
+    })
+    return
+  }
+
+  const nextValue = typeof existingRule.value === 'object' && existingRule.value !== null
+    ? existingRule.value.from ?? existingRule.value.to ?? ''
+    : existingRule.value
+
+  if (nextValue === '') return
+
+  localRules.value.push({
+    ...existingRule,
+    operator: nextOperator,
+    value: nextValue
+  })
+})
 
 const addDateRangeRule = (field) => {
   if (!dateFrom.value && !dateTo.value) return
