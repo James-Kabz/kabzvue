@@ -1,59 +1,332 @@
+<template>
+  <div class="bg-white border-b border-gray-200">
+    <!-- Main Filters Bar -->
+    <div :class="filtersClasses">
+      <!-- Search Input -->
+      <div
+        v-if="showSearch"
+        class="flex-1 min-w-80 max-w-md"
+      >
+        <div class="relative group">
+          <Icon
+            icon="magnifying-glass"
+            :class="searchIconClasses"
+          />
+          <input
+            :model-value="searchQuery"
+            :placeholder="searchPlaceholder"
+            :class="searchInputClasses"
+            @input="$emit('update:searchQuery', $event.target.value)"
+          >
+          <button
+            v-if="searchQuery"
+            :class="clearSearchButtonClasses"
+            @click="$emit('update:searchQuery', '')"
+          >
+            <Icon
+              icon="xmark"
+              class="w-3 h-3"
+            />
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div
+        v-if="showFilters && statusOptions.length > 0"
+        class="min-w-36"
+      >
+        <div class="relative">
+          <Select
+            :model-value="selectedStatus"
+            :class="selectClasses"
+            @change="$emit('update:selectedStatus', $event.target.value)"
+          >
+            <option value="">
+              All Status
+            </option>
+            <option
+              v-for="option in statusOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </Select>
+          <Icon
+            icon="chevron-down"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          />
+        </div>
+      </div>
+
+      <!-- Advanced Filters Toggle -->
+      <button
+        v-if="showFilters"
+        :class="advancedFiltersToggleClasses"
+        @click="toggleAdvancedFilters"
+      >
+        <Icon
+          icon="filter"
+          class="w-4 h-4"
+        />
+        Filters
+        <span
+          v-if="activeFiltersCount > 0"
+          :class="filterCountBadgeClasses"
+        >
+          {{ activeFiltersCount }}
+        </span>
+        <Icon
+          :icon="showAdvancedFilters ? 'chevron-up' : 'chevron-down'"
+          class="w-4 h-4 ml-1"
+        />
+      </button>
+
+      <!-- Custom Filters Slot -->
+      <div
+        v-if="$slots.filters"
+        class="flex items-center gap-2"
+      >
+        <slot name="filters" />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3 ml-auto">
+        <!-- Clear Filters -->
+        <Button 
+          v-if="hasActiveFilters" 
+          :class="clearFiltersButtonClasses" 
+          @click="clearFilters"
+        >
+          <Icon
+            icon="rotate-left"
+            class="w-4 h-4 mr-2"
+          />
+          Clear All
+        </Button>
+
+        <!-- Export Button -->
+        <Button 
+          v-if="showExport" 
+          :class="exportButtonClasses" 
+          @click="$emit('export')"
+        >
+          <Icon
+            icon="download"
+            class="w-4 h-4 mr-2"
+          />
+          Export
+        </Button>
+
+        <!-- Add Button Slot -->
+        <slot name="actions">
+          <Button
+            v-if="showAdd"
+            variant="success"
+            size="lg"
+            @click="$emit('add')"
+          >
+            <Icon
+              icon="plus"
+              class="w-4 h-4 mr-2"
+            />
+            Add
+          </Button>
+        </slot>
+      </div>
+    </div>
+
+    <!-- Advanced Filters Panel -->
+    <div
+      v-if="showFilters && showAdvancedFilters && dateFilters.length > 0"
+      :class="advancedFiltersContainerClasses"
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div 
+          v-for="dateFilter in dateFilters" 
+          :key="dateFilter.key" 
+          class="space-y-3"
+        >
+          <div class="flex items-center justify-between">
+            <label :class="dateFilterLabelClasses">
+              {{ dateFilter.label }}
+            </label>
+            <span :class="getDateFilterStatusClasses(dateFilter)">
+              {{ hasDateFilterValues(dateFilter) ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+              <Icon
+                icon="calendar" 
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              />
+              <input 
+                type="date" 
+                :model-value="dateFilter.from" 
+                :class="dateInputClasses"
+                :placeholder="`From ${dateFilter.label}`" 
+                @input="updateDateFilter(dateFilter.key, 'from', $event.target.value)"
+              >
+            </div>
+            <span :class="dateRangeSeparatorClasses">to</span>
+            <div class="relative flex-1">
+              <Icon 
+                icon="calendar" 
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              />
+              <input 
+                type="date" 
+                :model-value="dateFilter.to" 
+                :class="dateInputClasses"
+                :placeholder="`To ${dateFilter.label}`" 
+                @input="updateDateFilter(dateFilter.key, 'to', $event.target.value)"
+              >
+            </div>
+            <button
+              v-if="hasDateFilterValues(dateFilter)"
+              :class="clearDateFilterButtonClasses"
+              title="Clear this filter"
+              @click="clearDateFilter(dateFilter.key)"
+            >
+              <Icon
+                icon="xmark"
+                class="w-4 h-4"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Display -->
+    <div
+      v-if="showFilters && activeFiltersDisplay.length > 0"
+      :class="activeFiltersContainerClasses"
+    >
+      <div class="flex items-center gap-3 flex-wrap">
+        <span :class="activeFiltersLabelClasses">Active filters:</span>
+        <div
+          v-for="filter in activeFiltersDisplay"
+          :key="filter.key"
+          :class="activeFilterTagClasses"
+        >
+          <Icon
+            :icon="filter.icon"
+            class="w-3 h-3"
+          />
+          <span>{{ filter.label }}: {{ filter.value }}</span>
+          <button
+            :class="activeFilterRemoveButtonClasses"
+            @click="removeFilter(filter.key)"
+          >
+            <Icon
+              icon="xmark"
+              class="w-3 h-3"
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Info Bar -->
+    <div
+      v-if="showTableInfo"
+      class="px-6 py-3 bg-gray-50 border-t border-gray-200"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-600">
+            <span class="font-medium">{{ totalItems || 0 }}</span> 
+            {{ itemLabel || 'items' }} found
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import Button from './Button.vue'
-import FileUpload from './FileUpload.vue'
 import Select from './Select.vue'
 import { computed, ref } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 import Icon from './Icon.vue'
-import FilterDrawer from './FilterDrawer.vue'
 
 const props = defineProps({
-  drawerOpen: {
-    type: Boolean,
-    default: undefined
+  searchQuery: {
+    type: String,
+    default: ''
   },
-  showFilterButton: {
+  searchPlaceholder: {
+    type: String,
+    default: 'Search...'
+  },
+  selectedStatus: {
+    type: String,
+    default: ''
+  },
+  statusOptions: {
+    type: Array,
+    default: () => []
+  },
+  // Legacy props for backward compatibility
+  showDateFilter: {
+    type: Boolean,
+    default: false
+  },
+  dateFrom: {
+    type: String,
+    default: ''
+  },
+  dateTo: {
+    type: String,
+    default: ''
+  },
+  // Dynamic date filters prop (NO active property required)
+  dateFilters: {
+    type: Array,
+    default: () => [],
+    validator: (filters) => {
+      return filters.every(filter =>
+        Object.prototype.hasOwnProperty.call(filter, 'key') &&
+        Object.prototype.hasOwnProperty.call(filter, 'label') &&
+        Object.prototype.hasOwnProperty.call(filter, 'from') &&
+        Object.prototype.hasOwnProperty.call(filter, 'to')
+      )
+    }
+  },
+  showExport: {
+    type: Boolean,
+    default: false
+  },
+  showAdd: {
+    type: Boolean,
+    default: false
+  },
+  showTableInfo: {
     type: Boolean,
     default: true
   },
-  filterUi: {
+  showSearch: {
+    type: Boolean,
+    default: true
+  },
+  showFilters: {
+    type: Boolean,
+    default: true
+  },
+  totalItems: {
+    type: Number,
+    default: 0
+  },
+  itemLabel: {
     type: String,
-    default: 'auto',
-    validator: (value) => ['auto', 'drawer', 'toolbar'].includes(value)
+    default: 'items'
   },
-  searchQuery: { type: String, default: '' },
-  showSearch: { type: Boolean, default: false },
-  searchPlaceholder: { type: String, default: 'Search...' },
-  drilldownFilters: {
-    type: Object,
-    default: () => ({ logic: 'all', rules: [] })
-  },
-  selectedStatus: { type: String, default: '' },
-  statusOptions: { type: Array, default: () => [] },
-  showDateFilter: { type: Boolean, default: false },
-  dateFrom: { type: String, default: '' },
-  dateTo: { type: String, default: '' },
-  selectFilters: { type: Array, default: () => [] },
-  dateFilters: { type: Array, default: () => [] },
-  numberFilters: { type: Array, default: () => [] },
-  multiSelectFilters: { type: Array, default: () => [] },
-  showExport: { type: Boolean, default: false },
-  showAdd: { type: Boolean, default: false },
-  addButton: { type: Object, default: () => ({}) },
-  showTableInfo: { type: Boolean, default: true },
-  showFilters: { type: Boolean, default: true },
-  showFileUpload: { type: Boolean, default: false },
-  fileUploadMultiple: { type: Boolean, default: false },
-  fileUploadAccept: { type: String, default: '' },
-  fileUploadMaxSize: { type: Number, default: null },
-  fileUploadVariant: {
-    type: String,
-    default: 'default',
-    validator: (value) => ['default', 'dashed'].includes(value)
-  },
-  totalItems: { type: Number, default: 0 },
-  itemLabel: { type: String, default: 'items' },
   variant: {
     type: String,
     default: 'default',
@@ -63,11 +336,6 @@ const props = defineProps({
     type: String,
     default: 'normal',
     validator: (value) => ['compact', 'normal', 'comfortable'].includes(value)
-  },
-  themeScope: {
-    type: String,
-    default: 'default',
-    validator: (value) => ['default', 'module'].includes(value)
   }
 })
 
@@ -77,55 +345,21 @@ const emit = defineEmits([
   'update:dateFrom',
   'update:dateTo',
   'update:dateFilters',
-  'update:selectFilters',
-  'update:numberFilters',
-  'update:multiSelectFilters',
-  'update:drilldownFilters',
-  'update:drawerOpen',
   'export',
   'add',
-  'add-button-click',
-  'clear-filters',
-  'files-selected',
-  'file-removed'
+  'clear-filters'
 ])
 
-const isFileUploadModalOpen = ref(false)
-const showDrilldownPanel = ref(false)
-const showToolbarFilters = ref(false)
-const isDrawerOpen = computed(() =>
-  typeof props.drawerOpen === 'boolean' ? props.drawerOpen : showDrilldownPanel.value
-)
+// Local state
+const showAdvancedFilters = ref(false)
 
-const openFileUploadModal = () => { isFileUploadModalOpen.value = true }
-const closeFileUploadModal = () => { isFileUploadModalOpen.value = false }
-const handleFilesSelected = (files) => { emit('files-selected', files) }
-const handleFileRemoved = (files) => { emit('file-removed', files) }
-const hasAddButton = computed(() => Object.keys(props.addButton || {}).length > 0)
-const isAddVisible = computed(() => props.showAdd || hasAddButton.value)
-const addButtonLabel = computed(() => props.addButton?.label || 'Add')
-
-const usesLegacyToolbarContract = computed(() =>
-  props.showSearch ||
-  props.showAdd ||
-  hasAddButton.value ||
-  props.statusOptions.length > 0 ||
-  props.showDateFilter ||
-  Boolean(props.dateFrom || props.dateTo)
-)
-
-const resolvedFilterUi = computed(() => {
-  if (props.filterUi === 'toolbar') return 'toolbar'
-  if (props.filterUi === 'drawer') return 'drawer'
-  return usesLegacyToolbarContract.value ? 'toolbar' : 'drawer'
-})
-
+// CVA Variants
 const filtersVariants = cva('flex flex-wrap items-center gap-4', {
   variants: {
     variant: {
-      default: 'bg-(--ui-bg) ui-border-strong shadow-sm',
+      default: 'bg-white',
       minimal: 'bg-transparent',
-      bordered: 'ui-border-strong'
+      bordered: 'bg-gray-50'
     },
     padding: {
       compact: 'px-4 py-3',
@@ -133,413 +367,309 @@ const filtersVariants = cva('flex flex-wrap items-center gap-4', {
       comfortable: 'px-8 py-6'
     }
   },
-  defaultVariants: { variant: 'default', padding: 'normal' }
+  defaultVariants: {
+    variant: 'default',
+    padding: 'normal'
+  }
+})
+
+const inputVariants = cva('border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm', {
+  variants: {
+    size: {
+      sm: 'px-2 py-1.5',
+      md: 'px-3 py-2.5',
+      lg: 'px-4 py-3'
+    }
+  },
+  defaultVariants: {
+    size: 'md'
+  }
 })
 
 const buttonVariants = cva('rounded-lg flex items-center font-medium transition-all', {
   variants: {
     variant: {
-      default: 'ui-text hover:text-(--ui-text) border ui-border-strong hover:brightness-105',
-      ghost: 'ui-text hover:text-(--ui-text) hover:bg-(--ui-surface)'
+      default: 'text-gray-700 hover:text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 bg-white',
+      primary: 'text-white bg-blue-600 hover:bg-blue-700 border border-blue-600 shadow-sm',
+      success: 'text-white bg-green-600 hover:bg-green-700 border border-green-600 shadow-sm',
+      ghost: 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
     },
     size: {
+      sm: 'px-2 py-1.5 text-xs',
       md: 'px-3 py-2 text-sm',
       lg: 'px-4 py-2.5 text-sm'
     }
   },
-  defaultVariants: { variant: 'default', size: 'md' }
+  defaultVariants: {
+    variant: 'default',
+    size: 'md'
+  }
 })
 
-const drilldownFields = computed(() => {
-  const selectFields = props.selectFilters.map(filter => ({ key: filter.key, label: filter.label, type: 'select', options: filter.options || [] }))
-  const dateFields = props.dateFilters.map(filter => ({ key: filter.key, label: filter.label, type: 'date', options: filter.options || [] }))
-  const numberFields = props.numberFilters.map(filter => ({ key: filter.key, label: filter.label, type: 'number', options: filter.options || [] }))
-  const multiFields = props.multiSelectFilters.map(filter => ({ key: filter.key, label: filter.label, type: 'multi', options: filter.options || [] }))
-  return [...selectFields, ...dateFields, ...numberFields, ...multiFields]
-})
+const hasDateFilterValues = (dateFilter) => {
+  return !!(dateFilter.from || dateFilter.to)
+}
 
-const drilldownRules = computed(() => Array.isArray(props.drilldownFilters?.rules) ? props.drilldownFilters.rules : [])
+const clearDateFilter = (key) => {
+  const updatedFilters = [...props.dateFilters]
+  const filterIndex = updatedFilters.findIndex(f => f.key === key)
+  
+  if (filterIndex >= 0) {
+    updatedFilters[filterIndex] = {
+      ...updatedFilters[filterIndex],
+      from: '',
+      to: ''
+    }
+    emit('update:dateFilters', updatedFilters)
+  }
+}
 
+const getDateFilterStatusClasses = (dateFilter) => {
+  const hasValues = hasDateFilterValues(dateFilter)
+  return `text-xs px-2 py-1 rounded ${
+    hasValues
+      ? 'bg-blue-100 text-blue-700'
+      : 'bg-gray-100 text-gray-600'
+  }`
+}
+
+// Methods
+const toggleAdvancedFilters = () => {
+  showAdvancedFilters.value = !showAdvancedFilters.value
+}
+
+const updateDateFilter = (key, type, value) => {
+  const updatedFilters = [...props.dateFilters]
+  const filterIndex = updatedFilters.findIndex(f => f.key === key)
+  
+  if (filterIndex >= 0) {
+    updatedFilters[filterIndex] = {
+      ...updatedFilters[filterIndex],
+      [type]: value
+    }
+    emit('update:dateFilters', updatedFilters)
+  }
+}
+
+// Computed Properties
 const hasActiveFilters = computed(() => {
   const hasSearch = props.searchQuery
   const hasStatus = props.selectedStatus
   const hasLegacyDates = props.dateFrom || props.dateTo
-  const hasSelectFilters = props.selectFilters.some(f => f.value)
-  const hasDynamicDates = props.dateFilters.some(f => f.from || f.to)
-  const hasNumberFilters = props.numberFilters.some(f => f.min || f.max)
-  const hasMultiSelectFilters = props.multiSelectFilters.some(f => f.selected && f.selected.length > 0)
-  return hasSearch || hasStatus || hasLegacyDates || hasSelectFilters || hasDynamicDates || hasNumberFilters || hasMultiSelectFilters || drilldownRules.value.length > 0
+  const hasDynamicDates = props.dateFilters.some(filter => filter.from || filter.to)
+  
+  return hasSearch || hasStatus || hasLegacyDates || hasDynamicDates
+})
+
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (props.searchQuery) count++
+  if (props.selectedStatus) count++
+  if (props.dateFrom || props.dateTo) count++
+  count += props.dateFilters.filter(f => f.from || f.to).length
+  return count
 })
 
 const activeFiltersDisplay = computed(() => {
   const filters = []
 
   if (props.searchQuery && props.searchQuery.trim()) {
-    filters.push({ key: 'search', label: 'Search', value: `"${props.searchQuery}"`, icon: 'search' })
+    filters.push({
+      key: 'search',
+      label: 'Search',
+      value: `"${props.searchQuery}"`,
+      icon: 'magnifying-glass'
+    })
   }
 
   if (props.selectedStatus) {
-    const option = props.statusOptions.find(opt => opt.value === props.selectedStatus)
-    filters.push({ key: 'status', label: 'Status', value: option?.label || props.selectedStatus, icon: 'filter' })
+    const statusOption = props.statusOptions.find(opt => opt.value === props.selectedStatus)
+    filters.push({
+      key: 'status',
+      label: 'Status',
+      value: statusOption?.label || props.selectedStatus,
+      icon: 'filter'
+    })
   }
 
+  // Legacy date filter
   if (props.dateFrom || props.dateTo) {
-    const value = props.dateFrom && props.dateTo ? `${props.dateFrom} to ${props.dateTo}` : (props.dateFrom ? `From ${props.dateFrom}` : `Until ${props.dateTo}`)
-    filters.push({ key: 'legacy-date', label: 'Date Range', value, icon: 'calendar' })
+    let dateValue = ''
+    if (props.dateFrom && props.dateTo) {
+      dateValue = `${props.dateFrom} to ${props.dateTo}`
+    } else if (props.dateFrom) {
+      dateValue = `From ${props.dateFrom}`
+    } else if (props.dateTo) {
+      dateValue = `Until ${props.dateTo}`
+    }
+
+    if (dateValue) {
+      filters.push({
+        key: 'date',
+        label: 'Date Range',
+        value: dateValue,
+        icon: 'calendar'
+      })
+    }
   }
 
-  props.selectFilters.forEach(filter => {
-    if (filter.value) {
-      const option = filter.options.find(opt => opt.value === filter.value)
-      filters.push({ key: `select-${filter.key}`, label: filter.label, value: option?.label || filter.value, icon: 'filter' })
-    }
-  })
-
+  // Dynamic date filters - only show those with values
   props.dateFilters.forEach(dateFilter => {
     if (dateFilter.from || dateFilter.to) {
-      const value = dateFilter.from && dateFilter.to ? `${dateFilter.from} to ${dateFilter.to}` : (dateFilter.from ? `From ${dateFilter.from}` : `Until ${dateFilter.to}`)
-      filters.push({ key: `date-${dateFilter.key}`, label: dateFilter.label, value, icon: 'calendar' })
-    }
-  })
+      let dateValue = ''
+      if (dateFilter.from && dateFilter.to) {
+        dateValue = `${dateFilter.from} to ${dateFilter.to}`
+      } else if (dateFilter.from) {
+        dateValue = `From ${dateFilter.from}`
+      } else if (dateFilter.to) {
+        dateValue = `Until ${dateFilter.to}`
+      }
 
-  props.numberFilters.forEach(numberFilter => {
-    if (numberFilter.min || numberFilter.max) {
-      const value = numberFilter.min && numberFilter.max ? `${numberFilter.min} to ${numberFilter.max}` : (numberFilter.min ? `Min ${numberFilter.min}` : `Max ${numberFilter.max}`)
-      filters.push({ key: `number-${numberFilter.key}`, label: numberFilter.label, value, icon: 'hashtag' })
-    }
-  })
-
-  props.multiSelectFilters.forEach(multiFilter => {
-    if (multiFilter.selected && multiFilter.selected.length > 0) {
-      const labels = multiFilter.selected.map(value => multiFilter.options.find(opt => opt.value === value)?.label || value)
-      filters.push({ key: `multi-${multiFilter.key}`, label: multiFilter.label, value: labels.join(', '), icon: 'list' })
+      if (dateValue) {
+        filters.push({
+          key: `date-${dateFilter.key}`,
+          label: dateFilter.label,
+          value: dateValue,
+          icon: 'calendar'
+        })
+      }
     }
   })
 
   return filters
 })
 
-const filtersClasses = computed(() => cn(filtersVariants({ variant: props.variant, padding: props.padding })))
-const rootContainerClasses = computed(() => cn('border ui-border rounded-2xl mb-2 ui-surface overflow-hidden', props.themeScope === 'module' && 'kv-module-themed-filters'))
-const filterButtonClasses = computed(() => cn(buttonVariants({ variant: hasActiveFilters.value ? 'default' : 'default', size: 'lg' }), 'gap-2'))
-const clearFiltersButtonClasses = computed(() => cn(buttonVariants({ variant: 'ghost', size: 'md' })))
-const exportButtonClasses = computed(() => cn(buttonVariants({ variant: 'default', size: 'lg' })))
-const toolbarPanelClasses = computed(() => 'px-6 py-4 border-t ui-border-strong bg-(--ui-surface)')
-const filterCountBadgeClasses = computed(() => 'ui-surface ui-primary text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center font-semibold')
-const activeFiltersContainerClasses = computed(() => 'px-6 py-3 ui-primary-soft border-t border-(--ui-primary-soft)')
-const activeFiltersLabelClasses = computed(() => 'text-sm font-semibold ui-primary')
-const activeFilterTagClasses = computed(() => 'flex items-center gap-1.5 ui-bg border border-(--ui-primary-soft) ui-text px-3 py-1.5 rounded-full text-sm font-medium')
-const activeFilterRemoveButtonClasses = computed(() => 'ui-primary hover:text-(--ui-primary) ml-1 hover:bg-(--ui-primary-soft) rounded-full p-0.5 transition-all')
-const searchInputClasses = computed(() => 'w-full pl-10 pr-10 py-2.5 text-sm border ui-border-strong rounded-lg ui-surface ui-text placeholder:text-(--ui-text-muted) focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all')
-const selectClasses = computed(() => 'w-full pr-8 py-2.5 text-sm border ui-border-strong rounded-lg ui-surface ui-text appearance-none focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all')
-const dateInputClasses = computed(() => 'w-full pl-10 pr-3 py-2.5 text-sm border ui-border-strong rounded-lg ui-surface ui-text focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all')
+// Computed Classes
+const filtersClasses = computed(() =>
+  cn(filtersVariants({
+    variant: props.variant,
+    padding: props.padding
+  }))
+)
 
+const searchIconClasses = computed(() =>
+  'absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors'
+)
+
+const searchInputClasses = computed(() =>
+  cn(
+    inputVariants({ size: 'md' }),
+    'w-full pl-10 pr-10 hover:border-gray-300'
+  )
+)
+
+const clearSearchButtonClasses = computed(() =>
+  'absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-full transition-all'
+)
+
+const selectClasses = computed(() =>
+  cn(
+    inputVariants({ size: 'md' }),
+    'w-full pr-8 appearance-none hover:border-gray-300'
+  )
+)
+
+const advancedFiltersToggleClasses = computed(() => {
+  const isActive = showAdvancedFilters.value || hasActiveFilters.value
+  return cn(
+    buttonVariants({ 
+      variant: isActive ? 'primary' : 'default', 
+      size: 'lg' 
+    }),
+    'gap-2'
+  )
+})
+
+const filterCountBadgeClasses = computed(() =>
+  'bg-white text-blue-600 text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center font-semibold'
+)
+
+const advancedFiltersContainerClasses = computed(() =>
+  'px-6 py-4 border-t border-gray-100 bg-gray-50'
+)
+
+const dateInputClasses = computed(() =>
+  cn(inputVariants({ size: 'md' }), 'pl-10 pr-3')
+)
+
+const dateFilterLabelClasses = computed(() =>
+  'text-sm font-semibold text-gray-700'
+)
+
+const dateRangeSeparatorClasses = computed(() =>
+  'text-gray-500 text-sm font-medium'
+)
+
+const clearDateFilterButtonClasses = computed(() =>
+  'text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-200 rounded-full transition-all'
+)
+
+const clearFiltersButtonClasses = computed(() =>
+  cn(buttonVariants({ variant: 'ghost', size: 'md' }))
+)
+
+const exportButtonClasses = computed(() =>
+  cn(buttonVariants({ variant: 'default', size: 'lg' }))
+)
+
+const activeFiltersContainerClasses = computed(() =>
+  'px-6 py-3 bg-blue-50 border-t border-blue-100'
+)
+
+const activeFiltersLabelClasses = computed(() =>
+  'text-sm font-semibold text-blue-800'
+)
+
+const activeFilterTagClasses = computed(() =>
+  'flex items-center gap-1.5 bg-white border border-blue-200 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium'
+)
+
+const activeFilterRemoveButtonClasses = computed(() =>
+  'text-blue-600 hover:text-blue-800 ml-1 hover:bg-blue-100 rounded-full p-0.5 transition-all'
+)
+
+// Methods
 const clearFilters = () => {
   emit('update:searchQuery', '')
   emit('update:selectedStatus', '')
   emit('update:dateFrom', '')
   emit('update:dateTo', '')
-  emit('update:selectFilters', props.selectFilters.map(filter => ({ ...filter, value: '' })))
-  emit('update:dateFilters', props.dateFilters.map(filter => ({ ...filter, from: '', to: '' })))
-  emit('update:numberFilters', props.numberFilters.map(filter => ({ ...filter, min: '', max: '' })))
-  emit('update:multiSelectFilters', props.multiSelectFilters.map(filter => ({ ...filter, selected: [] })))
-  emit('update:drilldownFilters', { logic: 'all', rules: [] })
+  
+  // Clear dynamic date filters
+  const clearedDateFilters = props.dateFilters.map(filter => ({
+    ...filter,
+    from: '',
+    to: ''
+  }))
+  emit('update:dateFilters', clearedDateFilters)
+  
   emit('clear-filters')
 }
 
-const toggleDrilldownPanel = () => {
-  const next = !isDrawerOpen.value
-  showDrilldownPanel.value = next
-  emit('update:drawerOpen', next)
-}
-const closeDrilldownPanel = () => {
-  showDrilldownPanel.value = false
-  emit('update:drawerOpen', false)
-}
-const toggleToolbarFilters = () => {
-  showToolbarFilters.value = !showToolbarFilters.value
-}
-
-const handleAddClick = () => {
-  emit('add')
-  emit('add-button-click', props.addButton)
-  if (typeof props.addButton?.onClick === 'function') {
-    props.addButton.onClick()
-  }
-}
-
-const updateDateFilter = (key, type, value) => {
-  const updatedFilters = props.dateFilters.map((filter) =>
-    filter.key === key ? { ...filter, [type]: value } : filter
-  )
-  emit('update:dateFilters', updatedFilters)
-}
-
-const syncLegacyFiltersFromRules = (payload) => {
-  const rules = Array.isArray(payload?.rules) ? payload.rules : []
-
-  const nextSelect = props.selectFilters.map((f) => ({ ...f, value: '' }))
-  const nextDate = props.dateFilters.map((f) => ({ ...f, from: '', to: '' }))
-  const nextNumber = props.numberFilters.map((f) => ({ ...f, min: '', max: '' }))
-  const nextMulti = props.multiSelectFilters.map((f) => ({ ...f, selected: [] }))
-
-  for (const rule of rules) {
-    const selectMatch = nextSelect.find((f) => f.key === rule.field)
-    if (selectMatch && (rule.operator === 'equals' || rule.operator === 'contains')) {
-      selectMatch.value = rule.value ?? ''
-      continue
-    }
-
-    const dateMatch = nextDate.find((f) => f.key === rule.field)
-    if (dateMatch) {
-      if (rule.operator === 'between' && rule.value && typeof rule.value === 'object') {
-        dateMatch.from = rule.value.from || ''
-        dateMatch.to = rule.value.to || ''
-      }
-      continue
-    }
-
-    const numberMatch = nextNumber.find((f) => f.key === rule.field)
-    if (numberMatch) {
-      if (rule.operator === 'between' && rule.value && typeof rule.value === 'object') {
-        numberMatch.min = rule.value.from ?? ''
-        numberMatch.max = rule.value.to ?? ''
-      } else if (rule.operator === 'equals') {
-        numberMatch.min = rule.value ?? ''
-        numberMatch.max = rule.value ?? ''
-      }
-      continue
-    }
-
-    const multiMatch = nextMulti.find((f) => f.key === rule.field)
-    if (multiMatch) {
-      multiMatch.selected = Array.isArray(rule.value)
-        ? rule.value
-        : (rule.value == null ? [] : [rule.value])
-    }
-  }
-
-  emit('update:selectFilters', nextSelect)
-  emit('update:dateFilters', nextDate)
-  emit('update:numberFilters', nextNumber)
-  emit('update:multiSelectFilters', nextMulti)
-}
-
-const handleDrilldownModelUpdate = (payload) => {
-  emit('update:drilldownFilters', payload)
-  syncLegacyFiltersFromRules(payload)
-}
-
 const removeFilter = (filterKey) => {
-  if (filterKey === 'search') {
-    emit('update:searchQuery', '')
-  } else if (filterKey === 'status') {
-    emit('update:selectedStatus', '')
-  } else if (filterKey === 'legacy-date') {
-    emit('update:dateFrom', '')
-    emit('update:dateTo', '')
-  } else if (filterKey.startsWith('select-')) {
-    const key = filterKey.replace('select-', '')
-    emit('update:selectFilters', props.selectFilters.map(filter => filter.key === key ? { ...filter, value: '' } : filter))
-  } else if (filterKey.startsWith('date-')) {
-    const key = filterKey.replace('date-', '')
-    emit('update:dateFilters', props.dateFilters.map(filter => filter.key === key ? { ...filter, from: '', to: '' } : filter))
-  } else if (filterKey.startsWith('number-')) {
-    const key = filterKey.replace('number-', '')
-    emit('update:numberFilters', props.numberFilters.map(filter => filter.key === key ? { ...filter, min: '', max: '' } : filter))
-  } else if (filterKey.startsWith('multi-')) {
-    const key = filterKey.replace('multi-', '')
-    emit('update:multiSelectFilters', props.multiSelectFilters.map(filter => filter.key === key ? { ...filter, selected: [] } : filter))
+  switch (filterKey) {
+    case 'search':
+      emit('update:searchQuery', '')
+      break
+    case 'status':
+      emit('update:selectedStatus', '')
+      break
+    case 'date':
+      emit('update:dateFrom', '')
+      emit('update:dateTo', '')
+      break
+    default:
+      // Handle dynamic date filters
+      if (filterKey.startsWith('date-')) {
+        const dateKey = filterKey.replace('date-', '')
+        const updatedFilters = props.dateFilters.map(filter => 
+          filter.key === dateKey 
+            ? { ...filter, from: '', to: '' }
+            : filter
+        )
+        emit('update:dateFilters', updatedFilters)
+      }
+      break
   }
 }
 </script>
-
-<template>
-  <div :class="rootContainerClasses">
-    <div :class="filtersClasses">
-      <div
-        v-if="resolvedFilterUi === 'toolbar' && showSearch"
-        class="flex-1 min-w-80 max-w-md"
-      >
-        <div class="relative group">
-          <Icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
-          <input
-            :value="searchQuery"
-            :placeholder="searchPlaceholder"
-            :class="searchInputClasses"
-            @input="emit('update:searchQuery', $event.target.value)"
-          >
-          <button
-            v-if="searchQuery"
-            class="absolute right-3 top-1/2 -translate-y-1/2 ui-text hover:text-(--ui-text)"
-            @click="emit('update:searchQuery', '')"
-          >
-            <Icon icon="xmark" class="w-3 h-3" />
-          </button>
-        </div>
-      </div>
-
-      <div
-        v-if="resolvedFilterUi === 'toolbar' && showFilters && statusOptions.length > 0"
-        class="min-w-36"
-      >
-        <div class="relative">
-          <Select
-            :model-value="selectedStatus"
-            :class="selectClasses"
-            @change="emit('update:selectedStatus', $event.target.value)"
-          >
-            <option value="">All Status</option>
-            <option
-              v-for="option in statusOptions"
-              :key="option.value"
-              :value="option.value"
-            >
-              {{ option.label }}
-            </option>
-          </Select>
-          <Icon icon="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 ui-text pointer-events-none" />
-        </div>
-      </div>
-
-      <button
-        v-if="showFilters && showFilterButton"
-        :class="filterButtonClasses"
-        @click="resolvedFilterUi === 'toolbar' ? toggleToolbarFilters() : toggleDrilldownPanel()"
-      >
-        <Icon icon="filter" class="w-4 h-4" />
-        Filter
-        <span v-if="hasActiveFilters" :class="filterCountBadgeClasses">{{ activeFiltersDisplay.length }}</span>
-        <Icon :icon="resolvedFilterUi === 'toolbar' ? (showToolbarFilters ? 'chevron-up' : 'chevron-down') : (isDrawerOpen ? 'chevron-up' : 'chevron-down')" class="w-4 h-4 ml-1" />
-      </button>
-
-      <div class="flex items-center gap-3 ml-auto">
-        <div v-if="showFileUpload">
-          <Button variant="default" size="lg" @click="openFileUploadModal">
-            <Icon icon="upload" class="w-4 h-4 mr-2" />
-            Upload Files
-          </Button>
-        </div>
-
-        <Button v-if="hasActiveFilters" :class="clearFiltersButtonClasses" @click="clearFilters">
-          <Icon icon="rotate-left" class="w-4 h-4 mr-2" />
-          Clear All
-        </Button>
-
-        <Button v-if="showExport" :class="exportButtonClasses" @click="$emit('export')">
-          <Icon icon="download" class="w-4 h-4 mr-2" />
-          Export
-        </Button>
-
-        <Button v-if="isAddVisible" :class="exportButtonClasses" @click="handleAddClick">
-          <Icon icon="plus" class="w-4 h-4 mr-2" />
-          {{ addButtonLabel }}
-        </Button>
-      </div>
-    </div>
-
-    <div
-      v-if="resolvedFilterUi === 'toolbar' && showFilters && showToolbarFilters"
-      :class="toolbarPanelClasses"
-    >
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div
-          v-if="showDateFilter"
-          class="space-y-3"
-        >
-          <label class="text-sm font-semibold ui-text">Date Range</label>
-          <div class="flex items-center gap-3">
-            <div class="relative flex-1">
-              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
-              <input :value="dateFrom" type="date" :class="dateInputClasses" @input="emit('update:dateFrom', $event.target.value)">
-            </div>
-            <span class="ui-text text-sm font-medium">to</span>
-            <div class="relative flex-1">
-              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
-              <input :value="dateTo" type="date" :class="dateInputClasses" @input="emit('update:dateTo', $event.target.value)">
-            </div>
-          </div>
-        </div>
-
-        <div
-          v-for="dateFilter in dateFilters"
-          :key="dateFilter.key"
-          class="space-y-3"
-        >
-          <label class="text-sm font-semibold ui-text">{{ dateFilter.label }}</label>
-          <div class="flex items-center gap-3">
-            <div class="relative flex-1">
-              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
-              <input :value="dateFilter.from" type="date" :class="dateInputClasses" @input="updateDateFilter(dateFilter.key, 'from', $event.target.value)">
-            </div>
-            <span class="ui-text text-sm font-medium">to</span>
-            <div class="relative flex-1">
-              <Icon icon="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ui-text" />
-              <input :value="dateFilter.to" type="date" :class="dateInputClasses" @input="updateDateFilter(dateFilter.key, 'to', $event.target.value)">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <FilterDrawer
-      :open="resolvedFilterUi === 'drawer' && showFilters && isDrawerOpen"
-      :fields="drilldownFields"
-      :model-value="drilldownFilters"
-      @update:modelValue="handleDrilldownModelUpdate"
-      @close="closeDrilldownPanel"
-    />
-
-    <div v-if="showFilters && activeFiltersDisplay.length > 0" :class="activeFiltersContainerClasses">
-      <div class="flex items-center gap-3 flex-wrap">
-        <span :class="activeFiltersLabelClasses">Active filters:</span>
-        <div v-for="filter in activeFiltersDisplay" :key="filter.key" :class="activeFilterTagClasses">
-          <Icon :icon="filter.icon" class="w-3 h-3" />
-          <span>{{ filter.label }}: {{ filter.value }}</span>
-          <button :class="activeFilterRemoveButtonClasses" @click="removeFilter(filter.key)">
-            <Icon icon="circle-xmark" class="w-3 h-3" />
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div
-    v-if="showFileUpload && isFileUploadModalOpen"
-    class="fixed inset-0 ui-bg backdrop-blur-3xl z-50 flex items-center justify-center p-4"
-    @click.self="closeFileUploadModal"
-  >
-    <div class="rounded-xl shadow-2xl max-w-2xl w-full p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold ui-text">Upload Files</h3>
-        <button class="ui-text hover:text-(--ui-text) p-2 hover:bg-(--ui-surface) rounded-full transition-all" @click="closeFileUploadModal">
-          <Icon icon="circle-xmark" class="w-5 h-5" />
-        </button>
-      </div>
-
-      <FileUpload
-        :multiple="fileUploadMultiple"
-        :accept="fileUploadAccept"
-        :max-size="fileUploadMaxSize"
-        :variant="fileUploadVariant"
-        @files-selected="handleFilesSelected"
-        @file-removed="handleFileRemoved"
-      />
-
-      <div class="flex justify-end gap-3 mt-6">
-        <Button variant="default" @click="closeFileUploadModal">Close</Button>
-      </div>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.kv-module-themed-filters {
-  border-color: var(--module-border, var(--ui-border-strong));
-  background: color-mix(in oklab, var(--module-soft-alt, transparent) 65%, var(--ui-bg) 35%);
-}
-
-.kv-module-themed-filters :deep(button) {
-  border-color: var(--module-border, var(--ui-border-strong));
-}
-</style>
