@@ -337,9 +337,9 @@ const matchesBetween = (actual, expected) => {
   const range = Array.isArray(expected)
     ? { from: expected[0], to: expected[1] }
     : {
-        from: expected?.from ?? expected?.min ?? '',
-        to: expected?.to ?? expected?.max ?? '',
-      }
+      from: expected?.from ?? expected?.min ?? '',
+      to: expected?.to ?? expected?.max ?? '',
+    }
 
   const comparable = normalizeComparable(actual)
   if (comparable === '' || comparable == null) return false
@@ -952,13 +952,8 @@ loadPersistedReadKeys()
 <template>
   <div :class="tableContainerClasses">
     <!-- Header Component -->
-    <DataTableHeader
-      v-if="title || description || $slots.header"
-      :title="title"
-      :description="description"
-      :variant="headerVariant"
-      :padding="headerPadding"
-    >
+    <DataTableHeader v-if="title || description || $slots.header" :title="title" :description="description"
+      :variant="headerVariant" :padding="headerPadding">
       <template #header>
         <slot name="header" />
       </template>
@@ -968,173 +963,89 @@ loadPersistedReadKeys()
     </DataTableHeader>
 
     <!-- Toolbar Component -->
-    <DataTableToolBar
-      v-if="showToolbar"
-      :selected-items="selectedItems"
-      :total-items="filteredData.length"
-      :show-density-toggle="showDensityToggle"
-      :show-column-toggle="showColumnToggle"
-      :show-refresh="showRefresh"
-      :active-filters="showFilterDrawer ? toolbarActiveFilters : []"
-      :default-filter-rules="defaultFilterRules"
-      :add-button="addButton"
-      :density="density"
-      :toggleable-columns="toggleableColumns"
-      :visible-columns="visibleColumnKeys"
-      @update:density="(value) => emit('update:density', value)"
-      @toggle-column="handleToggleColumn"
-      @refresh="$emit('refresh')"
-      @add="emit('add')"
-      @add-button-click="(config) => emit('add-button-click', config)"
-    >
+    <DataTableToolBar v-if="showToolbar" :selected-items="selectedItems" :total-items="filteredData.length"
+      :show-density-toggle="showDensityToggle" :show-column-toggle="showColumnToggle" :show-refresh="showRefresh"
+      :active-filters="showFilterDrawer ? toolbarActiveFilters : []" :default-filter-rules="defaultFilterRules"
+      :add-button="addButton" :density="density" :toggleable-columns="toggleableColumns"
+      :visible-columns="visibleColumnKeys" @update:density="(value) => emit('update:density', value)"
+      @toggle-column="handleToggleColumn" @refresh="$emit('refresh')" @add="emit('add')"
+      @add-button-click="(config) => emit('add-button-click', config)">
       <template #actions>
         <slot name="toolbar-actions" />
       </template>
       <template #actions-after-add>
-        <button
-          v-if="showFilterDrawer"
+        <button v-if="showFilterDrawer"
           class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2"
-          @click="showFilterDrawerPanel = true"
-        >
+          @click="showFilterDrawerPanel = true">
           <font-awesome-icon icon="filter" />
           Filter
-          <span
-            v-if="activeRuleCount > 0"
-            class="inline-flex items-center justify-center min-w-5 h-5 rounded-full text-xs ui-primary-bg text-white px-1"
-          >
+          <span v-if="activeRuleCount > 0"
+            class="inline-flex items-center justify-center min-w-5 h-5 rounded-full text-xs ui-primary-bg text-white px-1">
             {{ activeRuleCount }}
           </span>
         </button>
         <slot name="toolbar-actions-after-add" />
       </template>
       <template #active-filter-actions>
-        <button
-          v-if="showFilterDrawer && activeRuleCount > 0"
+        <button v-if="showFilterDrawer && activeRuleCount > 0"
           class="ml-1 px-2 py-1 text-sm border border-(--ui-primary) rounded-md ui-primary hover:bg-(--ui-primary-soft)"
-          @click="clearFilterRules"
-        >
+          @click="clearFilterRules">
           Clear filter
         </button>
       </template>
     </DataTableToolBar>
-    <FilterDrawer
-      v-if="showFilterDrawer"
-      :open="showFilterDrawerPanel"
-      :fields="filterFields"
-      :model-value="filterRules"
-      @update:modelValue="$emit('update:filterRules', $event)"
-      @close="showFilterDrawerPanel = false"
-    />
+    <FilterDrawer v-if="showFilterDrawer" :open="showFilterDrawerPanel" :fields="filterFields"
+      :model-value="filterRules" @update:modelValue="$emit('update:filterRules', $event)"
+      @close="showFilterDrawerPanel = false" />
 
     <!-- Loading Overlay for entire table -->
     <div class="relative">
-      <Loader
-        v-if="loading"
-        :loading="true"
-        :type="loadingType"
-        :size="loadingSize"
-        :color="loadingColor"
-        :overlay="true"
-        :text="loadingText"
-        :text-position="loadingTextPosition"
-        :background-color="loadingBackground"
-        class="table-loading-overlay"
-      />
+      <Loader v-if="loading" :loading="true" :type="loadingType" :size="loadingSize" :color="loadingColor"
+        :overlay="true" :text="loadingText" :text-position="loadingTextPosition" :background-color="loadingBackground"
+        class="table-loading-overlay" />
 
       <!-- Table -->
-      <div
-        class="overflow-x-auto"
-        :class="{ 'opacity-50': loading }"
-      >
+      <div class="overflow-x-auto" :class="{ 'opacity-50': loading }">
         <table :class="tableClasses">
           <!-- Table Head -->
           <thead :class="headClasses">
             <tr>
               <!-- Selection Column Header -->
-              <th
-                v-if="selectable"
-                :class="checkboxCellClasses"
-              >
+              <th v-if="selectable" :class="checkboxCellClasses">
                 <div class="flex items-center justify-center">
                   <!-- Header loading for bulk operations -->
-                  <Loader
-                    v-if="bulkLoading"
-                    :loading="true"
-                    type="spin"
-                    size="small"
-                    :color="loadingColor"
-                  />
-                  <Checkbox
-                    v-else
-                    :model-value="isAllSelected"
-                    :indeterminate="isIndeterminate"
-                    :disabled="loading || dataLoading"
-                    @update:model-value="toggleSelectAll"
-                  />
+                  <Loader v-if="bulkLoading" :loading="true" type="spin" size="small" :color="loadingColor" />
+                  <Checkbox v-else :model-value="isAllSelected" :indeterminate="isIndeterminate"
+                    :disabled="loading || dataLoading" @update:model-value="toggleSelectAll" />
                 </div>
               </th>
 
               <!-- Data Column Headers -->
-              <th
-                v-for="column in displayedColumns"
-                :key="column.key"
-                :class="getHeaderCellClasses(column)"
-                @click="handleSort(column)"
-              >
+              <th v-for="column in displayedColumns" :key="column.key" :class="getHeaderCellClasses(column)"
+                @click="handleSort(column)">
                 <div class="flex items-center gap-2">
                   <span>{{ column.label }}</span>
 
                   <!-- Sort loading indicator -->
-                  <Loader
-                    v-if="sortLoading && sortColumn === column.key"
-                    :loading="true"
-                    type="spin"
-                    size="small"
-                    :color="loadingColor"
-                  />
+                  <Loader v-if="sortLoading && sortColumn === column.key" :loading="true" type="spin" size="small"
+                    :color="loadingColor" />
 
                   <!-- Sort icons -->
-                  <div
-                    v-else-if="column.sortable"
-                    class="flex flex-col"
-                  >
-                    <svg
-                      :class="getSortIconClasses(column, 'asc')"
-                      class="w-3 h-3 transition-colors"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m4.5 15.75 7.5-7.5 7.5 7.5"
-                      />
+                  <div v-else-if="column.sortable" class="flex flex-col">
+                    <svg :class="getSortIconClasses(column, 'asc')" class="w-3 h-3 transition-colors" fill="none"
+                      viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
                     </svg>
-                    <svg
-                      :class="getSortIconClasses(column, 'desc')"
-                      class="w-3 h-3 transition-colors"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                      />
+                    <svg :class="getSortIconClasses(column, 'desc')" class="w-3 h-3 transition-colors" fill="none"
+                      viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
                   </div>
                 </div>
               </th>
 
               <!-- Actions Column Header -->
-              <th
-                v-if="shouldShowActionsColumn"
-                :class="actionsCellClasses"
-              >
+              <th v-if="shouldShowActionsColumn" :class="actionsCellClasses">
                 Actions
               </th>
             </tr>
@@ -1144,33 +1055,19 @@ loadPersistedReadKeys()
           <tbody :class="bodyClasses">
             <!-- Skeleton Loading Rows - Show first when loading -->
             <template v-if="showSkeleton && (loading || dataLoading)">
-              <tr
-                v-for="n in skeletonRows"
-                :key="`skeleton-${n}`"
-                class="animate-pulse"
-              >
+              <tr v-for="n in skeletonRows" :key="`skeleton-${n}`" class="animate-pulse">
                 <!-- Selection checkbox skeleton -->
-                <td
-                  v-if="selectable"
-                  :class="checkboxCellClasses"
-                >
+                <td v-if="selectable" :class="checkboxCellClasses">
                   <div class="w-4 h-4 ui-bg rounded" />
                 </td>
 
                 <!-- Data columns skeleton -->
-                <td
-                  v-for="column in displayedColumns"
-                  :key="column.key"
-                  :class="getDataCellClasses()"
-                >
+                <td v-for="column in displayedColumns" :key="column.key" :class="getDataCellClasses()">
                   <div class="h-4 ui-bg rounded w-3/4" />
                 </td>
 
                 <!-- Actions column skeleton -->
-                <td
-                  v-if="shouldShowActionsColumn"
-                  :class="actionsCellClasses"
-                >
+                <td v-if="shouldShowActionsColumn" :class="actionsCellClasses">
                   <div class="flex gap-2 justify-center">
                     <div class="w-6 h-6 ui-surface rounded" />
                     <div class="w-6 h-6 ui-surface rounded" />
@@ -1181,37 +1078,16 @@ loadPersistedReadKeys()
 
             <!-- Data Rows - Show when not loading and has data -->
             <template v-else-if="paginatedData.length > 0">
-              <DataTableRow
-                v-for="(item, index) in paginatedData"
-                :key="getRowKey(item, index)"
-                :item="item"
-                :columns="displayedColumns"
-                :index="index"
-                :selectable="selectable"
-                :is-selected="isRowSelected(item)"
-                :striped="striped"
-                :hoverable="hoverable"
-                :clickable-rows="clickableRows"
-                :row-class="getUnreadRowClass(item, index)"
-                :density="density"
-                :variant="variant"
-                @toggle-selection="toggleRowSelection"
-                @row-click="handleRowClick"
-              >
-                <template
-                  v-for="column in displayedColumns"
-                  :key="column.key"
-                  #[`cell-${column.key}`]="slotProps"
-                >
-                  <slot
-                    :name="`cell-${column.key}`"
-                    v-bind="slotProps"
-                  >
-                    <span
-                      v-if="formatCellValue(slotProps.item, slotProps.column).toString().split(' ').length > 10"
+              <DataTableRow v-for="(item, index) in paginatedData" :key="getRowKey(item, index)" :item="item"
+                :columns="displayedColumns" :index="index" :selectable="selectable" :is-selected="isRowSelected(item)"
+                :striped="striped" :hoverable="hoverable" :clickable-rows="clickableRows"
+                :row-class="getUnreadRowClass(item, index)" :density="density" :variant="variant"
+                @toggle-selection="toggleRowSelection" @row-click="handleRowClick">
+                <template v-for="column in displayedColumns" :key="column.key" #[`cell-${column.key}`]="slotProps">
+                  <slot :name="`cell-${column.key}`" v-bind="slotProps">
+                    <span v-if="formatCellValue(slotProps.item, slotProps.column).toString().split(' ').length > 10"
                       class="cursor-pointer ui-primary hover:text-(--ui-primary)"
-                      @click.stop="openModal(formatCellValue(slotProps.item, slotProps.column))"
-                    >
+                      @click.stop="openModal(formatCellValue(slotProps.item, slotProps.column))">
                       {{ truncateText(formatCellValue(slotProps.item, slotProps.column)) }}
                     </span>
                     <span v-else>
@@ -1221,39 +1097,18 @@ loadPersistedReadKeys()
                 </template>
 
                 <template #actions="{ item: actionItem, index: actionIndex }">
-                  <slot
-                    v-if="$slots.actions"
-                    name="actions"
-                    :item="actionItem"
-                    :index="actionIndex"
-                  />
+                  <slot v-if="$slots.actions" name="actions" :item="actionItem" :index="actionIndex" />
 
-                  <div
-                    v-else-if="actions.length > 0"
-                    class="flex items-center gap-1 justify-center"
-                  >
-                    <Tooltip
-                      v-for="action in getVisibleActions(actionItem)"
-                      :key="action.key"
+                  <div v-else-if="actions.length > 0" class="flex items-center gap-1 justify-center">
+                    <Tooltip v-for="action in getVisibleActions(actionItem)" :key="action.key"
                       :content="typeof action.tooltip === 'function' ? action.tooltip(actionItem) : (action.tooltip || action.label || action.key)"
-                      placement="top"
-                    >
-                      <Button
-                        :variant="getButtonVariant(action.variant)"
-                        size="xs"
+                      placement="top">
+                      <Button :variant="getButtonVariant(action.variant)" size="xs"
                         :disabled="isActionDisabled(action, actionItem) || !hasPermission(action, actionItem)"
                         :class="['h-8 w-8', typeof action.class === 'function' ? action.class(actionItem) : action.class]"
-                        @click.stop="handleActionClick(action, actionItem)"
-                      >
-                        <Icon
-                          v-if="action.icon"
-                          :icon="action.icon"
-                          class="w-4 h-4"
-                        />
-                        <span
-                          v-else-if="action.label"
-                          class="text-xs"
-                        >{{ action.label }}</span>
+                        @click.stop="handleActionClick(action, actionItem)">
+                        <Icon v-if="action.icon" :icon="action.icon" class="w-4 h-4" />
+                        <span v-else-if="action.label" class="text-xs">{{ action.label }}</span>
                       </Button>
                     </Tooltip>
                   </div>
@@ -1263,17 +1118,11 @@ loadPersistedReadKeys()
 
             <!-- Empty State Row - Show when not loading and no data -->
             <tr v-else>
-              <td
-                :colspan="totalColumns"
-                :class="emptyCellClasses"
-              >
+              <td :colspan="totalColumns" :class="emptyCellClasses">
                 <slot name="empty">
                   <div class="flex flex-col items-center justify-center py-12">
                     <div class="ui-text mb-4 flex justify-center">
-                      <Icon
-                        icon="search"
-                        class="w-16 h-16"
-                      />
+                      <Icon icon="search" class="w-16 h-16" />
                     </div>
                     <p class="ui-text text-lg font-medium mb-2">
                       {{ emptyText }}
@@ -1291,33 +1140,18 @@ loadPersistedReadKeys()
     </div>
 
     <!-- Footer/Pagination Component -->
-    <DataTablePagination
-      v-if="showPagination || $slots.footer"
-      :current-page="currentPage"
-      :total-pages="totalPages"
-      :total="filteredData.length"
-      :page-size="pageSize"
-      :show-pagination="showPagination"
-      :selectable="selectable"
-      :selected-count="selectedItems.length"
-      :variant="paginationVariant"
-      :padding="paginationPadding"
-      :loading="paginationLoading"
-      :disabled="loading || dataLoading"
-      @update:current-page="handlePageChange"
-      @update:page-size="handlePageSizeChange"
-    >
+    <DataTablePagination v-if="showPagination || $slots.footer" :current-page="currentPage" :total-pages="totalPages"
+      :total="filteredData.length" :page-size="pageSize" :show-pagination="showPagination" :selectable="selectable"
+      :selected-count="selectedItems.length" :variant="paginationVariant" :padding="paginationPadding"
+      :loading="paginationLoading" :disabled="loading || dataLoading" @update:current-page="handlePageChange"
+      @update:page-size="handlePageSizeChange">
       <template #footer>
         <slot name="footer" />
       </template>
     </DataTablePagination>
 
     <!-- Modal for full text display -->
-    <Modal
-      v-model="showModal"
-      size="lg"
-      @close="closeModal"
-    >
+    <Modal v-model="showModal" size="lg" @close="closeModal">
       <div class="p-6">
         <h3 class="text-md font-semibold mb-4">
           Full Text
@@ -1347,11 +1181,9 @@ loadPersistedReadKeys()
 }
 
 .kv-module-themed-table :deep(tbody tr:nth-child(even)) {
-  background: color-mix(
-    in oklab,
-    var(--module-soft-alt, transparent) 55%,
-    transparent 45%
-  );
+  background: color-mix(in oklab,
+      var(--module-soft-alt, transparent) 55%,
+      transparent 45%);
 }
 
 /* Custom skeleton animation */
