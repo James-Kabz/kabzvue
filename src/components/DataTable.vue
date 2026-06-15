@@ -299,6 +299,89 @@ const toolbarActiveFilters = computed(() =>
   }))
 )
 
+const normalizeFilterField = (rule) => rule?.field || rule?.key || rule?.column || rule?.filterKey || ''
+
+const normalizeFilterValue = (rule) => {
+  if (rule?.value !== undefined) return rule.value
+  if (rule?.values !== undefined) return rule.values
+  if (rule?.selected !== undefined) return rule.selected
+  if (rule?.from !== undefined || rule?.to !== undefined) {
+    return { from: rule.from ?? '', to: rule.to ?? '' }
+  }
+  if (rule?.min !== undefined || rule?.max !== undefined) {
+    return { from: rule.min ?? '', to: rule.max ?? '' }
+  }
+  return undefined
+}
+
+const normalizeComparable = (value) => {
+  if (value instanceof Date) return value.getTime()
+  if (typeof value === 'number') return value
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return ''
+    const numeric = Number(trimmed)
+    if (!Number.isNaN(numeric) && trimmed === String(numeric)) return numeric
+    const timestamp = Date.parse(trimmed)
+    if (!Number.isNaN(timestamp) && /^\d{4}-\d{2}-\d{2}/.test(trimmed)) return timestamp
+    return trimmed.toLowerCase()
+  }
+  return value
+}
+
+const valuesEqual = (left, right) => normalizeComparable(left) === normalizeComparable(right)
+
+const matchesBetween = (actual, expected) => {
+  if (expected == null) return true
+  const range = Array.isArray(expected)
+    ? { from: expected[0], to: expected[1] }
+    : {
+        from: expected?.from ?? expected?.min ?? '',
+        to: expected?.to ?? expected?.max ?? '',
+      }
+
+  const comparable = normalizeComparable(actual)
+  if (comparable === '' || comparable == null) return false
+
+  const from = range.from === '' || range.from == null ? null : normalizeComparable(range.from)
+  const to = range.to === '' || range.to == null ? null : normalizeComparable(range.to)
+
+  if (from != null && comparable < from) return false
+  if (to != null && comparable > to) return false
+  return true
+}
+
+const matchesFilterRule = (item, rule) => {
+  const field = normalizeFilterField(rule)
+  if (!field) return true
+
+  const column = props.columns.find((col) => col.key === field || col.field === field)
+  const actual = column ? getCellValue(item, column) : getNestedValue(item, field)
+  const operator = String(rule?.operator || 'equals').toLowerCase()
+  const expected = normalizeFilterValue(rule)
+
+  if (operator === 'between') return matchesBetween(actual, expected)
+
+  if (operator === 'in') {
+    const values = Array.isArray(expected) ? expected : (expected == null ? [] : [expected])
+    return values.some((value) => valuesEqual(actual, value))
+  }
+
+  if (operator === 'contains') {
+    if (Array.isArray(actual)) return actual.some((value) => valuesEqual(value, expected))
+    return String(actual ?? '').toLowerCase().includes(String(expected ?? '').toLowerCase())
+  }
+
+  if (operator === 'not_equals') return !valuesEqual(actual, expected)
+  if (operator === 'gt') return normalizeComparable(actual) > normalizeComparable(expected)
+  if (operator === 'gte') return normalizeComparable(actual) >= normalizeComparable(expected)
+  if (operator === 'lt') return normalizeComparable(actual) < normalizeComparable(expected)
+  if (operator === 'lte') return normalizeComparable(actual) <= normalizeComparable(expected)
+
+  return valuesEqual(actual, expected)
+}
+
 // CVA variants
 const tableContainerVariants = cva('border ui-border-strong rounded-2xl relative overflow-hidden flex flex-col gap-y-2 px-2 pb-2', {
   variants: {
@@ -355,6 +438,15 @@ const bodyVariants = cva('divide-y', {
 // Computed properties
 const filteredData = computed(() => {
   let data = [...props.data]
+
+  const rules = Array.isArray(props.filterRules?.rules) ? props.filterRules.rules : []
+  if (rules.length > 0) {
+    const logic = (props.filterRules?.logic || 'all').toLowerCase() === 'any' ? 'any' : 'all'
+    data = data.filter((item) => {
+      const matches = rules.map((rule) => matchesFilterRule(item, rule))
+      return logic === 'any' ? matches.some(Boolean) : matches.every(Boolean)
+    })
+  }
 
   // Apply sorting
   if (sortColumn.value) {

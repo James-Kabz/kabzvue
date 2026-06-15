@@ -43,6 +43,7 @@ const slots = useSlots()
 const isLoading = computed(() => props.loading)
 const formData = ref({})
 const errors = ref({})
+const passwordVisibility = ref({})
 const uploadingFilesMap = ref({})
 const isHydratingFromProps = ref(false)
 
@@ -181,6 +182,21 @@ const setFieldValue = (fieldName, value) => {
   else formData.value[fieldName] = value
 }
 
+const isPasswordField = (field) => field?.type === 'password'
+const isPasswordVisible = (field) => Boolean(passwordVisibility.value[field.name])
+const getInputType = (field) => {
+  if (isPasswordField(field)) return isPasswordVisible(field) ? 'text' : 'password'
+  return field.type
+}
+
+const togglePasswordVisibility = (field) => {
+  if (!field?.name) return
+  passwordVisibility.value = {
+    ...passwordVisibility.value,
+    [field.name]: !passwordVisibility.value[field.name],
+  }
+}
+
 const validateForm = () => {
   errors.value = {}
 
@@ -249,14 +265,27 @@ const handleFieldActionClick = (field) => {
   if (typeof field?.actionButton?.onClick === 'function') field.actionButton.onClick(formData.value, field)
 }
 
-const hasTrailingIcon = (field) => !!resolveFieldOption(field.trailingIcon, field, null)
-const getTrailingIcon = (field) => resolveFieldOption(field.trailingIcon, field, null)
-const getTrailingIconTitle = (field) => resolveFieldOption(field.trailingIconTitle, field, 'Action')
-const getTrailingIconAriaLabel = (field) => resolveFieldOption(field.trailingIconAriaLabel, field, getTrailingIconTitle(field))
+const hasTrailingIcon = (field) => isPasswordField(field) || !!resolveFieldOption(field.trailingIcon, field, null)
+const getTrailingIcon = (field) => {
+  if (isPasswordField(field)) return isPasswordVisible(field) ? 'eye-slash' : 'eye'
+  return resolveFieldOption(field.trailingIcon, field, null)
+}
+const getTrailingIconTitle = (field) => {
+  if (isPasswordField(field)) return isPasswordVisible(field) ? 'Hide password' : 'Show password'
+  return resolveFieldOption(field.trailingIconTitle, field, 'Action')
+}
+const getTrailingIconAriaLabel = (field) => {
+  if (isPasswordField(field)) return isPasswordVisible(field) ? 'Hide password' : 'Show password'
+  return resolveFieldOption(field.trailingIconAriaLabel, field, getTrailingIconTitle(field))
+}
 const getTrailingIconClass = (field) => resolveFieldOption(field.trailingIconClass, field, 'w-4 h-4')
 const isTrailingIconDisabled = (field) => Boolean(isLoading.value || field.disabled || resolveFieldOption(field.trailingIconDisabled, field, false))
 const handleTrailingIconClick = (field) => {
   if (isTrailingIconDisabled(field)) return
+  if (isPasswordField(field)) {
+    togglePasswordVisibility(field)
+    return
+  }
   if (typeof field?.onTrailingIconClick === 'function') field.onTrailingIconClick(formData.value, field)
 }
 
@@ -511,7 +540,7 @@ const handleCancel = () => emit('cancel')
                       <Input
                         :id="fieldId"
                         :model-value="getFieldValue(field.name)"
-                        :type="field.type"
+                        :type="getInputType(field)"
                         :placeholder="field.placeholder"
                         :disabled="isLoading || field.disabled"
                         :readonly="field.readonly || field.disabled"
