@@ -47,6 +47,9 @@ const props = defineProps({
   },
   userInitialsOverride: { type: String, default: '' },
   userRoleDisplayOverride: { type: String, default: '' },
+  userAvatarUrl: { type: String, default: '' },
+  userAvatarAlt: { type: String, default: '' },
+  showUserAvatar: { type: Boolean, default: true },
   themeScope: {
     type: String,
     default: 'default',
@@ -73,6 +76,7 @@ const isMobile = ref(false)
 const showCompanyDropdown = ref(false)
 const currentThemeMode = ref('light')
 const displayedCompanyLogoSrc = ref('/logo.png')
+const avatarLoadFailed = ref(false)
 
 const notificationCount = computed(() => props.notifications.filter(n => !n.read).length)
 const resolvedThemeModes = computed(() => {
@@ -97,6 +101,19 @@ const userInitials = computed(() => {
   const name = props.user?.name || 'Guest'
   return name.split(' ').map(n => n[0] || '').join('').toUpperCase()
 })
+
+const resolvedUserAvatarUrl = computed(() => {
+  if (!props.showUserAvatar) return ''
+  return props.userAvatarUrl || ''
+})
+
+const showAvatarImage = computed(() => Boolean(resolvedUserAvatarUrl.value) && !avatarLoadFailed.value)
+
+const resolvedUserAvatarAlt = computed(() => props.userAvatarAlt || `${props.user?.name || 'User'} avatar`)
+
+const handleAvatarError = () => {
+  avatarLoadFailed.value = true
+}
 
 const entityLabelLower = computed(() => String(props.entityLabel || 'Company').toLowerCase())
 const resolvedShowCompanyInfo = computed(() => props.showCompanyInfo)
@@ -415,6 +432,9 @@ onUnmounted(() => {
 watch(searchQuery, (newValue) => emit('search', newValue))
 watch(resolvedCurrentCompanyLogo, (newLogo) => {
   updateDisplayedCompanyLogo(newLogo)
+})
+watch(resolvedUserAvatarUrl, () => {
+  avatarLoadFailed.value = false
 })
 </script>
 
@@ -801,9 +821,19 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
             @click="toggleProfile"
           >
             <div
-              class="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center transition-colors shadow-sm"
+              class="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center transition-colors shadow-sm overflow-hidden"
             >
-              <span class="ui-primary text-xs sm:text-lg font-semibold">{{ userInitials }}</span>
+              <img
+                v-if="showAvatarImage"
+                :src="resolvedUserAvatarUrl"
+                :alt="resolvedUserAvatarAlt"
+                class="w-full h-full object-cover"
+                @error="handleAvatarError"
+              >
+              <span
+                v-else
+                class="ui-primary text-xs sm:text-lg font-semibold"
+              >{{ userInitials }}</span>
             </div>
             <!-- Hide details on mobile or when showUserDetails is false -->
             <div
@@ -833,13 +863,30 @@ watch(resolvedCurrentCompanyLogo, (newLogo) => {
               v-if="showProfile"
               class="ui-surface absolute right-0 mt-2 w-56 sm:w-60 rounded-xl border ui-border-strong shadow-xl z-50 overflow-hidden"
             >
-              <div class="p-3 sm:p-4 border-b ui-border-strong">
-                <p class="text-sm font-semibold ui-text truncate">
-                  {{ user.name }}
-                </p>
-                <p class="text-xs ui-text truncate">
-                  {{ user.email }}
-                </p>
+              <div class="p-3 sm:p-4 border-b ui-border-strong flex items-center gap-3">
+                <div
+                  class="w-10 h-10 shrink-0 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center shadow-sm overflow-hidden"
+                >
+                  <img
+                    v-if="showAvatarImage"
+                    :src="resolvedUserAvatarUrl"
+                    :alt="resolvedUserAvatarAlt"
+                    class="w-full h-full object-cover"
+                    @error="handleAvatarError"
+                  >
+                  <span
+                    v-else
+                    class="ui-primary text-sm font-semibold"
+                  >{{ userInitials }}</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold ui-text truncate">
+                    {{ user.name }}
+                  </p>
+                  <p class="text-xs ui-text truncate">
+                    {{ user.email }}
+                  </p>
+                </div>
               </div>
               <div
                 v-if="showThemeSwitcher"
