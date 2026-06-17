@@ -817,11 +817,12 @@ watch(resolvedUserAvatarUrl, () => {
         <!-- Profile Dropdown -->
         <div class="relative">
           <button
-            class="shrink-0 ui-surface border ui-border-strong px-2.5 sm:px-3 py-1.5 sm:py-3 rounded-xl shadow-sm flex items-center gap-2 sm:gap-3 relative hover:bg-(--ui-surface-muted) transition-colors max-w-44 sm:max-w-md"
+            class="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ui-primary)"
+            :aria-label="`${user.name} profile menu`"
             @click="toggleProfile"
           >
             <div
-              class="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center transition-colors shadow-sm overflow-hidden"
+              class="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center shadow-sm overflow-hidden border ui-border-strong"
             >
               <img
                 v-if="showAvatarImage"
@@ -832,22 +833,9 @@ watch(resolvedUserAvatarUrl, () => {
               >
               <span
                 v-else
-                class="ui-primary text-xs sm:text-lg font-semibold"
+                class="ui-primary text-sm sm:text-base font-semibold"
               >{{ userInitials }}</span>
             </div>
-            <!-- Hide details on mobile or when showUserDetails is false -->
-            <div
-              v-if="showUserDetails"
-              class="hidden md:block text-left max-w-40 min-w-0"
-            >
-              <p class="text-lg font-bold ui-text truncate leading-tight">
-                {{ user.name }}
-              </p>
-            </div>
-            <Icon
-              icon="chevron-down"
-              class="w-3.5 h-3.5 ui-text-soft mt-0.5"
-            />
           </button>
 
           <!-- Dropdown - Mobile optimized -->
