@@ -25,7 +25,6 @@ const props = defineProps({
   showNotifications: { type: Boolean, default: true },
   showBreadcrumb: { type: Boolean, default: true },
   showCompanyInfo: { type: Boolean, default: true },
-  showUserDetails: { type: Boolean, default: true },
   showHeaderLogo: { type: Boolean, default: true },
   logoUrl: { type: String, default: '/applogo.png' },
   headerLogo: { type: String, default: '/logo.png' },
