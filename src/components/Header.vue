@@ -438,107 +438,71 @@ watch(resolvedUserAvatarUrl, () => {
 </script>
 
 <template>
-  <header
-    :class="cn(
-      'fixed top-0 z-50 w-full backdrop-blur-md transition-all duration-300 ease-out',
-      props.themeScope === 'module' && 'kv-module-header',
-      getHeaderClass()
-    )"
-    :style="{ left: '0' }"
-  >
+  <header :class="cn(
+    'fixed top-0 z-50 w-full backdrop-blur-md transition-all duration-300 ease-out',
+    props.themeScope === 'module' && 'kv-module-header',
+    getHeaderClass()
+  )" :style="{ left: '0' }">
     <div class="relative flex items-center justify-between h-20 sm:h-18 px-3 sm:px-4 md:px-6">
       <!-- Left side - Company & Page Info -->
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
         <!-- Mobile Sidebar Toggle - Moved to far left -->
-        <button
-          v-if="isMobile"
+        <button v-if="isMobile"
           class="p-2 ui-text rounded-lg hover:bg-[var(--ui-surface-muted)] transition-colors shrink-0"
-          @click="emit('toggle-mobile-sidebar')"
-        >
-          <Icon
-            icon="bars"
-            class="w-5 h-5"
-          />
+          @click="emit('toggle-mobile-sidebar')">
+          <Icon icon="bars" class="w-5 h-5" />
         </button>
 
         <!-- Logged-in Company Logo -->
-        <div
-          v-if="resolvedCurrentCompanyLogo"
-          :class="cn('shrink-0 overflow-hidden rounded-2xl flex items-center justify-center', props.companyLogoClass)"
-        >
-          <img
-            :src="displayedCompanyLogoSrc"
-            alt="Company logo"
-            class="max-w-full max-h-full w-auto h-auto object-contain object-center"
-          >
+        <div v-if="resolvedCurrentCompanyLogo"
+          :class="cn('shrink-0 overflow-hidden rounded-2xl flex items-center justify-center', props.companyLogoClass)">
+          <img :src="displayedCompanyLogoSrc" alt="Company logo"
+            class="max-w-full max-h-full w-auto h-auto object-contain object-center">
         </div>
 
         <!-- Divider -->
-        <div
-          v-if="resolvedCurrentCompanyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
-          class="h-5 sm:h-18 w-px ui-border-strong-bg shrink-0 hidden sm:block"
-        />
+        <div v-if="resolvedCurrentCompanyLogo && resolvedShowCompanyInfo && normalizedCurrentCompany"
+          class="h-5 sm:h-18 w-px ui-border-strong-bg shrink-0 hidden sm:block" />
 
         <!-- Company Info Card - Simplified for mobile -->
-        <div
-          v-if="resolvedShowCompanyInfo && normalizedCurrentCompany"
-          class="shrink-0 ui-surface border ui-border-strong px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-[var(--ui-surface-muted)] transition-colors max-w-52 sm:max-w-72"
-        >
+        <div v-if="resolvedShowCompanyInfo && normalizedCurrentCompany"
+          class="shrink-0 ui-surface border ui-border-strong px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-[var(--ui-surface-muted)] transition-colors max-w-52 sm:max-w-72">
           <!-- Company Details with Switcher -->
-          <button
-            v-if="normalizedCompanies.length > 1"
+          <button v-if="normalizedCompanies.length > 1"
             class="flex items-center gap-2 sm:gap-3 w-44 sm:w-60 cursor-pointer rounded-lg px-1.5 py-1 transition-all group"
-            @click="toggleCompanyDropdown"
-          >
-            <div class="w-8 h-8 rounded-lg ui-surface-muted border ui-border-strong flex items-center justify-center shrink-0">
-              <Icon
-                icon="building"
-                class="w-4 h-4 ui-primary"
-              />
+            @click="toggleCompanyDropdown">
+            <div
+              class="w-8 h-8 rounded-lg ui-surface-muted border ui-border-strong flex items-center justify-center shrink-0">
+              <Icon icon="building" class="w-4 h-4 ui-primary" />
             </div>
             <div class="flex-1 min-w-0">
               <p
-                class="text-xs sm:text-sm font-semibold ui-text truncate group-hover:text-[var(--ui-primary)] leading-tight"
-              >
+                class="text-xs sm:text-sm font-semibold ui-text truncate group-hover:text-[var(--ui-primary)] leading-tight">
                 {{ normalizedCurrentCompany.__name }}
               </p>
             </div>
-            <Icon
-              icon="chevron-down"
+            <Icon icon="chevron-down"
               class="w-3.5 h-3.5 ui-text-soft shrink-0 group-hover:text-[var(--ui-primary)] transition-transform"
-              :class="{ 'rotate-180': showCompanyDropdown }"
-            />
+              :class="{ 'rotate-180': showCompanyDropdown }" />
           </button>
 
           <!-- Static display when only one company -->
-          <div
-            v-else
-            class="min-w-0 flex-1 px-1"
-          >
+          <div v-else class="min-w-0 flex-1 px-1">
             <p class="text-xs sm:text-sm font-semibold ui-text truncate max-w-[160px] sm:max-w-52 leading-tight">
               {{ normalizedCurrentCompany.__name }}
             </p>
           </div>
 
           <!-- Company Dropdown - Same as before but positioned better -->
-          <transition
-            enter-active-class="transition-all duration-200 ease-out"
-            leave-active-class="transition-all duration-200 ease-in"
-            enter-from-class="opacity-0 translate-y-2 scale-95"
-            enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 translate-y-2 scale-95"
-          >
-            <div
-              v-if="showCompanyDropdown"
-              class="ui-surface absolute top-full left-0 right-0 sm:left-0 sm:right-auto mt-2 w-[min(92vw,24rem)] rounded-2xl border ui-border-strong shadow-2xl z-50 max-h-96 overflow-hidden"
-            >
+          <transition enter-active-class="transition-all duration-200 ease-out"
+            leave-active-class="transition-all duration-200 ease-in" enter-from-class="opacity-0 translate-y-2 scale-95"
+            enter-to-class="opacity-100 translate-y-0 scale-100" leave-from-class="opacity-100 translate-y-0 scale-100"
+            leave-to-class="opacity-0 translate-y-2 scale-95">
+            <div v-if="showCompanyDropdown"
+              class="ui-surface absolute top-full left-0 right-0 sm:left-0 sm:right-auto mt-2 w-[min(92vw,24rem)] rounded-2xl border ui-border-strong shadow-2xl z-50 max-h-96 overflow-hidden">
               <div class="p-3 sm:p-4 border-b ui-border-strong ui-surface-muted">
                 <h3 class="text-sm sm:text-base font-semibold ui-text flex items-center gap-2">
-                  <Icon
-                    icon="list"
-                    class="w-4 h-4 ui-primary"
-                  />
+                  <Icon icon="list" class="w-4 h-4 ui-primary" />
                   {{ resolvedSwitcherTitle }}
                 </h3>
                 <p class="text-xs ui-text mt-1">
@@ -546,47 +510,28 @@ watch(resolvedUserAvatarUrl, () => {
                 </p>
               </div>
               <div class="py-2 max-h-80 overflow-y-auto">
-                <button
-                  v-for="company in normalizedCompanies"
-                  :key="company.__id || company.__name"
-                  :class="cn(
-                    'mx-2 flex items-center w-[calc(100%-1rem)] rounded-xl px-3 sm:px-4 py-2.5 text-sm transition-all group border',
-                    getCompanyRowClasses(company.__id === normalizedCurrentCompany?.__id)
-                  )"
-                  :style="getCompanyRowStyle(company.__id === normalizedCurrentCompany?.__id)"
-                  @click="handleCompanyChange(company)"
-                >
-                  <div
-                    v-if="getCompanyLogoUrl(company)"
-                    class="shrink-0 mr-2 sm:mr-3"
-                  >
-                    <img
-                      :src="getCompanyLogoUrl(company)"
-                      :alt="`${company.__name} ${entityLabelLower} logo`"
+                <button v-for="company in normalizedCompanies" :key="company.__id || company.__name" :class="cn(
+                  'mx-2 flex items-center w-[calc(100%-1rem)] rounded-xl px-3 sm:px-4 py-2.5 text-sm transition-all group border',
+                  getCompanyRowClasses(company.__id === normalizedCurrentCompany?.__id)
+                )" :style="getCompanyRowStyle(company.__id === normalizedCurrentCompany?.__id)"
+                  @click="handleCompanyChange(company)">
+                  <div v-if="getCompanyLogoUrl(company)" class="shrink-0 mr-2 sm:mr-3">
+                    <img :src="getCompanyLogoUrl(company)" :alt="`${company.__name} ${entityLabelLower} logo`"
                       class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-lg ui-surface p-0.5 sm:p-1 border ui-border-strong group-hover:border-[var(--ui-primary-soft)] transition-colors"
-                      @error="(e) => { e.target.src = '/logo.png' }"
-                    >
+                      @error="(e) => { e.target.src = '/logo.png' }">
                   </div>
-                  <div
-                    v-else
-                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-linear-to-br from-[var(--ui-bg)] to-[var(--ui-bg)] flex items-center justify-center mr-2 sm:mr-3 shrink-0"
-                  >
-                    <Icon
-                      icon="building"
-                      class="w-3.5 h-3.5 sm:w-4 sm:h-4 ui-text"
-                    />
+                  <div v-else
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-linear-to-br from-[var(--ui-bg)] to-[var(--ui-bg)] flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+                    <Icon icon="building" class="w-3.5 h-3.5 sm:w-4 sm:h-4 ui-text" />
                   </div>
                   <div class="flex-1 text-left min-w-0">
                     <p class="font-semibold truncate text-sm sm:text-md">
                       {{ company.__name }}
                     </p>
                   </div>
-                  <Icon
-                    v-if="company.__id === normalizedCurrentCompany?.__id"
-                    icon="check-circle"
+                  <Icon v-if="company.__id === normalizedCurrentCompany?.__id" icon="check-circle"
                     class="w-4 h-4 sm:w-5 sm:h-5 ui-primary shrink-0 ml-2"
-                    :style="getCompanyCheckStyle(company.__id === normalizedCurrentCompany?.__id)"
-                  />
+                    :style="getCompanyCheckStyle(company.__id === normalizedCurrentCompany?.__id)" />
                 </button>
               </div>
             </div>
@@ -594,110 +539,64 @@ watch(resolvedUserAvatarUrl, () => {
         </div>
       </div>
 
-      <div
-        v-if="showHeaderLogo && (logoUrl || headerLogo)"
-        class="pointer-events-none absolute left-1/2 -translate-x-1/2"
-      >
-        <img
-          :src="logoUrl || headerLogo"
-          alt="App logo"
-          class="h-16 sm:h-32 md:h-32 mt-4 w-auto object-contain"
-          @error="(e) => { e.target.src = '/applogo.png' }"
-        >
+      <div v-if="showHeaderLogo && (logoUrl || headerLogo)"
+        class="pointer-events-none absolute left-1/2 -translate-x-1/2">
+        <img :src="logoUrl || headerLogo" alt="App logo" class="h-16 sm:h-32 md:h-32 mt-4 w-auto object-contain"
+          @error="(e) => { e.target.src = '/applogo.png' }">
       </div>
 
       <!-- Right side - Actions -->
       <div class="flex items-center gap-1 sm:gap-2 md:gap-3 pl-2">
         <!-- Notifications -->
-        <button
-          v-if="showNotifications"
+        <button v-if="showNotifications"
           class="relative p-2 ui-text rounded-xl hover:bg-[var(--ui-surface-muted)] transition-colors"
-          @click="toggleNotifications"
-        >
-          <Icon
-            icon="bell"
-            class="w-5 h-5"
-          />
-          <span
-            v-if="notificationCount > 0"
-            class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[18px] sm:h-[18px] ui-danger-bg ui-text-inverse text-[10px] sm:text-xs rounded-full flex items-center justify-center font-semibold px-0.5 sm:px-1"
-          >
+          @click="toggleNotifications">
+          <Icon icon="bell" class="w-5 h-5" />
+          <span v-if="notificationCount > 0"
+            class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[18px] sm:h-[18px] ui-danger-bg ui-text-inverse text-[10px] sm:text-xs rounded-full flex items-center justify-center font-semibold px-0.5 sm:px-1">
             {{ notificationCount > 9 ? '9+' : notificationCount }}
           </span>
         </button>
 
         <!-- Notifications Dropdown - Mobile optimized -->
-        <transition
-          enter-active-class="transition-all duration-300 ease-out"
-          leave-active-class="transition-all duration-300 ease-in"
-          enter-from-class="opacity-0 translate-y-2 scale-95"
-          enter-to-class="opacity-100 translate-y-0 scale-100"
-          leave-from-class="opacity-100 translate-y-0 scale-100"
-          leave-to-class="opacity-0 translate-y-2 scale-95"
-        >
-          <div
-            v-if="showNotificationsDropdown"
-            class="ui-surface absolute right-2 sm:right-4 md:right-6 top-14 sm:top-16 mt-2 w-[calc(100vw-1rem)] max-w-sm sm:w-80 md:w-96 rounded-2xl border ui-border-strong shadow-2xl z-9999 overflow-hidden"
-          >
+        <transition enter-active-class="transition-all duration-300 ease-out"
+          leave-active-class="transition-all duration-300 ease-in" enter-from-class="opacity-0 translate-y-2 scale-95"
+          enter-to-class="opacity-100 translate-y-0 scale-100" leave-from-class="opacity-100 translate-y-0 scale-100"
+          leave-to-class="opacity-0 translate-y-2 scale-95">
+          <div v-if="showNotificationsDropdown"
+            class="ui-surface absolute right-2 sm:right-4 md:right-6 top-14 sm:top-16 mt-2 w-[calc(100vw-1rem)] max-w-sm sm:w-80 md:w-96 rounded-2xl border ui-border-strong shadow-2xl z-9999 overflow-hidden">
             <div class="p-3 sm:p-4 border-b ui-border-strong ui-surface-muted">
               <h3 class="text-sm sm:text-base font-semibold ui-text">
                 {{ notificationsTitle }}
               </h3>
-              <p
-                v-if="notificationCount > 0"
-                class="text-xs ui-text mt-1"
-              >
+              <p v-if="notificationCount > 0" class="text-xs ui-text mt-1">
                 You have {{ notificationCount }} unread notification{{ notificationCount > 1 ? 's' : '' }}
               </p>
             </div>
 
             <div class="max-h-[60vh] sm:max-h-96 overflow-y-auto">
-              <div
-                v-if="notifications.length === 0"
-                class="p-6 sm:p-8 text-center"
-              >
-                <Icon
-                  icon="bell"
-                  class="w-10 h-10 sm:w-12 sm:h-12 mx-auto ui-text mb-2"
-                />
+              <div v-if="notifications.length === 0" class="p-6 sm:p-8 text-center">
+                <Icon icon="bell" class="w-10 h-10 sm:w-12 sm:h-12 mx-auto ui-text mb-2" />
                 <p class="text-md ui-text">
                   No notifications
                 </p>
               </div>
 
-              <div
-                v-for="notification in notifications"
-                v-else
-                :key="notification.id"
-                :class="[
-                  'p-3 sm:p-4 border-b ui-border-strong hover:bg-[var(--ui-surface-muted)] cursor-pointer transition-colors',
-                  notification.read ? 'opacity-60' : ''
-                ]"
-                @click="handleNotificationClick(notification)"
-              >
+              <div v-for="notification in notifications" v-else :key="notification.id" :class="[
+                'p-3 sm:p-4 border-b ui-border-strong hover:bg-[var(--ui-surface-muted)] cursor-pointer transition-colors',
+                notification.read ? 'opacity-60' : ''
+              ]" @click="handleNotificationClick(notification)">
                 <div class="flex items-start space-x-2 sm:space-x-3">
                   <!-- Notification Type Icon -->
-                  <div
-                    :class="[
-                      'shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center',
-                      getNotificationTypeClass(notification)
-                    ]"
-                  >
-                    <Icon
-                      v-if="notification.title.includes('Overdue')"
-                      icon="exclamation-triangle"
-                      class="w-4 h-4 sm:w-5 sm:h-5"
-                    />
-                    <Icon
-                      v-else-if="notification.type === 'due_date_reminder'"
-                      icon="clock"
-                      class="w-4 h-4 sm:w-5 sm:h-5"
-                    />
-                    <Icon
-                      v-else
-                      icon="bell"
-                      class="w-4 h-4 sm:w-5 sm:h-5"
-                    />
+                  <div :class="[
+                    'shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center',
+                    getNotificationTypeClass(notification)
+                  ]">
+                    <Icon v-if="notification.title.includes('Overdue')" icon="exclamation-triangle"
+                      class="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Icon v-else-if="notification.type === 'due_date_reminder'" icon="clock"
+                      class="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Icon v-else icon="bell" class="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
 
                   <div class="flex-1 min-w-0">
@@ -707,76 +606,48 @@ watch(resolvedUserAvatarUrl, () => {
                         {{ notification.title }}
                       </p>
                       <!-- Unread indicator -->
-                      <div
-                        v-if="!notification.read"
-                        class="shrink-0 w-2 h-2 mt-1 ui-primary-bg rounded-full"
-                      />
+                      <div v-if="!notification.read" class="shrink-0 w-2 h-2 mt-1 ui-primary-bg rounded-full" />
                     </div>
 
-                    <div
-                      v-if="notification.source"
-                      class="flex items-center gap-1 sm:gap-1.5 mt-1.5 flex-wrap"
-                    >
+                    <div v-if="notification.source" class="flex items-center gap-1 sm:gap-1.5 mt-1.5 flex-wrap">
                       <span
-                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold ui-accent-soft ui-accent border border-[var(--ui-accent-soft)]"
-                      >
-                        <Icon
-                          icon="tag"
-                          class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                        />
+                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold ui-accent-soft ui-accent border border-[var(--ui-accent-soft)]">
+                        <Icon icon="tag" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                         {{ notification.source.body_code }}
                       </span>
-                      <Icon
-                        icon="chevron-right"
-                        class="w-2.5 h-2.5 sm:w-3 sm:h-3 ui-text hidden xs:block"
-                      />
+                      <Icon icon="chevron-right" class="w-2.5 h-2.5 sm:w-3 sm:h-3 ui-text hidden xs:block" />
                       <span
-                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium ui-surface-muted ui-text border ui-border-strong"
-                      >
+                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium ui-surface-muted ui-text border ui-border-strong">
                         {{ notification.source.code }}
                       </span>
                     </div>
 
                     <!-- Model & Due Date Badges -->
                     <div class="flex items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 flex-wrap">
-                      <span
-                        v-if="notification.model"
-                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium ui-primary-soft ui-primary"
-                      >
-                        <Icon
-                          icon="file"
-                          class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                        />
+                      <span v-if="notification.model"
+                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium ui-primary-soft ui-primary">
+                        <Icon icon="file" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                         <span class="truncate max-w-[100px] sm:max-w-none">{{ formatModelName(notification.model)
-                        }}</span>
+                          }}</span>
                       </span>
 
                       <!-- Due Date Badge -->
-                      <span
-                        v-if="notification.due_date"
-                        :class="[
-                          'inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium whitespace-nowrap',
-                          notification.title.includes('Overdue')
-                            ? 'ui-danger-soft ui-danger border border-[var(--ui-danger-soft)]'
-                            : notification.title.includes('Due in 0')
-                              ? 'ui-warning-soft ui-warning border border-[var(--ui-warning-soft)]'
-                              : 'ui-warning-soft ui-warning border border-[var(--ui-warning-soft)]'
-                        ]"
-                      >
-                        <Icon
-                          icon="calendar"
-                          class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 shrink-0"
-                        />
+                      <span v-if="notification.due_date" :class="[
+                        'inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium whitespace-nowrap',
+                        notification.title.includes('Overdue')
+                          ? 'ui-danger-soft ui-danger border border-[var(--ui-danger-soft)]'
+                          : notification.title.includes('Due in 0')
+                            ? 'ui-warning-soft ui-warning border border-[var(--ui-warning-soft)]'
+                            : 'ui-warning-soft ui-warning border border-[var(--ui-warning-soft)]'
+                      ]">
+                        <Icon icon="calendar" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 shrink-0" />
                         {{ formatDueDate(notification.due_date) }}
                       </span>
                     </div>
 
                     <!-- Time -->
                     <p class="text-[10px] sm:text-xs ui-text mt-1.5 sm:mt-2 flex items-center">
-                      <Icon
-                        icon="clock"
-                        class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                      />
+                      <Icon icon="clock" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                       {{ notification.time }}
                     </p>
                   </div>
@@ -784,87 +655,47 @@ watch(resolvedUserAvatarUrl, () => {
               </div>
             </div>
 
-            <div
-              v-if="notifications.length > 0"
-              class="p-2 sm:p-3 text-center border-t ui-border-strong ui-surface-muted"
-            >
-              <button
-                class="text-sm font-semibold ui-primary hover:text-[var(--ui-primary-strong)] transition-colors"
-                @click="handleViewAllNotifications"
-              >
+            <div v-if="notifications.length > 0"
+              class="p-2 sm:p-3 text-center border-t ui-border-strong ui-surface-muted">
+              <button class="text-sm font-semibold ui-primary hover:text-[var(--ui-primary-strong)] transition-colors"
+                @click="handleViewAllNotifications">
                 View all notifications →
               </button>
             </div>
           </div>
         </transition>
 
-        <div
-          v-if="showSearch"
-          class="w-40 sm:w-52 md:w-64"
-        >
-          <Search
-            v-model="searchQuery"
-            :placeholder="searchPlaceholder"
-            size="sm"
-            :show-no-results="false"
-            :min-length="0"
-            :debounce="200"
-            :results="[]"
-          />
+        <div v-if="showSearch" class="w-40 sm:w-52 md:w-64">
+          <Search v-model="searchQuery" :placeholder="searchPlaceholder" size="sm" :show-no-results="false"
+            :min-length="0" :debounce="200" :results="[]" />
         </div>
 
         <!-- Profile Dropdown -->
         <div class="relative">
           <button
             class="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ui-primary)]"
-            :aria-label="`${user.name} profile menu`"
-            @click="toggleProfile"
-          >
+            :aria-label="`${user.name} profile menu`" @click="toggleProfile">
             <div
-              class="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-accent-soft)] rounded-full flex items-center justify-center shadow-sm overflow-hidden border ui-border-strong"
-            >
-              <img
-                v-if="showAvatarImage"
-                :src="resolvedUserAvatarUrl"
-                :alt="resolvedUserAvatarAlt"
-                class="w-full h-full object-cover"
-                @error="handleAvatarError"
-              >
-              <span
-                v-else
-                class="ui-primary text-sm sm:text-base font-semibold"
-              >{{ userInitials }}</span>
+              class="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-accent-soft)] rounded-full flex items-center justify-center shadow-sm overflow-hidden border ui-border-strong">
+              <img v-if="showAvatarImage" :src="resolvedUserAvatarUrl" :alt="resolvedUserAvatarAlt"
+                class="w-full h-full object-cover" @error="handleAvatarError">
+              <span v-else class="ui-primary text-sm sm:text-base font-semibold">{{ userInitials }}</span>
             </div>
           </button>
 
           <!-- Dropdown - Mobile optimized -->
-          <transition
-            enter-active-class="transition-all duration-200 ease-out"
-            leave-active-class="transition-all duration-200 ease-in"
-            enter-from-class="opacity-0 translate-y-2 scale-95"
-            enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 translate-y-2 scale-95"
-          >
-            <div
-              v-if="showProfile"
-              class="ui-surface absolute right-0 mt-2 w-56 sm:w-60 rounded-xl border ui-border-strong shadow-xl z-50 overflow-hidden"
-            >
+          <transition enter-active-class="transition-all duration-200 ease-out"
+            leave-active-class="transition-all duration-200 ease-in" enter-from-class="opacity-0 translate-y-2 scale-95"
+            enter-to-class="opacity-100 translate-y-0 scale-100" leave-from-class="opacity-100 translate-y-0 scale-100"
+            leave-to-class="opacity-0 translate-y-2 scale-95">
+            <div v-if="showProfile"
+              class="ui-surface absolute right-0 mt-2 w-56 sm:w-60 rounded-xl border ui-border-strong shadow-xl z-50 overflow-hidden">
               <div class="p-3 sm:p-4 border-b ui-border-strong flex items-center gap-3">
                 <div
-                  class="w-10 h-10 shrink-0 bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-accent-soft)] rounded-full flex items-center justify-center shadow-sm overflow-hidden"
-                >
-                  <img
-                    v-if="showAvatarImage"
-                    :src="resolvedUserAvatarUrl"
-                    :alt="resolvedUserAvatarAlt"
-                    class="w-full h-full object-cover"
-                    @error="handleAvatarError"
-                  >
-                  <span
-                    v-else
-                    class="ui-primary text-sm font-semibold"
-                  >{{ userInitials }}</span>
+                  class="w-10 h-10 shrink-0 bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-accent-soft)] rounded-full flex items-center justify-center shadow-sm overflow-hidden">
+                  <img v-if="showAvatarImage" :src="resolvedUserAvatarUrl" :alt="resolvedUserAvatarAlt"
+                    class="w-full h-full object-cover" @error="handleAvatarError">
+                  <span v-else class="ui-primary text-sm font-semibold">{{ userInitials }}</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-sm font-semibold ui-text truncate">
@@ -875,85 +706,47 @@ watch(resolvedUserAvatarUrl, () => {
                   </p>
                 </div>
               </div>
-              <div
-                v-if="showThemeSwitcher"
-                class="px-3 py-3 border-b ui-border-strong"
-              >
+              <div v-if="showThemeSwitcher" class="px-3 py-3 border-b ui-border-strong">
                 <div class="flex items-center justify-between gap-3">
                   <div class="flex items-center gap-2 min-w-0">
-                    <Icon
-                      :icon="currentThemeMode === 'dark' ? 'moon' : 'sun'"
-                      class="w-4 h-4 shrink-0"
-                      :class="currentThemeMode === 'dark' ? 'ui-primary' : 'ui-text'"
-                    />
+                    <Icon :icon="currentThemeMode === 'dark' ? 'moon' : 'sun'" class="w-4 h-4 shrink-0"
+                      :class="currentThemeMode === 'dark' ? 'ui-primary' : 'ui-text'" />
                     <span class="text-sm font-medium ui-text truncate">
                       {{ themeSwitcherTitle }}
                     </span>
                   </div>
-                  <Switch
-                    v-model="isDarkTheme"
-                    size="md"
-                    :disabled="!canToggleTheme"
-                  />
+                  <Switch v-model="isDarkTheme" size="md" :disabled="!canToggleTheme" />
                 </div>
               </div>
               <div class="py-2">
-                <template
-                  v-for="item in profileMenuItems"
-                  :key="item.name"
-                >
-                  <router-link
-                    v-if="item.route"
-                    :to="item.route"
-                    :class="cn(
-                      'flex items-center px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
-                      getHeaderActiveItemClasses(isItemActive(item))
-                    )"
-                    :style="getHeaderActiveItemStyle(isItemActive(item))"
-                    @click="handleNavigation(item)"
-                  >
+                <template v-for="item in profileMenuItems" :key="item.name">
+                  <router-link v-if="item.route" :to="item.route" :class="cn(
+                    'flex items-center px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
+                    getHeaderActiveItemClasses(isItemActive(item))
+                  )" :style="getHeaderActiveItemStyle(isItemActive(item))" @click="handleNavigation(item)">
                     <!-- Active indicator bar -->
-                    <div
-                      v-if="isItemActive(item)"
+                    <div v-if="isItemActive(item)"
                       class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 sm:h-8 bg-linear-to-b from-[var(--ui-primary)] to-[var(--ui-primary)] rounded-r-full"
-                      :style="getHeaderActiveIndicatorStyle(isItemActive(item))"
-                    />
-                    <div
-                      :class="cn(
-                        'flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2',
-                        getHeaderActiveIconClasses(isItemActive(item))
-                      )"
-                      :style="getHeaderActiveIconStyle(isItemActive(item))"
-                    >
-                      <Icon
-                        v-if="item.icon"
-                        :icon="item.icon"
-                        class="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                      />
+                      :style="getHeaderActiveIndicatorStyle(isItemActive(item))" />
+                    <div :class="cn(
+                      'flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2',
+                      getHeaderActiveIconClasses(isItemActive(item))
+                    )" :style="getHeaderActiveIconStyle(isItemActive(item))">
+                      <Icon v-if="item.icon" :icon="item.icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <span
-                      :class="cn(
-                        'flex-1 truncate font-semibold text-xs sm:text-md',
-                        getHeaderActiveTextClasses(isItemActive(item))
-                      )"
-                      :style="getHeaderActiveTextStyle(isItemActive(item))"
-                    >
+                    <span :class="cn(
+                      'flex-1 truncate font-semibold text-xs sm:text-md',
+                      getHeaderActiveTextClasses(isItemActive(item))
+                    )" :style="getHeaderActiveTextStyle(isItemActive(item))">
                       {{ item.label }}
                     </span>
                   </router-link>
-                  <button
-                    v-else
+                  <button v-else
                     class="flex items-center w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ui-text hover:bg-[var(--ui-surface-muted)] hover:text-[var(--ui-text)] border border-transparent"
-                    @click="handleProfileAction(item)"
-                  >
+                    @click="handleProfileAction(item)">
                     <div
-                      class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2 ui-surface-muted ui-text group-hover:bg-[var(--ui-bg)]"
-                    >
-                      <Icon
-                        v-if="item.icon"
-                        :icon="item.icon"
-                        class="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                      />
+                      class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2 ui-surface-muted ui-text group-hover:bg-[var(--ui-bg)]">
+                      <Icon v-if="item.icon" :icon="item.icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <span class="flex-1 truncate font-semibold ui-text text-xs sm:text-md">
                       {{ item.label }}
@@ -964,15 +757,10 @@ watch(resolvedUserAvatarUrl, () => {
               <div class="border-t ui-border-strong py-2">
                 <button
                   class="flex items-center w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ui-danger hover:bg-[var(--ui-danger-soft)] border border-transparent"
-                  @click="handleLogout"
-                >
+                  @click="handleLogout">
                   <div
-                    class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-1 sm:mr-1 shrink-0 transition-colors ml-1 sm:ml-2 ui-danger-soft ui-danger group-hover:bg-[var(--ui-danger-soft)]"
-                  >
-                    <Icon
-                      icon="sign-out-alt"
-                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                    />
+                    class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-1 sm:mr-1 shrink-0 transition-colors ml-1 sm:ml-2 ui-danger-soft ui-danger group-hover:bg-[var(--ui-danger-soft)]">
+                    <Icon icon="sign-out-alt" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
                   <span class="truncate font-semibold ui-danger text-xs sm:text-md">
                     Sign out
@@ -989,10 +777,8 @@ watch(resolvedUserAvatarUrl, () => {
 
 <style scoped>
 .kv-module-header {
-  background: color-mix(
-    in oklab,
-    var(--module-soft, var(--ui-primary-soft)) 62%,
-    var(--ui-surface) 38%
-  );
+  background: color-mix(in oklab,
+      var(--module-soft, var(--ui-primary-soft)) 62%,
+      var(--ui-surface) 38%);
 }
 </style>
