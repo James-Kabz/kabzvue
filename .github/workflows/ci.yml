@@ -13,30 +13,45 @@ jobs:
       docs_only: ${{ steps.classifier.outputs.docs_only }}
       reason: ${{ steps.classifier.outputs.reason }}
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Classify workflow mode
       id: classifier
       env:
         EVENT_NAME: ${{ github.event_name }}
-        REF_NAME: ${{ github.ref_name }}
-        HEAD_COMMIT_MSG: ${{ github.event.head_commit.message }}
-        PR_TITLE: ${{ github.event.pull_request.title }}
+        BEFORE_SHA: ${{ github.event.before }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        CURRENT_SHA: ${{ github.sha }}
       run: |
-        MESSAGE="$HEAD_COMMIT_MSG"
-        BRANCH="$REF_NAME"
-
         if [ "$EVENT_NAME" = "pull_request" ]; then
-          MESSAGE="$PR_TITLE"
+          BASE_REF="$BASE_SHA"
+          HEAD_REF="$HEAD_SHA"
+        else
+          BASE_REF="$BEFORE_SHA"
+          HEAD_REF="$CURRENT_SHA"
         fi
 
-        if [ "$BRANCH" = "docs/usage-update" ]; then
-          echo "docs_only=true" >> "$GITHUB_OUTPUT"
-          echo "reason=docs branch (docs/usage-update)" >> "$GITHUB_OUTPUT"
-        elif echo "$MESSAGE" | grep -Eiq '^docs(\(|:|!|[[:space:]])'; then
-          echo "docs_only=true" >> "$GITHUB_OUTPUT"
-          echo "reason=conventional docs commit detected" >> "$GITHUB_OUTPUT"
-        else
+        if [ -z "$BASE_REF" ] || [ "$BASE_REF" = "0000000000000000000000000000000000000000" ]; then
           echo "docs_only=false" >> "$GITHUB_OUTPUT"
-          echo "reason=standard ci/release path" >> "$GITHUB_OUTPUT"
+          echo "reason=no comparable base sha; running full ci" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        CHANGED_FILES="$(git diff --name-only "$BASE_REF" "$HEAD_REF")"
+
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          echo "reason=no changed files detected; running full ci" >> "$GITHUB_OUTPUT"
+        elif echo "$CHANGED_FILES" | grep -Eqv '^(README\.md|docs/|public/|resources/|vercel\.json$)'; then
+          echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          echo "reason=non-docs files changed" >> "$GITHUB_OUTPUT"
+        else
+          echo "docs_only=true" >> "$GITHUB_OUTPUT"
+          echo "reason=docs-only file changes" >> "$GITHUB_OUTPUT"
         fi
 
   test:
@@ -155,16 +170,16 @@ jobs:
       run: |
         # Get commit messages since last tag
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-        COMMITS=$(git log --oneline ${LAST_TAG}..HEAD 2>/dev/null || echo "")
+        COMMITS=$(git log --format=%B ${LAST_TAG}..HEAD 2>/dev/null || echo "")
 
         # Determine bump type based on commit messages
-        if echo "$COMMITS" | grep -q "BREAKING CHANGE\|!:"; then
+        if echo "$COMMITS" | grep -Eiq 'BREAKING CHANGE|^[a-z]+(\([^)]+\))?!:'; then
           echo "bump=major" >> $GITHUB_OUTPUT
           echo "reason=BREAKING CHANGE detected" >> $GITHUB_OUTPUT
-        elif echo "$COMMITS" | grep -q "feat:"; then
+        elif echo "$COMMITS" | grep -Eiq '^feat(\([^)]+\))?:'; then
           echo "bump=minor" >> $GITHUB_OUTPUT
           echo "reason=New features detected" >> $GITHUB_OUTPUT
-        elif echo "$COMMITS" | grep -q "fix:"; then
+        elif echo "$COMMITS" | grep -Eiq '^fix(\([^)]+\))?:'; then
           echo "bump=patch" >> $GITHUB_OUTPUT
           echo "reason=Bug fixes detected" >> $GITHUB_OUTPUT
         else
@@ -187,12 +202,12 @@ jobs:
 
         # Commit version change
         git add package.json package-lock.json
-        git commit -m "chore: release v${NEW_VERSION}"
-
-        # Create and push tag
-        git tag "v${NEW_VERSION}"
-        git push origin main
-        git push origin "v${NEW_VERSION}"
+        git commit -m "chore: release v${NEW_VERSION} [skip ci]"
 
         # Publish to NPM using OIDC (no token needed!)
         npm publish --access public
+
+        # Create and push release metadata only after publish succeeds
+        git tag "v${NEW_VERSION}"
+        git push origin HEAD:main
+        git push origin "v${NEW_VERSION}"
