@@ -54,7 +54,7 @@ const toggleMobileSidebar = () => {
         <div class="flex items-center gap-3">
           <button
             type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-md border ui-border-strong hover:bg-(--ui-surface-soft) lg:hidden"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-md border ui-border-strong hover:bg-[var(--ui-surface-soft)] lg:hidden"
             @click="toggleMobileSidebar"
           >
             <Icon
@@ -88,7 +88,7 @@ const toggleMobileSidebar = () => {
             :href="githubUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-md border ui-border-strong px-3 py-1.5 text-xs font-medium hover:bg-(--ui-surface-soft)"
+            class="rounded-md border ui-border-strong px-3 py-1.5 text-xs font-medium hover:bg-[var(--ui-surface-soft)]"
           >
             GitHub
           </a>

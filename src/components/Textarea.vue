@@ -75,7 +75,7 @@ const ariaDescribedBy = computed(() =>
 
 // variants with cva
 const textareaVariants = cva(
-  'block w-full rounded-lg border ui-surface   transition-colors duration-200 placeholder:text-(--ui-text-muted) focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-(--ui-surface) disabled:text-(--ui-text) disabled:cursor-not-allowed',
+  'block w-full rounded-lg border ui-surface   transition-colors duration-200 placeholder:text-[var(--ui-text-muted)] focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-[var(--ui-surface)] disabled:text-[var(--ui-text)] disabled:cursor-not-allowed',
   {
     variants: {
       size: {
@@ -84,9 +84,9 @@ const textareaVariants = cva(
         lg: 'px-4 py-3 text-base'
       },
       variant: {
-        default: 'ui-border-strong focus:border-(--ui-primary) focus:ring-(--ui-primary)',
-        error: 'border-(--ui-danger-soft) focus:border-(--ui-danger) focus:ring-(--ui-danger)',
-        success: 'border-(--ui-success-soft) focus:border-(--ui-success) focus:ring-(--ui-success)'
+        default: 'ui-border-strong focus:border-[var(--ui-primary)] focus:ring-[var(--ui-primary)]',
+        error: 'border-[var(--ui-danger-soft)] focus:border-[var(--ui-danger)] focus:ring-[var(--ui-danger)]',
+        success: 'border-[var(--ui-success-soft)] focus:border-[var(--ui-success)] focus:ring-[var(--ui-success)]'
       },
       resize: {
         none: 'resize-none',

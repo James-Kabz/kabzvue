@@ -167,7 +167,7 @@ const variantClasses = computed(() => {
 
 const colorClasses = computed(() => {
   if (props.gradient) {
-    return 'bg-linear-to-r from-(--ui-primary) to-(--ui-accent) bg-clip-text text-transparent'
+    return 'bg-linear-to-r from-[var(--ui-primary)] to-[var(--ui-accent)] bg-clip-text text-transparent'
   }
   
   const colors = {

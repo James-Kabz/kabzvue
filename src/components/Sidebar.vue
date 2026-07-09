@@ -216,9 +216,9 @@ const isItemActive = (item) => {
 }
 
 const getActiveCardClasses = (active) => {
-  if (!active) return 'ui-text hover:bg-(--ui-surface-muted) border border-transparent'
+  if (!active) return 'ui-text hover:bg-[var(--ui-surface-muted)] border border-transparent'
   if (props.themeScope === 'module') return 'border shadow-sm'
-  return 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-(--ui-primary-soft) shadow-sm'
+  return 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 18%)] border border-[var(--ui-primary-soft)] shadow-sm'
 }
 
 const getActiveCardStyle = (active) => {
@@ -230,7 +230,7 @@ const getActiveCardStyle = (active) => {
 }
 
 const getActiveIconClasses = (active) => {
-  if (!active) return 'ui-surface-muted ui-text-soft group-hover:text-(--ui-text) group-hover:bg-(--ui-primary-soft)'
+  if (!active) return 'ui-surface-muted ui-text-soft group-hover:text-[var(--ui-text)] group-hover:bg-[var(--ui-primary-soft)]'
   if (props.themeScope === 'module') return 'shadow-sm text-white'
   return 'ui-primary-bg shadow-sm'
 }
@@ -250,7 +250,7 @@ const getActiveIconStyle = (active) => {
 }
 
 const getActiveTextClasses = (active) => {
-  if (!active) return 'ui-text group-hover:text-(--ui-text)'
+  if (!active) return 'ui-text group-hover:text-[var(--ui-text)]'
   if (props.themeScope === 'module') return 'ui-text font-semibold'
   return 'ui-primary font-semibold'
 }
@@ -343,7 +343,7 @@ defineExpose({
           {{ header?.title }}
         </h2>
         <button
-          class="p-2 rounded-lg ui-text hover:bg-(--ui-surface-muted) transition-colors"
+          class="p-2 rounded-lg ui-text hover:bg-[var(--ui-surface-muted)] transition-colors"
           aria-label="Close sidebar"
           @click="closeMobileSidebar"
         >
@@ -511,7 +511,7 @@ defineExpose({
                 v-model="searchQuery"
                 type="text"
                 :placeholder="searchPlaceholder"
-                class="w-full px-3 py-2 pl-9 pr-9 text-sm border ui-border-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all ui-bg"
+                class="w-full px-3 py-2 pl-9 pr-9 text-sm border ui-border-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent transition-all ui-bg"
                 @input="handleSearch(searchQuery)"
               >
               <div class="absolute left-3 top-1/2 transform -translate-y-1/2 ui-text-soft">
@@ -522,7 +522,7 @@ defineExpose({
               </div>
               <button
                 v-if="searchQuery"
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 ui-text-soft hover:text-(--ui-text) transition-colors p-1"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 ui-text-soft hover:text-[var(--ui-text)] transition-colors p-1"
                 @click="clearSearch"
               >
                 <Icon
@@ -552,7 +552,7 @@ defineExpose({
                   'mx-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                   isItemActive(subItem)
                     ? 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 22%)] ui-primary'
-                    : 'ui-text hover:bg-(--ui-surface-muted)'
+                    : 'ui-text hover:bg-[var(--ui-surface-muted)]'
                 )"
                 @click="handleSubmenuNavigation(subItem)"
               >

@@ -655,7 +655,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
       </p>
       <RouterLink
         to="/components/components"
-        class="mt-4 inline-flex rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+        class="mt-4 inline-flex rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
       >
         Back to Components
       </RouterLink>
@@ -678,7 +678,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
 
           <RouterLink
             to="/components/components"
-            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
           >
             All components
           </RouterLink>
@@ -686,7 +686,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
 
         <p
           v-if="componentDoc.sourcePath"
-          class="mt-4 rounded-md border ui-border-strong bg-(--ui-surface-soft) px-3 py-2 text-xs ui-text-muted"
+          class="mt-4 rounded-md border ui-border-strong bg-[var(--ui-surface-soft)] px-3 py-2 text-xs ui-text-muted"
         >
           Source: {{ componentDoc.sourcePath }}
         </p>
@@ -737,7 +737,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
           </h2>
           <button
             type="button"
-            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
             @click="resetPlayground"
           >
             Reset Props
@@ -821,7 +821,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
                 <template v-else-if="control.control === 'number'">
                   <input
                     type="number"
-                    class="w-full rounded-md border ui-border-strong bg-(--ui-surface) px-3 py-2 text-sm"
+                    class="w-full rounded-md border ui-border-strong bg-[var(--ui-surface)] px-3 py-2 text-sm"
                     :value="playgroundValues[control.name]"
                     @input="updateNumberProp(control.name, $event)"
                   >
@@ -829,7 +829,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
 
                 <template v-else-if="control.control === 'json'">
                   <textarea
-                    class="min-h-24 w-full rounded-md border ui-border-strong bg-(--ui-surface) px-3 py-2 text-xs font-mono"
+                    class="min-h-24 w-full rounded-md border ui-border-strong bg-[var(--ui-surface)] px-3 py-2 text-xs font-mono"
                     :value="jsonDrafts[control.name]"
                     @input="updateJsonProp(control.name, $event)"
                   />
@@ -844,7 +844,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
                 <template v-else>
                   <input
                     type="text"
-                    class="w-full rounded-md border ui-border-strong bg-(--ui-surface) px-3 py-2 text-sm"
+                    class="w-full rounded-md border ui-border-strong bg-[var(--ui-surface)] px-3 py-2 text-sm"
                     :value="playgroundValues[control.name]"
                     @input="updateTextProp(control.name, $event)"
                   >
@@ -938,7 +938,7 @@ watch(componentSlug, loadRuntimeComponent, { immediate: true })
             v-for="entry in relatedComponents"
             :key="entry.slug"
             :to="`/components/components/${entry.slug}`"
-            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
           >
             {{ entry.name }}
           </RouterLink>

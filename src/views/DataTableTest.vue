@@ -31,7 +31,7 @@
         <!-- Additional toolbar actions -->
         <button
           :disabled="selectedUsers.length === 0"
-          class="px-3 py-2 text-sm ui-text hover:text-(--ui-text) border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-3 py-2 text-sm ui-text hover:text-[var(--ui-text)] border ui-border-strong rounded-md hover:bg-[var(--ui-surface)] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="handleBulkExport"
         >
           <font-awesome-icon icon="download" />
@@ -491,8 +491,8 @@ const filteredUsers = computed(() => {
 const showStatusMessage = (message, type = 'success') => {
   statusMessage.value = message
   statusMessageClass.value = type === 'success'
-    ? 'ui-success-soft ui-success border border-(--ui-success-soft)'
-    : 'ui-danger-soft ui-danger border border-(--ui-danger-soft)'
+    ? 'ui-success-soft ui-success border border-[var(--ui-success-soft)]'
+    : 'ui-danger-soft ui-danger border border-[var(--ui-danger-soft)]'
 
   setTimeout(() => {
     statusMessage.value = ''

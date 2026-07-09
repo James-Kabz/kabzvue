@@ -91,11 +91,11 @@ describe('Form Integration', () => {
 
     // Check error styling
     const errorInput = wrapper.findAll('input')[0]
-    expect(errorInput.classes()).toContain('border-(--ui-danger-soft)')
+    expect(errorInput.classes()).toContain('border-[var(--ui-danger-soft)]')
 
     // Check success styling
     const successInput = wrapper.findAll('input')[1]
-    expect(successInput.classes()).toContain('border-(--ui-success-soft)')
+    expect(successInput.classes()).toContain('border-[var(--ui-success-soft)]')
 
     // Button should be disabled
     expect(wrapper.find('button').attributes('disabled')).toBeDefined()

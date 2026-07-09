@@ -69,12 +69,15 @@
     </div>
 
     <!-- Content -->
-    <div
-      v-if="$slots.default"
-      :class="cn(contentVariants({ padding }))"
-    >
-      <slot />
-    </div>
+    <template v-if="$slots.default">
+      <div
+        v-if="contentWrapper"
+        :class="cn(contentVariants({ padding }), contentClass)"
+      >
+        <slot />
+      </div>
+      <slot v-else />
+    </template>
 
     <!-- Footer -->
     <div
@@ -137,6 +140,14 @@ const props = defineProps({
   },
   subtitle: String,
   badge: String,
+  contentClass: {
+    type: [String, Array, Object],
+    default: ''
+  },
+  contentWrapper: {
+    type: Boolean,
+    default: true
+  },
   
   // Image props
   image: String,
@@ -240,7 +251,7 @@ const cardVariants = cva(
         true: 'hover:shadow-lg hover:scale-[1.02]'
       },
       clickable: {
-        true: 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-(--ui-ring) focus:ring-offset-2'
+        true: 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--ui-ring)] focus:ring-offset-2'
       },
       loading: {
         true: ''
@@ -270,7 +281,7 @@ const cardVariants = cva(
       {
         clickable: true,
         hoverable: false,
-        class: 'hover:bg-(--ui-surface)'
+        class: 'hover:bg-[var(--ui-surface)]'
       }
     ],
     defaultVariants: {

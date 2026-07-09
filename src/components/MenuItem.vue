@@ -49,12 +49,12 @@ const props = defineProps({
 const emit = defineEmits(['click'])
 
 const itemVariants = cva(
-  'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-(--ui-surface) focus:text-(--ui-text) data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full text-left',
+  'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-[var(--ui-surface)] focus:text-[var(--ui-text)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full text-left',
   {
     variants: {
       variant: {
-        default: 'hover:bg-(--ui-surface) hover:text-(--ui-text)',
-        danger: 'ui-danger hover:bg-(--ui-danger-soft) hover:text-(--ui-danger)'
+        default: 'hover:bg-[var(--ui-surface)] hover:text-[var(--ui-text)]',
+        danger: 'ui-danger hover:bg-[var(--ui-danger-soft)] hover:text-[var(--ui-danger)]'
       }
     }
   }

@@ -30,7 +30,7 @@ const copySnippet = async () => {
           :href="githubUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+          class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
         >
           Open GitHub Repository
         </a>
@@ -38,7 +38,7 @@ const copySnippet = async () => {
           :href="`${githubUrl}/issues`"
           target="_blank"
           rel="noopener noreferrer"
-          class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+          class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
         >
           Report an Issue
         </a>

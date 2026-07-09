@@ -124,44 +124,44 @@ const isDisabled = computed(() => {
 })
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-primary) focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-primary)] focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
         primary:
-          'ui-primary-bg shadow-sm hover:bg-(--ui-primary-strong) hover:shadow-md',
+          'ui-primary-bg shadow-sm hover:bg-[var(--ui-primary-strong)] hover:shadow-md',
         default:
-          'ui-primary-bg shadow-sm hover:bg-(--ui-primary-strong) hover:shadow-md',
+          'ui-primary-bg shadow-sm hover:bg-[var(--ui-primary-strong)] hover:shadow-md',
         danger:
-          'ui-danger-bg shadow-sm hover:bg-(--ui-danger-strong) hover:shadow-md',
+          'ui-danger-bg shadow-sm hover:bg-[var(--ui-danger-strong)] hover:shadow-md',
         outline:
-          'border ui-border-strong ui-surface ui-text hover:bg-(--ui-surface-soft) hover:border-(--ui-primary) hover:text-(--ui-primary)',
+          'border ui-border-strong ui-surface ui-text hover:bg-[var(--ui-surface-soft)] hover:border-[var(--ui-primary)] hover:text-[var(--ui-primary)]',
         secondary:
-          'border ui-border ui-surface-muted ui-text hover:bg-(--ui-surface-soft) hover:shadow-sm',
+          'border ui-border ui-surface-muted ui-text hover:bg-[var(--ui-surface-soft)] hover:shadow-sm',
         ghost:
-          'bg-transparent ui-text-muted hover:bg-[color:color-mix(in oklab, var(--ui-accent-soft), transparent 40%)] hover:text-(--ui-text)',
+          'bg-transparent ui-text-muted hover:bg-[color:color-mix(in oklab, var(--ui-accent-soft), transparent 40%)] hover:text-[var(--ui-text)]',
         link:
-          'ui-primary underline-offset-4 hover:underline hover:text-(--ui-primary-strong)',
+          'ui-primary underline-offset-4 hover:underline hover:text-[var(--ui-primary-strong)]',
         success:
-          'ui-success-bg shadow-sm hover:bg-(--ui-success-strong) hover:shadow-md',
+          'ui-success-bg shadow-sm hover:bg-[var(--ui-success-strong)] hover:shadow-md',
         warning:
-          'ui-warning-bg shadow-sm hover:bg-(--ui-warning-strong) hover:shadow-md',
+          'ui-warning-bg shadow-sm hover:bg-[var(--ui-warning-strong)] hover:shadow-md',
         info:
           'border border-blue-600 bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md dark:border-blue-500 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400',
         subtle:
-          'border ui-border ui-surface ui-text-muted hover:text-(--ui-text) hover:bg-(--ui-surface-soft)',
+          'border ui-border ui-surface ui-text-muted hover:text-[var(--ui-text)] hover:bg-[var(--ui-surface-soft)]',
         dark:
           'border border-zinc-900 bg-zinc-900 text-white shadow-sm hover:bg-black hover:shadow-md dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white',
         light:
           'border border-zinc-200 bg-white text-zinc-900 shadow-sm hover:bg-zinc-50 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800',
         primaryOutline:
-          'border border-(--ui-primary) ui-primary bg-transparent hover:bg-(--ui-primary-soft) hover:border-(--ui-primary-strong) hover:text-(--ui-primary-strong)',
+          'border border-[var(--ui-primary)] ui-primary bg-transparent hover:bg-[var(--ui-primary-soft)] hover:border-[var(--ui-primary-strong)] hover:text-[var(--ui-primary-strong)]',
         dangerOutline:
-          'border border-(--ui-danger) ui-danger bg-transparent hover:bg-(--ui-danger-soft) hover:border-(--ui-danger-strong) hover:text-(--ui-danger-strong)',
+          'border border-[var(--ui-danger)] ui-danger bg-transparent hover:bg-[var(--ui-danger-soft)] hover:border-[var(--ui-danger-strong)] hover:text-[var(--ui-danger-strong)]',
         successOutline:
-          'border border-(--ui-success) ui-success bg-transparent hover:bg-(--ui-success-soft) hover:border-(--ui-success-strong) hover:text-(--ui-success-strong)',
+          'border border-[var(--ui-success)] ui-success bg-transparent hover:bg-[var(--ui-success-soft)] hover:border-[var(--ui-success-strong)] hover:text-[var(--ui-success-strong)]',
         gradient:
-          'bg-linear-to-r from-(--ui-primary) to-(--ui-accent) ui-text-inverse shadow-sm hover:from-(--ui-primary-strong) hover:to-(--ui-accent-strong) hover:shadow-md',
+          'bg-linear-to-r from-[var(--ui-primary)] to-[var(--ui-accent)] ui-text-inverse shadow-sm hover:from-[var(--ui-primary-strong)] hover:to-[var(--ui-accent-strong)] hover:shadow-md',
       },
       size: {
         '2xs': 'h-4 px-1 py-3 text-md rounded',

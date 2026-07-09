@@ -76,38 +76,38 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          'border border-(--ui-primary-soft) ui-primary-soft ui-primary hover:bg-(--ui-primary-soft) dark:border-(--ui-primary-soft) dark:bg-(--ui-primary-soft) dark:text-(--ui-primary)',
+          'border border-[var(--ui-primary-soft)] ui-primary-soft ui-primary hover:bg-[var(--ui-primary-soft)] dark:border-[var(--ui-primary-soft)] dark:bg-[var(--ui-primary-soft)] dark:text-[var(--ui-primary)]',
         secondary:
-          'border ui-border-strong ui-surface-muted ui-text hover:bg-(--ui-surface) dark:border-(--ui-border-strong) dark:bg-(--ui-surface) dark:text-(--ui-text)',
+          'border ui-border-strong ui-surface-muted ui-text hover:bg-[var(--ui-surface)] dark:border-[var(--ui-border-strong)] dark:bg-[var(--ui-surface)] dark:text-[var(--ui-text)]',
         danger:
-          'border border-(--ui-danger-soft) ui-danger-soft ui-danger hover:bg-(--ui-danger-soft) dark:border-(--ui-danger-soft) dark:bg-(--ui-danger-soft) dark:text-(--ui-danger)',
+          'border border-[var(--ui-danger-soft)] ui-danger-soft ui-danger hover:bg-[var(--ui-danger-soft)] dark:border-[var(--ui-danger-soft)] dark:bg-[var(--ui-danger-soft)] dark:text-[var(--ui-danger)]',
         primary:
-          'border border-(--ui-primary-soft) ui-primary-soft ui-primary hover:bg-(--ui-primary-soft) dark:border-(--ui-primary-soft) dark:bg-(--ui-primary-soft) dark:text-(--ui-primary)',
+          'border border-[var(--ui-primary-soft)] ui-primary-soft ui-primary hover:bg-[var(--ui-primary-soft)] dark:border-[var(--ui-primary-soft)] dark:bg-[var(--ui-primary-soft)] dark:text-[var(--ui-primary)]',
         outline: 'ui-text border',
         success:
-          'border border-(--ui-success-soft) ui-success-soft ui-success dark:border-(--ui-success-soft) dark:bg-(--ui-success-soft) dark:text-(--ui-success)',
+          'border border-[var(--ui-success-soft)] ui-success-soft ui-success dark:border-[var(--ui-success-soft)] dark:bg-[var(--ui-success-soft)] dark:text-[var(--ui-success)]',
         warning:
-          'border border-(--ui-warning-soft) ui-warning-soft ui-warning hover:bg-(--ui-warning-soft) dark:border-(--ui-warning-soft) dark:bg-(--ui-warning-soft) dark:text-(--ui-warning)',
+          'border border-[var(--ui-warning-soft)] ui-warning-soft ui-warning hover:bg-[var(--ui-warning-soft)] dark:border-[var(--ui-warning-soft)] dark:bg-[var(--ui-warning-soft)] dark:text-[var(--ui-warning)]',
         info:
-          'border border-(--ui-primary-soft) ui-primary-soft ui-primary hover:bg-(--ui-primary-soft) dark:border-(--ui-primary-soft) dark:bg-(--ui-primary-soft) dark:text-(--ui-primary)',
+          'border border-[var(--ui-primary-soft)] ui-primary-soft ui-primary hover:bg-[var(--ui-primary-soft)] dark:border-[var(--ui-primary-soft)] dark:bg-[var(--ui-primary-soft)] dark:text-[var(--ui-primary)]',
         ghost:
-          'bg-transparent ui-text hover:bg-(--ui-surface)',
+          'bg-transparent ui-text hover:bg-[var(--ui-surface)]',
         link:
           'ui-primary hover:underline',
         subtle:
-          'ui-surface-muted ui-text hover:bg-(--ui-bg)',
+          'ui-surface-muted ui-text hover:bg-[var(--ui-bg)]',
         dark:
-          'ui-bg ui-text hover:bg-(--ui-bg)',
+          'ui-bg ui-text hover:bg-[var(--ui-bg)]',
         light:
-          'ui-surface-muted ui-text border ui-border-strong hover:bg-(--ui-surface)',
+          'ui-surface-muted ui-text border ui-border-strong hover:bg-[var(--ui-surface)]',
         primaryOutline:
-          'border border-(--ui-primary) ui-primary bg-transparent hover:bg-(--ui-primary-soft)',
+          'border border-[var(--ui-primary)] ui-primary bg-transparent hover:bg-[var(--ui-primary-soft)]',
         dangerOutline:
-          'border border-(--ui-danger) ui-danger bg-transparent hover:bg-(--ui-danger-soft)',
+          'border border-[var(--ui-danger)] ui-danger bg-transparent hover:bg-[var(--ui-danger-soft)]',
         successOutline:
-          'border border-(--ui-success) ui-success bg-transparent hover:bg-(--ui-success-soft)',
+          'border border-[var(--ui-success)] ui-success bg-transparent hover:bg-[var(--ui-success-soft)]',
         gradient:
-          'bg-linear-to-r from-(--ui-primary-soft) to-(--ui-accent) ui-text hover:from-(--ui-primary) hover:to-(--ui-accent)',
+          'bg-linear-to-r from-[var(--ui-primary-soft)] to-[var(--ui-accent)] ui-text hover:from-[var(--ui-primary)] hover:to-[var(--ui-accent)]',
       },
       size: {
         sm: 'px-2 py-0.5 text-xs',

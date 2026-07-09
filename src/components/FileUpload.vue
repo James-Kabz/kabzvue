@@ -29,8 +29,8 @@ const dropzoneVariants = cva(
   {
     variants: {
       variant: {
-        default: 'ui-border-strong  hover:border-(--ui-border-strong) hover:bg-(--ui-surface) focus-within:ring-2 focus-within:ring-(--ui-primary)',
-        dashed: 'border-(--ui-primary-soft) hover:border-(--ui-primary-soft) hover:bg-(--ui-primary-soft) focus-within:ring-2 focus-within:ring-(--ui-primary)'
+        default: 'ui-border-strong  hover:border-[var(--ui-border-strong)] hover:bg-[var(--ui-surface)] focus-within:ring-2 focus-within:ring-[var(--ui-primary)]',
+        dashed: 'border-[var(--ui-primary-soft)] hover:border-[var(--ui-primary-soft)] hover:bg-[var(--ui-primary-soft)] focus-within:ring-2 focus-within:ring-[var(--ui-primary)]'
       }
     }
   }
@@ -40,9 +40,9 @@ const dropzoneClasses = computed(() =>
   cn(
     dropzoneVariants({ variant: props.variant }),
     {
-      'border-(--ui-success) ui-success-soft shadow-md': files.value.length > 0 && !isDragOver.value,
-      'border-(--ui-primary) ui-primary-soft ring-4 ring-(--ui-primary) shadow-lg': isDragOver.value,
-      'border-(--ui-success) ui-success-soft ring-4 ring-(--ui-success) shadow-lg': files.value.length > 0 && isDragOver.value
+      'border-[var(--ui-success)] ui-success-soft shadow-md': files.value.length > 0 && !isDragOver.value,
+      'border-[var(--ui-primary)] ui-primary-soft ring-4 ring-[var(--ui-primary)] shadow-lg': isDragOver.value,
+      'border-[var(--ui-success)] ui-success-soft ring-4 ring-[var(--ui-success)] shadow-lg': files.value.length > 0 && isDragOver.value
     }
   )
 )
@@ -268,7 +268,7 @@ const getUploadTone = (progress) => {
           </div>
         </div>
         <button
-          class="ui-text hover:text-(--ui-danger) hover:bg-(--ui-danger-soft) rounded-full p-1 transition-colors"
+          class="ui-text hover:text-[var(--ui-danger)] hover:bg-[var(--ui-danger-soft)] rounded-full p-1 transition-colors"
           @click="removeFile(index)"
         >
           <Icon

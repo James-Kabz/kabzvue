@@ -15,7 +15,7 @@
 
     <!-- Dot / Icon -->
     <div
-      class="z-10 flex items-center justify-center w-6 h-6 rounded-full border-2 border-(--ui-primary) ui-surface  ui-primary"
+      class="z-10 flex items-center justify-center w-6 h-6 rounded-full border-2 border-[var(--ui-primary)] ui-surface  ui-primary"
     >
       <slot name="icon">
         <!-- Default dot -->

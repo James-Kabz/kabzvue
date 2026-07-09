@@ -203,9 +203,9 @@ watch(isOpen, (open) => {
       type="button"
       :disabled="disabled"
       :class="[
-        'w-full px-3 py-2.5 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) ui-surface  min-h-[42px]',
-        hasError ? 'border-(--ui-danger)' : 'ui-border-strong ',
-        disabled ? 'ui-surface-muted cursor-not-allowed opacity-50' : 'hover:border-(--ui-border-strong)'
+        'w-full px-3 py-2.5 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] ui-surface  min-h-[42px]',
+        hasError ? 'border-[var(--ui-danger)]' : 'ui-border-strong ',
+        disabled ? 'ui-surface-muted cursor-not-allowed opacity-50' : 'hover:border-[var(--ui-border-strong)]'
       ]"
       @click="toggleDropdown"
       @keydown="handleKeydown"
@@ -257,7 +257,7 @@ watch(isOpen, (open) => {
           ref="dropdownRef"
           :style="dropdownStyle"
           data-multiselect-dropdown
-          class="shadow-lg rounded-md text-base ring-1 ring-(--ui-border-strong) ring-opacity-5 overflow-hidden focus:outline-none ui-surface flex flex-col overscroll-contain"
+          class="shadow-lg rounded-md text-base ring-1 ring-[var(--ui-border-strong)] ring-opacity-5 overflow-hidden focus:outline-none ui-surface flex flex-col overscroll-contain"
         >
           <!-- Search input -->
           <div class="px-3 py-2.5 border-b ui-border-strong  ui-surface-muted">
@@ -266,7 +266,7 @@ watch(isOpen, (open) => {
               v-model="searchQuery"
               type="text"
               placeholder="Search options..."
-              class="w-full px-3 py-2 text-sm border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent ui-surface placeholder:text-(--ui-text-muted)"
+              class="w-full px-3 py-2 text-sm border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent ui-surface placeholder:text-[var(--ui-text-muted)]"
               @input="filterOptions"
               @keydown.stop
             >
@@ -282,7 +282,7 @@ watch(isOpen, (open) => {
               v-for="option in filteredOptions"
               :key="option.value"
               type="button"
-              class="cursor-pointer select-none relative py-2.5 pl-3 pr-9 w-full text-left hover:bg-(--ui-primary-soft) focus:bg-(--ui-primary-soft) focus:outline-none transition-colors duration-150"
+              class="cursor-pointer select-none relative py-2.5 pl-3 pr-9 w-full text-left hover:bg-[var(--ui-primary-soft)] focus:bg-[var(--ui-primary-soft)] focus:outline-none transition-colors duration-150"
               :class="{ 'ui-primary-soft': modelValue.includes(option.value) }"
               @click="toggleOption(option.value)"
             >
@@ -290,7 +290,7 @@ watch(isOpen, (open) => {
                 <input
                   type="checkbox"
                   :checked="modelValue.includes(option.value)"
-                  class="h-4 w-4 ui-primary focus:ring-(--ui-primary) ui-border-strong  rounded cursor-pointer pointer-events-none"
+                  class="h-4 w-4 ui-primary focus:ring-[var(--ui-primary)] ui-border-strong  rounded cursor-pointer pointer-events-none"
                   readonly
                   tabindex="-1"
                 >

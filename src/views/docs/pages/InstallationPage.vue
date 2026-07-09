@@ -89,8 +89,8 @@ const copySnippet = async (key, content) => {
           :class="[
             'rounded-md border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide',
             selectedManager === manager
-              ? 'ui-primary-bg border-(--ui-primary)'
-              : 'ui-border-strong hover:bg-(--ui-surface-soft)'
+              ? 'ui-primary-bg border-[var(--ui-primary)]'
+              : 'ui-border-strong hover:bg-[var(--ui-surface-soft)]'
           ]"
           @click="selectedManager = manager"
         >

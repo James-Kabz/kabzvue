@@ -30,7 +30,7 @@
         :model-value="modelValue"
         :disabled="false"
         :required="required"
-        :class="hasError ? 'border-(--ui-danger)' : ''"
+        :class="hasError ? 'border-[var(--ui-danger)]' : ''"
         @update:model-value="emit('update:modelValue', $event)"
       />
       <slot
@@ -46,7 +46,7 @@
       <button
         v-if="type === 'password'"
         type="button"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center ui-text hover:text-(--ui-text) transition-colors"
+        class="absolute inset-y-0 right-0 pr-3 flex items-center ui-text hover:text-[var(--ui-text)] transition-colors"
         :aria-label="showPassword ? 'Hide password' : 'Show password'"
         @click="togglePasswordVisibility"
       >

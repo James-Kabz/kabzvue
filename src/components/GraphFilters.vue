@@ -301,27 +301,27 @@ const filtersClasses = computed(() =>
 )
 
 const dateInputClasses = computed(() =>
-    'w-full pl-10 pr-3 py-2 border ui-border-strong  rounded-lg focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent text-sm ui-surface '
+    'w-full pl-10 pr-3 py-2 border ui-border-strong  rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent text-sm ui-surface '
 )
 
 const selectClasses = computed(() =>
-    'w-full pr-8 appearance-none border ui-border-strong  rounded-lg focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent text-sm py-2 pl-3 ui-surface '
+    'w-full pr-8 appearance-none border ui-border-strong  rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent text-sm py-2 pl-3 ui-surface '
 )
 
 const clearFiltersButtonClasses = computed(() =>
-    'ui-text hover:text-(--ui-text) border   hover:brightness-105 px-3 py-2 rounded-lg text-sm font-medium transition-all'
+    'ui-text hover:text-[var(--ui-text)] border   hover:brightness-105 px-3 py-2 rounded-lg text-sm font-medium transition-all'
 )
 
 const exportButtonClasses = computed(() =>
-    'ui-text ui-primary-bg hover:bg-(--ui-primary-strong) border border-(--ui-primary)  px-3 py-2 rounded-lg text-sm font-medium transition-all'
+    'ui-text ui-primary-bg hover:bg-[var(--ui-primary-strong)] border border-[var(--ui-primary)]  px-3 py-2 rounded-lg text-sm font-medium transition-all'
 )
 
 const refreshButtonClasses = computed(() =>
-    'ui-text hover:text-(--ui-text) border   hover:brightness-105 px-3 py-2 rounded-lg text-sm font-medium transition-all'
+    'ui-text hover:text-[var(--ui-text)] border   hover:brightness-105 px-3 py-2 rounded-lg text-sm font-medium transition-all'
 )
 
 const activeFiltersContainerClasses = computed(() =>
-    'px-6 py-3 ui-primary-soft border-t border-(--ui-primary-soft)'
+    'px-6 py-3 ui-primary-soft border-t border-[var(--ui-primary-soft)]'
 )
 
 const activeFiltersLabelClasses = computed(() =>
@@ -329,11 +329,11 @@ const activeFiltersLabelClasses = computed(() =>
 )
 
 const activeFilterTagClasses = computed(() =>
-    'flex items-center gap-1.5 ui-surface border border-(--ui-primary-soft) ui-primary px-3 py-1.5 rounded-full text-sm font-medium'
+    'flex items-center gap-1.5 ui-surface border border-[var(--ui-primary-soft)] ui-primary px-3 py-1.5 rounded-full text-sm font-medium'
 )
 
 const activeFilterRemoveButtonClasses = computed(() =>
-    'ui-primary hover:text-(--ui-primary) ml-1 hover:bg-(--ui-primary-soft) rounded-full p-0.5 transition-all'
+    'ui-primary hover:text-[var(--ui-primary)] ml-1 hover:bg-[var(--ui-primary-soft)] rounded-full p-0.5 transition-all'
 )
 
 // Methods

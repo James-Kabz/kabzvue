@@ -204,16 +204,16 @@ const indicatorClasses = computed(() => [
   'cursor-pointer select-none',
   sizeClasses.value,
   {
-    'ui-primary-bg border-(--ui-primary) ui-text': isChecked.value && !props.disabled && props.variant === 'default',
-    'ui-danger-bg border-(--ui-danger) ui-text': isChecked.value && !props.disabled && props.variant === 'error',
+    'ui-primary-bg border-[var(--ui-primary)] ui-text': isChecked.value && !props.disabled && props.variant === 'default',
+    'ui-danger-bg border-[var(--ui-danger)] ui-text': isChecked.value && !props.disabled && props.variant === 'error',
     'ui-bg ui-border-strong  ui-text': isChecked.value && props.disabled,
-    'ui-surface  ui-border-strong  hover:border-(--ui-border-strong)': !isChecked.value && !props.disabled && props.variant === 'default',
-    'ui-surface  border-(--ui-danger-soft) hover:border-(--ui-danger-soft)': !isChecked.value && !props.disabled && props.variant === 'error',
+    'ui-surface  ui-border-strong  hover:border-[var(--ui-border-strong)]': !isChecked.value && !props.disabled && props.variant === 'default',
+    'ui-surface  border-[var(--ui-danger-soft)] hover:border-[var(--ui-danger-soft)]': !isChecked.value && !props.disabled && props.variant === 'error',
     'ui-surface-muted ui-border-strong ': !isChecked.value && props.disabled,
     'cursor-not-allowed': props.disabled,
     'focus-within:ring-2 focus-within:ring-offset-2': !props.disabled,
-    'focus-within:ring-(--ui-primary)': !props.disabled && props.variant === 'default',
-    'focus-within:ring-(--ui-danger)': !props.disabled && props.variant === 'error'
+    'focus-within:ring-[var(--ui-primary)]': !props.disabled && props.variant === 'default',
+    'focus-within:ring-[var(--ui-danger)]': !props.disabled && props.variant === 'error'
   }
 ])
 

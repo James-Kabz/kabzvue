@@ -63,12 +63,12 @@ const selectedOption = computed(() => {
 })
 
 const selectVariants = cva(
-  'border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) text-sm min-w-[60px] focus:border-transparent ',
+  'border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] text-sm min-w-[60px] focus:border-transparent ',
   {
     variants: {
       disabled: {
         true: 'ui-surface-muted cursor-not-allowed opacity-50',
-        false: 'ui-surface hover:border-(--ui-border-strong)'
+        false: 'ui-surface hover:border-[var(--ui-border-strong)]'
       }
     }
   }
@@ -84,9 +84,9 @@ const selectClasses = computed(() =>
 
 const selectButtonClasses = computed(() =>
   cn(
-    'w-full px-3 py-2 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) ui-surface  ',
-    props.hasError ? 'border-(--ui-danger)' : 'ui-border',
-    props.disabled ? 'ui-surface-muted cursor-not-allowed opacity-50' : 'hover:border-(--ui-border-strong)',
+    'w-full px-3 py-2 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] ui-surface  ',
+    props.hasError ? 'border-[var(--ui-danger)]' : 'ui-border',
+    props.disabled ? 'ui-surface-muted cursor-not-allowed opacity-50' : 'hover:border-[var(--ui-border-strong)]',
     props.class
   )
 )
@@ -297,7 +297,7 @@ watch(isOpen, (open) => {
             v-model="searchQuery"
             type="text"
             placeholder="Search options..."
-            class="w-full px-2 py-1 text-sm border ui-border-strong  rounded focus:outline-none focus:ring-1 focus:ring-(--ui-primary) ui-surface placeholder:text-(--ui-text-muted)"
+            class="w-full px-2 py-1 text-sm border ui-border-strong  rounded focus:outline-none focus:ring-1 focus:ring-[var(--ui-primary)] ui-surface placeholder:text-[var(--ui-text-muted)]"
             @input="filterOptions"
             @keydown="handleKeydown"
             @keydown.enter.prevent="handleKeydown"
@@ -314,7 +314,7 @@ watch(isOpen, (open) => {
             v-for="option in filteredOptions"
             :key="option.value"
             type="button"
-            class="cursor-pointer select-none relative py-2 pl-3 pr-9 w-full text-left hover:bg-(--ui-primary-soft) focus:bg-(--ui-primary-soft) focus:outline-none transition-colors duration-150"
+            class="cursor-pointer select-none relative py-2 pl-3 pr-9 w-full text-left hover:bg-[var(--ui-primary-soft)] focus:bg-[var(--ui-primary-soft)] focus:outline-none transition-colors duration-150"
             :class="{ 'ui-primary-soft ui-primary': modelValue === option.value }"
             @click.stop="selectOption(option.value)"
           >
@@ -351,7 +351,7 @@ watch(isOpen, (open) => {
         >
           <button
             type="button"
-            class="w-full text-left px-2 py-1 text-sm ui-primary hover:bg-(--ui-primary-soft) rounded cursor-pointer transition-colors"
+            class="w-full text-left px-2 py-1 text-sm ui-primary hover:bg-[var(--ui-primary-soft)] rounded cursor-pointer transition-colors"
             @click.stop="createOption"
             @mousedown.prevent
           >

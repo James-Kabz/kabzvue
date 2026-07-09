@@ -316,9 +316,9 @@ const tableContainerVariants = cva('border ui-border-strong rounded-2xl relative
 const tableVariants = cva('min-w-full', {
   variants: {
     variant: {
-      default: 'divide-y divide-(--ui-border-strong)',
-      bordered: 'border-collapse [&_td]:border [&_th]:border [&_td]:border-(--ui-border-strong) [&_th]:border-(--ui-border-strong)',
-      minimal: 'divide-y divide-(--ui-border-strong)'
+      default: 'divide-y divide-[var(--ui-border-strong)]',
+      bordered: 'border-collapse [&_td]:border [&_th]:border [&_td]:border-[var(--ui-border-strong)] [&_th]:border-[var(--ui-border-strong)]',
+      minimal: 'divide-y divide-[var(--ui-border-strong)]'
     }
   },
   defaultVariants: {
@@ -329,9 +329,9 @@ const tableVariants = cva('min-w-full', {
 const headVariants = cva('', {
   variants: {
     variant: {
-      default: ' border-b border-(--ui-border-strong)',
-      bordered: ' border-b-2 border-(--ui-border-strong)',
-      minimal: 'bg-transparent border-b border-(--ui-border-strong)'
+      default: ' border-b border-[var(--ui-border-strong)]',
+      bordered: ' border-b-2 border-[var(--ui-border-strong)]',
+      minimal: 'bg-transparent border-b border-[var(--ui-border-strong)]'
     }
   },
   defaultVariants: {
@@ -342,9 +342,9 @@ const headVariants = cva('', {
 const bodyVariants = cva('divide-y', {
   variants: {
     variant: {
-      default: ' divide-(--ui-border-strong)',
-      bordered: ' divide-(--ui-border-strong)',
-      minimal: 'bg-transparent divide-(--ui-border-strong)'
+      default: ' divide-[var(--ui-border-strong)]',
+      bordered: ' divide-[var(--ui-border-strong)]',
+      minimal: 'bg-transparent divide-[var(--ui-border-strong)]'
     }
   },
   defaultVariants: {
@@ -712,7 +712,7 @@ const getHeaderCellClasses = (column) => {
     densityPadding[props.density],
     'text-left text-sm font-extrabold ui-text uppercase tracking-wider',
     {
-      'cursor-pointer hover:bg-(--ui-surface) transition-colors': column.sortable && !props.loading && !props.sortLoading,
+      'cursor-pointer hover:bg-[var(--ui-surface)] transition-colors': column.sortable && !props.loading && !props.sortLoading,
       'cursor-not-allowed opacity-50': props.loading || (props.sortLoading && sortColumn.value === column.key)
     }
   )
@@ -883,7 +883,7 @@ loadPersistedReadKeys()
       </template>
       <template #actions-after-add>
         <button v-if="showFilterDrawer"
-          class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2"
+          class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-[var(--ui-surface)] flex items-center gap-2"
           @click="showFilterDrawerPanel = true">
           <font-awesome-icon icon="filter" />
           Filter
@@ -896,7 +896,7 @@ loadPersistedReadKeys()
       </template>
       <template #active-filter-actions>
         <button v-if="showFilterDrawer && activeRuleCount > 0"
-          class="ml-1 px-2 py-1 text-sm border border-(--ui-primary) rounded-md ui-primary hover:bg-(--ui-primary-soft)"
+          class="ml-1 px-2 py-1 text-sm border border-[var(--ui-primary)] rounded-md ui-primary hover:bg-[var(--ui-primary-soft)]"
           @click="clearFilterRules">
           Clear filter
         </button>
@@ -994,7 +994,7 @@ loadPersistedReadKeys()
                 <template v-for="column in displayedColumns" :key="column.key" #[`cell-${column.key}`]="slotProps">
                   <slot :name="`cell-${column.key}`" v-bind="slotProps">
                     <span v-if="formatCellValue(slotProps.item, slotProps.column).toString().split(' ').length > 10"
-                      class="cursor-pointer ui-primary hover:text-(--ui-primary)"
+                      class="cursor-pointer ui-primary hover:text-[var(--ui-primary)]"
                       @click.stop="openModal(formatCellValue(slotProps.item, slotProps.column))">
                       {{ truncateText(formatCellValue(slotProps.item, slotProps.column)) }}
                     </span>

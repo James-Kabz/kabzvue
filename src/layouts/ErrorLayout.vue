@@ -6,7 +6,7 @@
       :class="backgroundClasses"
     >
       <slot name="background">
-        <div class="absolute inset-0 bg-linear-to-br from-(--ui-surface) to-(--ui-surface)" />
+        <div class="absolute inset-0 bg-linear-to-br from-[var(--ui-surface)] to-[var(--ui-surface)]" />
       </slot>
     </div>
 
@@ -75,7 +75,7 @@
         <!-- Network Status -->
         <div
           v-if="!isOnline"
-          class="ui-danger-soft border border-(--ui-danger-soft) rounded-lg p-4 mx-auto max-w-md mb-6"
+          class="ui-danger-soft border border-[var(--ui-danger-soft)] rounded-lg p-4 mx-auto max-w-md mb-6"
         >
           <div class="flex items-center justify-center gap-2 ui-danger">
             <span class="w-3 h-3 ui-danger-bg rounded-full animate-pulse" />
@@ -92,7 +92,7 @@
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 v-if="showHomeButton"
-                class="ui-primary-bg ui-text px-6 py-3 rounded-lg font-medium hover:bg-(--ui-primary-strong) transition-colors flex items-center justify-center gap-2"
+                class="ui-primary-bg ui-text px-6 py-3 rounded-lg font-medium hover:bg-[var(--ui-primary-strong)] transition-colors flex items-center justify-center gap-2"
                 @click="goHome"
               >
                 <span>{{ homeButtonIcon }}</span>
@@ -101,7 +101,7 @@
 
               <button
                 v-if="showBackButton"
-                class="border ui-border-strong ui-text px-6 py-3 rounded-lg font-medium hover:bg-(--ui-surface) transition-colors flex items-center justify-center gap-2"
+                class="border ui-border-strong ui-text px-6 py-3 rounded-lg font-medium hover:bg-[var(--ui-surface)] transition-colors flex items-center justify-center gap-2"
                 @click="goBack"
               >
                 <span>←</span>
@@ -111,7 +111,7 @@
               <button
                 v-if="showRetryButton"
                 :disabled="isRetrying || !isOnline"
-                class="border ui-border-strong ui-text px-6 py-3 rounded-lg font-medium hover:bg-(--ui-surface) transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="border ui-border-strong ui-text px-6 py-3 rounded-lg font-medium hover:bg-[var(--ui-surface)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 @click="retry"
               >
                 <span
@@ -125,7 +125,7 @@
               <button
                 v-if="showSupportButton"
                 :disabled="reportSent"
-                class="ui-bg ui-text px-6 py-3 rounded-lg font-medium hover:bg-(--ui-bg) transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="ui-bg ui-text px-6 py-3 rounded-lg font-medium hover:bg-[var(--ui-bg)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 @click="$emit('contact-support')"
               >
                 <span v-if="reportSent">✓</span>
@@ -178,7 +178,7 @@
               <a
                 v-if="supportUrl"
                 :href="supportUrl"
-                class="ui-primary hover:text-(--ui-primary) underline ml-1"
+                class="ui-primary hover:text-[var(--ui-primary)] underline ml-1"
               >
                 <span class="inline-block w-4 h-4 mr-1">❓</span>
                 Get Help

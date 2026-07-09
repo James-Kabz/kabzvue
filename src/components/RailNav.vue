@@ -123,7 +123,7 @@ const getLogoSrc = (item, index) => {
       <div class="px-4 py-3 border-b ui-border-strong">
         <h3 class="text-sm font-semibold uppercase tracking-wide ui-text">{{ title }}</h3>
         <button v-if="showSetup" type="button"
-          class="mt-3 w-full px-3 py-2 rounded-md border ui-border-strong ui-primary hover:bg-(--ui-primary-soft) text-sm font-medium"
+          class="mt-3 w-full px-3 py-2 rounded-md border ui-border-strong ui-primary hover:bg-[var(--ui-primary-soft)] text-sm font-medium"
           @click="emit('setup-click')">
           {{ setupLabel }}
         </button>
@@ -136,8 +136,8 @@ const getLogoSrc = (item, index) => {
         <div v-else-if="!items.length" class="px-4 py-3 text-sm ui-text">No compliance bodies</div>
         <nav v-else class="py-1" aria-label="Rail navigation">
           <button v-for="(item, index) in items" :key="String(normalizeItemKey(item, index))" type="button" :title="item?.body || item?.name || normalizeItemLabel(item)"
-            class="w-full px-3 py-2 flex items-center gap-3 text-left transition-colors border-l-2 border-transparent hover:bg-(--ui-surface-muted) ui-text"
-            :class="isActive(item, index) ? 'ui-primary-soft border-(--ui-primary) font-semibold' : ''"
+            class="w-full px-3 py-2 flex items-center gap-3 text-left transition-colors border-l-2 border-transparent hover:bg-[var(--ui-surface-muted)] ui-text"
+            :class="isActive(item, index) ? 'ui-primary-soft border-[var(--ui-primary)] font-semibold' : ''"
             :aria-current="isActive(item, index) ? 'page' : undefined" @click="emit('select', item)">
             <span
               class="h-8 w-8 rounded-full overflow-hidden border ui-border-strong ui-surface-muted flex items-center justify-center text-xs font-semibold ui-text">

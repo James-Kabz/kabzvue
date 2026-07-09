@@ -103,7 +103,7 @@ const copySnippet = async (key, content) => {
 
         <RouterLink
           to="/components/full-gallery"
-          class="inline-flex rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+          class="inline-flex rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
         >
           Open Full Gallery
         </RouterLink>
@@ -258,7 +258,7 @@ const copySnippet = async (key, content) => {
 
               <RouterLink
                 :to="`/components/components/${component.slug}`"
-                class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
+                class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
               >
                 View docs
               </RouterLink>

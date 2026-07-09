@@ -109,22 +109,22 @@ const iconBackgroundMap = {
 
 // Progress bar colors
 const progressBarMap = {
-  default: 'bg-(--ui-primary)',
+  default: 'bg-[var(--ui-primary)]',
   info: 'bg-white/70',
   success: 'bg-white/70',
   warning: 'bg-white/70',
   error: 'bg-white/70',
-  loading: 'bg-(--ui-primary)'
+  loading: 'bg-[var(--ui-primary)]'
 }
 
 // Action button colors
 const actionButtonMap = {
-  default: 'ui-primary hover:text-(--ui-primary-strong) underline-offset-4 hover:underline',
+  default: 'ui-primary hover:text-[var(--ui-primary-strong)] underline-offset-4 hover:underline',
   info: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
   success: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
   warning: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
   error: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
-  loading: 'ui-primary hover:text-(--ui-primary-strong) underline-offset-4 hover:underline'
+  loading: 'ui-primary hover:text-[var(--ui-primary-strong)] underline-offset-4 hover:underline'
 }
 
 const titleTextMap = {
@@ -146,12 +146,12 @@ const messageTextMap = {
 }
 
 const closeButtonMap = {
-  default: 'ui-text-soft hover:bg-black/5 dark:hover:bg-white/10 hover:text-(--ui-text)',
+  default: 'ui-text-soft hover:bg-black/5 dark:hover:bg-white/10 hover:text-[var(--ui-text)]',
   info: 'text-white/80 hover:text-white hover:bg-white/15',
   success: 'text-white/80 hover:text-white hover:bg-white/15',
   warning: 'text-white/80 hover:text-white hover:bg-white/15',
   error: 'text-white/80 hover:text-white hover:bg-white/15',
-  loading: 'ui-text hover:bg-black/5 dark:hover:bg-white/5 hover:text-(--ui-text)'
+  loading: 'ui-text hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--ui-text)]'
 }
 
 const getIconName = (toast) => toast.icon || iconMap[toast.variant] || iconMap.default
@@ -255,7 +255,7 @@ const isDismissible = (toast) => toast.dismissible !== false && (toast.closeButt
           <button
             v-if="isDismissible(toast)"
             :class="cn(
-              'absolute right-2 top-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-md opacity-70 transition-all hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-(--ui-ring)',
+              'absolute right-2 top-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-md opacity-70 transition-all hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[var(--ui-ring)]',
               getCloseButtonClasses(toast)
             )"
             aria-label="Dismiss"
