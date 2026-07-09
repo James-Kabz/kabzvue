@@ -248,7 +248,7 @@ onUnmounted(() => {
       ' rounded-xl border ui-border-strong overflow-hidden transition-all select-none flex flex-col relative',
       'shadow-sm',
       isDragging ? 'opacity-50 scale-95' : 'hover:shadow-lg cursor-move',
-      isFocused ? 'ring-2 ring-[var(--ui-primary)] ring-offset-2' : ''
+      isFocused ? 'ring-2 ring-(--ui-primary) ring-offset-2' : ''
     )"
     @dragstart="handleDragStart"
     @dragend="handleDragEnd"
@@ -257,7 +257,7 @@ onUnmounted(() => {
   >
     <div
       v-if="showHeader"
-      class="flex bg-[var(--ui-surface)]  items-center justify-between px-6 py-4 border-b ui-border-strong shrink-0"
+      class="flex bg-(--ui-surface)  items-center justify-between px-6 py-4 border-b ui-border-strong shrink-0"
     >
       <div class="flex items-center gap-3">
         <Icon
@@ -323,7 +323,7 @@ onUnmounted(() => {
           Customize Widget
         </h4>
         <button
-          class="p-1 rounded hover:bg-[var(--ui-surface)]"
+          class="p-1 rounded hover:bg-(--ui-surface)"
           @click="showCustomization = false"
         >
           <Icon
@@ -373,7 +373,7 @@ onUnmounted(() => {
           Keyboard Shortcuts
         </h4>
         <button
-          class="p-1 rounded hover:bg-[var(--ui-surface)]"
+          class="p-1 rounded hover:bg-(--ui-surface)"
           @click="showKeyboardHelp = false"
         >
           <Icon

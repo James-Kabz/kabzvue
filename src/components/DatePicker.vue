@@ -401,7 +401,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="relative w-full bg-[var(--ui-surface)] rounded-md">
+  <div class="relative w-full bg-(--ui-surface) rounded-md">
     <!-- Input Field -->
     <div class="relative">
       <input
@@ -416,9 +416,9 @@ onBeforeUnmount(() => {
         :aria-describedby="ariaDescribedby"
         :class="[
           'w-full px-3 py-2 pr-10 border rounded-md ui-surface ui-text placeholder-slate-400 text-sm  ',
-          'focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-[var(--ui-primary)] cursor-pointer transition-colors',
-          'disabled:bg-[var(--ui-bg)] disabled:text-[var(--ui-text)] disabled:cursor-not-allowed',
-          hasValidationError ? 'border-[var(--ui-danger)] focus:ring-[var(--ui-danger)] focus:border-[var(--ui-danger)]' : 'ui-border'
+          'focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary) cursor-pointer transition-colors',
+          'disabled:bg-(--ui-bg) disabled:text-(--ui-text) disabled:cursor-not-allowed',
+          hasValidationError ? 'border-(--ui-danger) focus:ring-(--ui-danger) focus:border-(--ui-danger)' : 'ui-border'
         ]"
         @click="toggleCalendar"
       >
@@ -444,7 +444,7 @@ onBeforeUnmount(() => {
       <button
         v-if="clearable && displayValue && !disabled"
         type="button"
-        class="absolute right-9 top-1/2 -translate-y-1/2 p-1 hover:bg-[var(--ui-bg)] rounded transition-colors"
+        class="absolute right-9 top-1/2 -translate-y-1/2 p-1 hover:bg-(--ui-bg) rounded transition-colors"
         aria-label="Clear date"
         @click.stop="clearDate"
       >
@@ -488,7 +488,7 @@ onBeforeUnmount(() => {
               <div class="flex items-center justify-between mb-3">
                 <button
                   type="button"
-                  class="p-1.5 rounded hover:bg-[var(--ui-bg)] transition-colors"
+                  class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
                   aria-label="Previous Month"
                   @click="prevMonth"
                 >
@@ -513,7 +513,7 @@ onBeforeUnmount(() => {
 
                 <button
                   type="button"
-                  class="p-1.5 rounded hover:bg-[var(--ui-bg)] transition-colors"
+                  class="p-1.5 rounded hover:bg-(--ui-bg) transition-colors"
                   aria-label="Next Month"
                   @click="nextMonth"
                 >
@@ -563,8 +563,8 @@ onBeforeUnmount(() => {
               :disabled="isDateDisabled(day)"
               :class="[
                 'w-8 h-8 rounded text-xs font-medium transition-colors',
-                isToday(day) && !isSelected(day) ? 'ui-primary-soft ui-primary ring-1 ring-[var(--ui-primary)]' : '',
-                isSelected(day) ? 'ui-primary-bg ui-text hover:bg-[var(--ui-primary)]' : 'ui-text hover:bg-[var(--ui-bg)]',
+                isToday(day) && !isSelected(day) ? 'ui-primary-soft ui-primary ring-1 ring-(--ui-primary)' : '',
+                isSelected(day) ? 'ui-primary-bg ui-text hover:bg-(--ui-primary)' : 'ui-text hover:bg-(--ui-bg)',
                 isDateDisabled(day) ? 'ui-text cursor-not-allowed hover:bg-transparent line-through' : 'cursor-pointer'
               ]"
               @click="selectDate(day)"
@@ -589,7 +589,7 @@ onBeforeUnmount(() => {
               >
                 <button
                   type="button"
-                  class="w-full px-3 py-1.5 text-xs font-medium ui-primary hover:bg-[var(--ui-primary-soft)] rounded transition-colors"
+                  class="w-full px-3 py-1.5 text-xs font-medium ui-primary hover:bg-(--ui-primary-soft) rounded transition-colors"
                   @click="selectToday"
                 >
                   Today
@@ -608,7 +608,7 @@ onBeforeUnmount(() => {
                   :key="time"
                   type="button"
                   class="w-full px-2 py-1.5 text-left text-sm rounded transition-colors"
-                  :class="time === selectedTime ? 'ui-primary-bg ui-text' : 'ui-text hover:bg-[var(--ui-bg)]'"
+                  :class="time === selectedTime ? 'ui-primary-bg ui-text' : 'ui-text hover:bg-(--ui-bg)'"
                   @click="selectedTime = time"
                 >
                   {{ time }}

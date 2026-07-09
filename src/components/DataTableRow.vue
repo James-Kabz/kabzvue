@@ -63,7 +63,7 @@ const rowVariants = cva(
   {
   variants: {
     striped: {
-      true: 'odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft) 72%, var(--ui-surface) 28%)] even:bg-[var(--ui-surface-soft)]',
+      true: 'odd:bg-[color:color-mix(in oklab, var(--ui-primary-soft) 72%, var(--ui-surface) 28%)] even:bg-(--ui-surface-soft)',
       false: ''
     },
     hoverable: {
@@ -75,20 +75,20 @@ const rowVariants = cva(
       false: ''
     },
     selected: {
-      true: 'ui-primary-soft border-l-2 border-[var(--ui-primary)]',
+      true: 'ui-primary-soft border-l-2 border-(--ui-primary)',
       false: ''
     },
     variant: {
-      default: 'border-b border-[var(--ui-border-strong)] ',
-      bordered: 'border-b border-[var(--ui-border-strong)] ',
-      minimal: 'border-b border-[var(--ui-border-strong)] '
+      default: 'border-b border-(--ui-border-strong) ',
+      bordered: 'border-b border-(--ui-border-strong) ',
+      minimal: 'border-b border-(--ui-border-strong) '
     }
   },
   compoundVariants: [
     {
       hoverable: true,
       clickable: true,
-      class: 'hover:bg-[var(--ui-surface)]'
+      class: 'hover:bg-(--ui-surface)'
     }
   ],
   defaultVariants: {

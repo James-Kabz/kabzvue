@@ -192,9 +192,9 @@ const toolbarVariants = cva('flex items-center justify-between border ui-border-
 const bulkActionVariants = cva('px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-1 transition-colors ', {
   variants: {
     variant: {
-      danger: 'ui-danger ui-danger-bg hover:bg-[var(--ui-danger-soft)] border border-[var(--ui-danger-soft)]',
-      primary: 'ui-primary ui-primary-soft hover:bg-[var(--ui-primary-soft)] border border-[var(--ui-primary-soft)]',
-      secondary: 'ui-text ui-bg hover:bg-[var(--ui-bg)] border ui-border-strong'
+      danger: 'ui-danger ui-danger-bg hover:bg-(--ui-danger-soft) border border-(--ui-danger-soft)',
+      primary: 'ui-primary ui-primary-soft hover:bg-(--ui-primary-soft) border border-(--ui-primary-soft)',
+      secondary: 'ui-text ui-bg hover:bg-(--ui-bg) border ui-border-strong'
     }
   },
   defaultVariants: {
@@ -205,8 +205,8 @@ const bulkActionVariants = cva('px-3 py-1.5 text-sm font-medium rounded-md flex 
 const densityButtonVariants = cva('p-2 border ui-border-strong  transition-colors ', {
   variants: {
     active: {
-      true: 'ui-primary-soft ui-primary border-[var(--ui-primary-soft)]',
-      false: 'ui-surface ui-text hover:bg-[var(--ui-surface)]'
+      true: 'ui-primary-soft ui-primary border-(--ui-primary-soft)',
+      false: 'ui-surface ui-text hover:bg-(--ui-surface)'
     },
     position: {
       first: 'rounded-l-md border-r-0',
@@ -223,7 +223,7 @@ const densityButtonVariants = cva('p-2 border ui-border-strong  transition-color
 const refreshButtonVariants = cva('px-3 py-2 text-sm border ui-border-strong rounded-md flex items-center gap-2 transition-colors ', {
   variants: {
     state: {
-      normal: 'ui-text hover:text-[var(--ui-text)] hover:bg-[var(--ui-surface)]',
+      normal: 'ui-text hover:text-(--ui-text) hover:bg-(--ui-surface)',
       refreshing: 'ui-text opacity-75 cursor-not-allowed'
     }
   },
@@ -247,7 +247,7 @@ const itemCountClasses = computed(() => 'text-md ui-text')
 const densityToggleClasses = computed(() => 'flex items-center')
 
 const columnToggleButtonClasses = computed(() => 
-  'flex items-center gap-2 px-3 py-2 text-sm ui-text hover:text-[var(--ui-text)] border ui-border-strong rounded-md  hover:brightness-105 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:ring-offset-1'
+  'flex items-center gap-2 px-3 py-2 text-sm ui-text hover:text-(--ui-text) border ui-border-strong rounded-md  hover:brightness-105 transition-colors focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:ring-offset-1'
 )
 
 const columnMenuClasses = computed(() => 
@@ -259,11 +259,11 @@ const columnMenuHeaderClasses = computed(() =>
 )
 
 const columnMenuItemClasses = computed(() => 
-  'py-1 hover:bg-[var(--ui-surface)] rounded transition-colors'
+  'py-1 hover:bg-(--ui-surface) rounded transition-colors'
 )
 
 const checkboxClasses = computed(() => 
-  'w-4 h-4 rounded ui-border-strong ui-primary focus:ring-[var(--ui-primary)] focus:ring-2 focus:ring-offset-1'
+  'w-4 h-4 rounded ui-border-strong ui-primary focus:ring-(--ui-primary) focus:ring-2 focus:ring-offset-1'
 )
 
 const labelClasses = computed(() => 
@@ -271,7 +271,7 @@ const labelClasses = computed(() =>
 )
 
 const searchInputClasses = computed(() =>
-  'w-72 pl-9 pr-3 py-2 text-sm border ui-border-strong rounded-md ui-surface ui-text placeholder:text-[var(--ui-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-transparent transition-all'
+  'w-72 pl-9 pr-3 py-2 text-sm border ui-border-strong rounded-md ui-surface ui-text placeholder:text-(--ui-text-muted) focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-transparent transition-all'
 )
 
 // Click outside handler
@@ -568,7 +568,7 @@ onUnmounted(() => {
 
         <button
           v-if="enableFilters"
-          class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-[var(--ui-surface)] flex items-center gap-2"
+          class="px-3 py-2 text-sm border ui-border-strong rounded-md hover:bg-(--ui-surface) flex items-center gap-2"
           @click="showFilterDrawer = true"
         >
           <font-awesome-icon icon="filter" />
@@ -618,7 +618,7 @@ onUnmounted(() => {
       </span>
       <button
         v-if="enableFilters"
-        class="ml-1 px-2 py-1 text-sm border border-[var(--ui-primary)] rounded-md ui-primary hover:bg-[var(--ui-primary-soft)]"
+        class="ml-1 px-2 py-1 text-sm border border-(--ui-primary) rounded-md ui-primary hover:bg-(--ui-primary-soft)"
         @click="$emit('update:filterRules', { logic: defaultFilterRules?.logic || 'all', rules: defaultFilterRules?.rules || [] })"
       >
         Clear filter

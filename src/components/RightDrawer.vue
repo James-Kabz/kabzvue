@@ -127,7 +127,7 @@ onUnmounted(() => {
             </h3>
             <button
               v-if="showCloseButton"
-              class="w-8 h-8 rounded-md ui-text-muted hover:bg-[var(--ui-surface-muted)] hover:text-[var(--ui-text)] transition-colors flex items-center justify-center"
+              class="w-8 h-8 rounded-md ui-text-muted hover:bg-(--ui-surface-muted) hover:text-(--ui-text) transition-colors flex items-center justify-center"
               @click="close"
             >
               <span class="sr-only">Close drawer</span>

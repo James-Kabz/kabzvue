@@ -24,19 +24,19 @@
             <div class="space-y-2">
               <Link
                 href="#"
-                class="block ui-text hover:text-[var(--ui-text)]"
+                class="block ui-text hover:text-(--ui-text)"
               >
                 About
               </Link>
               <Link
                 href="#"
-                class="block ui-text hover:text-[var(--ui-text)]"
+                class="block ui-text hover:text-(--ui-text)"
               >
                 Services
               </Link>
               <Link
                 href="#"
-                class="block ui-text hover:text-[var(--ui-text)]"
+                class="block ui-text hover:text-(--ui-text)"
               >
                 Contact
               </Link>
@@ -56,7 +56,7 @@
             <div class="flex space-x-4">
               <Link
                 href="#"
-                class="ui-text hover:text-[var(--ui-text)]"
+                class="ui-text hover:text-(--ui-text)"
               >
                 <Icon
                   name="square-x-twitter"
@@ -66,7 +66,7 @@
               </Link>
               <Link
                 href="#"
-                class="ui-text hover:text-[var(--ui-text)]"
+                class="ui-text hover:text-(--ui-text)"
               >
                 <Icon
                   name="github"
@@ -91,13 +91,13 @@
           <div class="flex space-x-6 mt-4 md:mt-0">
             <Link
               href="#"
-              class="ui-text hover:text-[var(--ui-text)]"
+              class="ui-text hover:text-(--ui-text)"
             >
               Privacy
             </Link>
             <Link
               href="#"
-              class="ui-text hover:text-[var(--ui-text)]"
+              class="ui-text hover:text-(--ui-text)"
             >
               Terms
             </Link>

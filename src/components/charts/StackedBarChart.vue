@@ -53,7 +53,7 @@ const props = defineProps({
   },
   axisLabelClasses: {
     type: String,
-    default: 'fill-[var(--ui-text)] text-xs font-medium'
+    default: 'fill-(--ui-text) text-xs font-medium'
   },
   maxValue: {
     type: Number,
@@ -180,7 +180,7 @@ const getBarValueLabelY = (value) => {
 
 const getBarValueLabelClass = (value) => {
   return (Number(value) || 0) <= 0
-    ? 'fill-[var(--ui-text)] text-[10px] font-semibold'
+    ? 'fill-(--ui-text) text-[10px] font-semibold'
     : 'fill-white text-[10px] font-semibold'
 }
 
@@ -403,7 +403,7 @@ onBeforeUnmount(() => {
         <text
           :x="padding.left + chartWidth / 2"
           :y="resolvedHeight - 10"
-          class="fill-[var(--ui-text)] text-sm font-semibold"
+          class="fill-(--ui-text) text-sm font-semibold"
           text-anchor="middle"
         >
           {{ xAxisLabel }}
@@ -429,7 +429,7 @@ onBeforeUnmount(() => {
         <text
           :x="-(padding.top + chartHeight / 2)"
           :y="padding.left - 40"
-          class="fill-[var(--ui-text)] text-sm font-semibold"
+          class="fill-(--ui-text) text-sm font-semibold"
           text-anchor="middle"
           transform="rotate(-90)"
         >

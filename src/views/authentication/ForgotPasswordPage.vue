@@ -161,7 +161,7 @@ const handleTryAgain = () => {
         Remember your password?
         <Link
           href="/auth/login"
-          class="ui-primary hover:text-[var(--ui-primary)] font-medium ml-1"
+          class="ui-primary hover:text-(--ui-primary) font-medium ml-1"
         >
           Back to Sign In
         </Link>

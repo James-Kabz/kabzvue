@@ -57,7 +57,7 @@
           :key="`value-${index}`"
           :x="point.x"
           :y="point.y - 10"
-          class="fill-[var(--ui-text)] text-[10px] font-semibold"
+          class="fill-(--ui-text) text-[10px] font-semibold"
           text-anchor="middle"
         >
           {{ formatValue(point.value) }}
@@ -218,7 +218,7 @@ const props = defineProps({
   },
   axisLabelClasses: {
     type: String,
-    default: 'fill-[var(--ui-text)] text-xs font-medium'
+    default: 'fill-(--ui-text) text-xs font-medium'
   },
   autoSkipXAxisLabels: {
     type: Boolean,

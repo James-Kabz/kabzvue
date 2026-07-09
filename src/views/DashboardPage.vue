@@ -367,13 +367,13 @@ onMounted(() => {
         </div>
         <div class="flex items-center space-x-3">
           <button
-            class="px-4 py-2 ui-primary-bg ui-text rounded-lg hover:bg-[var(--ui-primary-strong)] transition-colors"
+            class="px-4 py-2 ui-primary-bg ui-text rounded-lg hover:bg-(--ui-primary-strong) transition-colors"
             @click="toggleSidebar"
           >
             {{ sidebarCollapsed ? 'Expand' : 'Collapse' }} Sidebar
           </button>
           <button
-            class="px-4 py-2 ui-surface-muted ui-text rounded-lg hover:bg-[var(--ui-bg)] transition-colors"
+            class="px-4 py-2 ui-surface-muted ui-text rounded-lg hover:bg-(--ui-bg) transition-colors"
             @click="refreshData"
           >
             Refresh Data
@@ -509,8 +509,8 @@ onMounted(() => {
                 <button
                   v-for="preset in themePresets"
                   :key="preset.key"
-                  class="relative rounded-xl border ui-border-strong p-2 ui-surface hover:bg-[var(--ui-surface-muted)] transition-colors"
-                  :class="companyForm.theme_preset === preset.key ? 'ring-2 ring-[var(--ui-primary)] ring-offset-1' : ''"
+                  class="relative rounded-xl border ui-border-strong p-2 ui-surface hover:bg-(--ui-surface-muted) transition-colors"
+                  :class="companyForm.theme_preset === preset.key ? 'ring-2 ring-(--ui-primary) ring-offset-1' : ''"
                   :title="preset.name"
                   @click="applyThemePreset(preset.key)"
                 >
@@ -518,10 +518,10 @@ onMounted(() => {
                     class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full overflow-hidden border border-black/10"
                     :style="getPresetSwatchStyle(preset)"
                   >
-                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-left)]" />
-                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-top-right)]" />
-                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-left)]" />
-                    <span class="block w-1/2 h-1/2 float-left bg-[var(--swatch-bottom-right)]" />
+                    <span class="block w-1/2 h-1/2 float-left bg-(--swatch-top-left)" />
+                    <span class="block w-1/2 h-1/2 float-left bg-(--swatch-top-right)" />
+                    <span class="block w-1/2 h-1/2 float-left bg-(--swatch-bottom-left)" />
+                    <span class="block w-1/2 h-1/2 float-left bg-(--swatch-bottom-right)" />
                   </span>
                   <Icon
                     v-if="companyForm.theme_preset === preset.key"
@@ -531,7 +531,7 @@ onMounted(() => {
                 </button>
 
                 <div class="rounded-xl border ui-border-strong p-2 ui-surface">
-                  <span class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full border border-black/10 bg-[var(--ui-primary-soft)] relative">
+                  <span class="block w-10 h-10 sm:w-11 sm:h-11 mx-auto rounded-full border border-black/10 bg-(--ui-primary-soft) relative">
                     <span class="absolute inset-0 m-auto w-fit h-fit text-sm font-bold ui-primary">+</span>
                   </span>
                 </div>
@@ -579,14 +579,14 @@ onMounted(() => {
             </label>
 
             <button
-              class="self-end px-4 py-2 rounded-lg ui-primary-bg hover:bg-[var(--ui-primary-strong)] transition-colors text-sm font-medium"
+              class="self-end px-4 py-2 rounded-lg ui-primary-bg hover:bg-(--ui-primary-strong) transition-colors text-sm font-medium"
               @click="upsertCompanyTheme(true)"
             >
               Save Theme (DB Payload)
             </button>
 
             <button
-              class="self-end px-4 py-2 rounded-lg border ui-border-strong ui-surface hover:bg-[var(--ui-surface-muted)] transition-colors text-sm font-medium ui-text"
+              class="self-end px-4 py-2 rounded-lg border ui-border-strong ui-surface hover:bg-(--ui-surface-muted) transition-colors text-sm font-medium ui-text"
               @click="createCompanyWithTheme"
             >
               Create Company With Theme
@@ -762,7 +762,7 @@ onMounted(() => {
             <h3 class="text-lg font-semibold ui-text">
               Recent Activity
             </h3>
-            <button class="text-sm ui-primary hover:text-[var(--ui-primary)]">
+            <button class="text-sm ui-primary hover:text-(--ui-primary)">
               View all
             </button>
           </div>
@@ -789,7 +789,7 @@ onMounted(() => {
               <tr
                 v-for="activity in recentActivities"
                 :key="activity.id"
-                class="hover:bg-[var(--ui-surface)]"
+                class="hover:bg-(--ui-surface)"
               >
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">

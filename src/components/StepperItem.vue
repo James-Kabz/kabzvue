@@ -3,8 +3,8 @@
     <div
       :class="[
         'flex items-center justify-center w-8 h-8 rounded-full border-2',
-        active ? 'ui-primary-bg border-[var(--ui-primary)] ui-text' :
-        completed ? 'ui-success-bg border-[var(--ui-success)] ui-text' :
+        active ? 'ui-primary-bg border-(--ui-primary) ui-text' :
+        completed ? 'ui-success-bg border-(--ui-success) ui-text' :
         'ui-border-strong  ui-text'
       ]"
     >

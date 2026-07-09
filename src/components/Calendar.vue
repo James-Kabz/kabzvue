@@ -282,7 +282,7 @@ onBeforeUnmount(() => {
         :placeholder="placeholder"
         :required="required"
         :aria-describedby="ariaDescribedby"
-        class="w-full px-3 py-2 pr-10 border ui-border-strong  rounded-md bg-[var(--ui-bg)]  ui-text placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-[var(--ui-primary)] cursor-pointer disabled:bg-[var(--ui-surface)] disabled:text-[var(--ui-text)] disabled:cursor-not-allowed"
+        class="w-full px-3 py-2 pr-10 border ui-border-strong  rounded-md bg-(--ui-bg)  ui-text placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary) cursor-pointer disabled:bg-(--ui-surface) disabled:text-(--ui-text) disabled:cursor-not-allowed"
         @click="toggleCalendar"
       >
       
@@ -307,7 +307,7 @@ onBeforeUnmount(() => {
       <button
         v-if="clearable && displayValue && !disabled"
         type="button"
-        class="absolute right-9 top-1/2 -translate-y-1/2 p-1 hover:bg-[var(--ui-surface)] rounded"
+        class="absolute right-9 top-1/2 -translate-y-1/2 p-1 hover:bg-(--ui-surface) rounded"
         aria-label="Clear date"
         @click.stop="clearDate"
       >
@@ -347,7 +347,7 @@ onBeforeUnmount(() => {
         <div class="flex items-center justify-between mb-3">
           <button
             type="button"
-            class="p-1 hover:bg-[var(--ui-surface)] rounded"
+            class="p-1 hover:bg-(--ui-surface) rounded"
             aria-label="Previous Month"
             @click="prevMonth"
           >
@@ -372,7 +372,7 @@ onBeforeUnmount(() => {
 
           <button
             type="button"
-            class="p-1 hover:bg-[var(--ui-surface)] rounded"
+            class="p-1 hover:bg-(--ui-surface) rounded"
             aria-label="Next Month"
             @click="nextMonth"
           >
@@ -422,7 +422,7 @@ onBeforeUnmount(() => {
             :disabled="isDateDisabled(day)"
             :class="[
               'w-8 h-8 text-sm rounded flex items-center justify-center',
-              isSelected(day) ? 'ui-primary-bg ui-text' : 'hover:bg-[var(--ui-surface)]',
+              isSelected(day) ? 'ui-primary-bg ui-text' : 'hover:bg-(--ui-surface)',
               isDateDisabled(day) ? 'ui-text cursor-not-allowed' : ''
             ]"
             @click="selectDate(day)"
@@ -447,7 +447,7 @@ onBeforeUnmount(() => {
         >
           <button
             type="button"
-            class="w-full px-3 py-2 text-sm font-medium ui-primary hover:bg-[var(--ui-primary-soft)] rounded-lg transition-colors"
+            class="w-full px-3 py-2 text-sm font-medium ui-primary hover:bg-(--ui-primary-soft) rounded-lg transition-colors"
             @click="selectToday"
           >
             Today
@@ -466,7 +466,7 @@ onBeforeUnmount(() => {
                 :key="time"
                 type="button"
                 class="w-full px-2 py-1.5 text-left text-sm rounded transition-colors"
-                :class="time === selectedTime ? 'ui-primary-bg ui-text' : 'ui-text hover:bg-[var(--ui-surface)]'"
+                :class="time === selectedTime ? 'ui-primary-bg ui-text' : 'ui-text hover:bg-(--ui-surface)'"
                 @click="selectedTime = time"
               >
                 {{ time }}

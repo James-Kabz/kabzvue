@@ -220,9 +220,9 @@ const getHeaderClass = () => {
 }
 
 const getHeaderActiveItemClasses = (active) => {
-  if (!active) return 'ui-text hover:bg-[var(--ui-surface-muted)] hover:text-[var(--ui-text)] border border-transparent'
+  if (!active) return 'ui-text hover:bg-(--ui-surface-muted) hover:text-(--ui-text) border border-transparent'
   if (props.themeScope === 'module') return 'shadow-sm border'
-  return 'bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-primary-soft)] ui-primary shadow-sm border border-[var(--ui-primary-soft)]'
+  return 'bg-linear-to-br from-(--ui-primary-soft) to-(--ui-primary-soft) ui-primary shadow-sm border border-(--ui-primary-soft)'
 }
 
 const getHeaderActiveItemStyle = (active) => {
@@ -239,9 +239,9 @@ const getHeaderActiveIndicatorStyle = (active) => {
 }
 
 const getHeaderActiveIconClasses = (active) => {
-  if (!active) return 'ui-surface-muted ui-text group-hover:bg-[var(--ui-bg)]'
+  if (!active) return 'ui-surface-muted ui-text group-hover:bg-(--ui-bg)'
   if (props.themeScope === 'module') return 'shadow-md border'
-  return 'bg-linear-to-br from-[var(--ui-primary)] to-[var(--ui-primary)] ui-text shadow-md'
+  return 'bg-linear-to-br from-(--ui-primary) to-(--ui-primary) ui-text shadow-md'
 }
 
 const getHeaderActiveIconStyle = (active) => {
@@ -266,9 +266,9 @@ const getHeaderActiveTextStyle = (active) => {
 
 
 const getCompanyRowClasses = (selected) => {
-  if (!selected) return 'ui-text border-transparent hover:bg-[var(--ui-surface-muted)]'
+  if (!selected) return 'ui-text border-transparent hover:bg-(--ui-surface-muted)'
   if (props.themeScope === 'module') return 'border shadow-sm font-semibold'
-  return 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 25%)] ui-primary border-[var(--ui-primary-soft)]'
+  return 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 25%)] ui-primary border-(--ui-primary-soft)'
 }
 
 const getCompanyRowStyle = (selected) => {
@@ -448,7 +448,7 @@ watch(resolvedUserAvatarUrl, () => {
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
         <!-- Mobile Sidebar Toggle - Moved to far left -->
         <button v-if="isMobile"
-          class="p-2 ui-text rounded-lg hover:bg-[var(--ui-surface-muted)] transition-colors shrink-0"
+          class="p-2 ui-text rounded-lg hover:bg-(--ui-surface-muted) transition-colors shrink-0"
           @click="emit('toggle-mobile-sidebar')">
           <Icon icon="bars" class="w-5 h-5" />
         </button>
@@ -466,7 +466,7 @@ watch(resolvedUserAvatarUrl, () => {
 
         <!-- Company Info Card - Simplified for mobile -->
         <div v-if="resolvedShowCompanyInfo && normalizedCurrentCompany"
-          class="shrink-0 ui-surface border ui-border-strong px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-[var(--ui-surface-muted)] transition-colors max-w-52 sm:max-w-72">
+          class="shrink-0 ui-surface border ui-border-strong px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl shadow-sm flex items-center gap-2 relative hover:bg-(--ui-surface-muted) transition-colors max-w-52 sm:max-w-72">
           <!-- Company Details with Switcher -->
           <button v-if="normalizedCompanies.length > 1"
             class="flex items-center gap-2 sm:gap-3 w-44 sm:w-60 cursor-pointer rounded-lg px-1.5 py-1 transition-all group"
@@ -477,12 +477,12 @@ watch(resolvedUserAvatarUrl, () => {
             </div>
             <div class="flex-1 min-w-0">
               <p
-                class="text-xs sm:text-sm font-semibold ui-text truncate group-hover:text-[var(--ui-primary)] leading-tight">
+                class="text-xs sm:text-sm font-semibold ui-text truncate group-hover:text-(--ui-primary) leading-tight">
                 {{ normalizedCurrentCompany.__name }}
               </p>
             </div>
             <Icon icon="chevron-down"
-              class="w-3.5 h-3.5 ui-text-soft shrink-0 group-hover:text-[var(--ui-primary)] transition-transform"
+              class="w-3.5 h-3.5 ui-text-soft shrink-0 group-hover:text-(--ui-primary) transition-transform"
               :class="{ 'rotate-180': showCompanyDropdown }" />
           </button>
 
@@ -517,11 +517,11 @@ watch(resolvedUserAvatarUrl, () => {
                   @click="handleCompanyChange(company)">
                   <div v-if="getCompanyLogoUrl(company)" class="shrink-0 mr-2 sm:mr-3">
                     <img :src="getCompanyLogoUrl(company)" :alt="`${company.__name} ${entityLabelLower} logo`"
-                      class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-lg ui-surface p-0.5 sm:p-1 border ui-border-strong group-hover:border-[var(--ui-primary-soft)] transition-colors"
+                      class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-lg ui-surface p-0.5 sm:p-1 border ui-border-strong group-hover:border-(--ui-primary-soft) transition-colors"
                       @error="(e) => { e.target.src = '/logo.png' }">
                   </div>
                   <div v-else
-                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-linear-to-br from-[var(--ui-bg)] to-[var(--ui-bg)] flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-linear-to-br from-(--ui-bg) to-(--ui-bg) flex items-center justify-center mr-2 sm:mr-3 shrink-0">
                     <Icon icon="building" class="w-3.5 h-3.5 sm:w-4 sm:h-4 ui-text" />
                   </div>
                   <div class="flex-1 text-left min-w-0">
@@ -549,7 +549,7 @@ watch(resolvedUserAvatarUrl, () => {
       <div class="flex items-center gap-1 sm:gap-2 md:gap-3 pl-2">
         <!-- Notifications -->
         <button v-if="showNotifications"
-          class="relative p-2 ui-text rounded-xl hover:bg-[var(--ui-surface-muted)] transition-colors"
+          class="relative p-2 ui-text rounded-xl hover:bg-(--ui-surface-muted) transition-colors"
           @click="toggleNotifications">
           <Icon icon="bell" class="w-5 h-5" />
           <span v-if="notificationCount > 0"
@@ -583,7 +583,7 @@ watch(resolvedUserAvatarUrl, () => {
               </div>
 
               <div v-for="notification in notifications" v-else :key="notification.id" :class="[
-                'p-3 sm:p-4 border-b ui-border-strong hover:bg-[var(--ui-surface-muted)] cursor-pointer transition-colors',
+                'p-3 sm:p-4 border-b ui-border-strong hover:bg-(--ui-surface-muted) cursor-pointer transition-colors',
                 notification.read ? 'opacity-60' : ''
               ]" @click="handleNotificationClick(notification)">
                 <div class="flex items-start space-x-2 sm:space-x-3">
@@ -611,7 +611,7 @@ watch(resolvedUserAvatarUrl, () => {
 
                     <div v-if="notification.source" class="flex items-center gap-1 sm:gap-1.5 mt-1.5 flex-wrap">
                       <span
-                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold ui-accent-soft ui-accent border border-[var(--ui-accent-soft)]">
+                        class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold ui-accent-soft ui-accent border border-(--ui-accent-soft)">
                         <Icon icon="tag" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                         {{ notification.source.body_code }}
                       </span>
@@ -635,10 +635,10 @@ watch(resolvedUserAvatarUrl, () => {
                       <span v-if="notification.due_date" :class="[
                         'inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium whitespace-nowrap',
                         notification.title.includes('Overdue')
-                          ? 'ui-danger-soft ui-danger border border-[var(--ui-danger-soft)]'
+                          ? 'ui-danger-soft ui-danger border border-(--ui-danger-soft)'
                           : notification.title.includes('Due in 0')
-                            ? 'ui-warning-soft ui-warning border border-[var(--ui-warning-soft)]'
-                            : 'ui-warning-soft ui-warning border border-[var(--ui-warning-soft)]'
+                            ? 'ui-warning-soft ui-warning border border-(--ui-warning-soft)'
+                            : 'ui-warning-soft ui-warning border border-(--ui-warning-soft)'
                       ]">
                         <Icon icon="calendar" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 shrink-0" />
                         {{ formatDueDate(notification.due_date) }}
@@ -657,7 +657,7 @@ watch(resolvedUserAvatarUrl, () => {
 
             <div v-if="notifications.length > 0"
               class="p-2 sm:p-3 text-center border-t ui-border-strong ui-surface-muted">
-              <button class="text-sm font-semibold ui-primary hover:text-[var(--ui-primary-strong)] transition-colors"
+              <button class="text-sm font-semibold ui-primary hover:text-(--ui-primary-strong) transition-colors"
                 @click="handleViewAllNotifications">
                 View all notifications →
               </button>
@@ -673,10 +673,10 @@ watch(resolvedUserAvatarUrl, () => {
         <!-- Profile Dropdown -->
         <div class="relative">
           <button
-            class="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ui-primary)]"
+            class="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ui-primary)"
             :aria-label="`${user.name} profile menu`" @click="toggleProfile">
             <div
-              class="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-accent-soft)] rounded-full flex items-center justify-center shadow-sm overflow-hidden border ui-border-strong">
+              class="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center shadow-sm overflow-hidden border ui-border-strong">
               <img v-if="showAvatarImage" :src="resolvedUserAvatarUrl" :alt="resolvedUserAvatarAlt"
                 class="w-full h-full object-cover" @error="handleAvatarError">
               <span v-else class="ui-primary text-sm sm:text-base font-semibold">{{ userInitials }}</span>
@@ -692,7 +692,7 @@ watch(resolvedUserAvatarUrl, () => {
               class="ui-surface absolute right-0 mt-2 w-56 sm:w-60 rounded-xl border ui-border-strong shadow-xl z-50 overflow-hidden">
               <div class="p-3 sm:p-4 border-b ui-border-strong flex items-center gap-3">
                 <div
-                  class="w-10 h-10 shrink-0 bg-linear-to-br from-[var(--ui-primary-soft)] to-[var(--ui-accent-soft)] rounded-full flex items-center justify-center shadow-sm overflow-hidden">
+                  class="w-10 h-10 shrink-0 bg-linear-to-br from-(--ui-primary-soft) to-(--ui-accent-soft) rounded-full flex items-center justify-center shadow-sm overflow-hidden">
                   <img v-if="showAvatarImage" :src="resolvedUserAvatarUrl" :alt="resolvedUserAvatarAlt"
                     class="w-full h-full object-cover" @error="handleAvatarError">
                   <span v-else class="ui-primary text-sm font-semibold">{{ userInitials }}</span>
@@ -726,7 +726,7 @@ watch(resolvedUserAvatarUrl, () => {
                   )" :style="getHeaderActiveItemStyle(isItemActive(item))" @click="handleNavigation(item)">
                     <!-- Active indicator bar -->
                     <div v-if="isItemActive(item)"
-                      class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 sm:h-8 bg-linear-to-b from-[var(--ui-primary)] to-[var(--ui-primary)] rounded-r-full"
+                      class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 sm:h-8 bg-linear-to-b from-(--ui-primary) to-(--ui-primary) rounded-r-full"
                       :style="getHeaderActiveIndicatorStyle(isItemActive(item))" />
                     <div :class="cn(
                       'flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2',
@@ -742,10 +742,10 @@ watch(resolvedUserAvatarUrl, () => {
                     </span>
                   </router-link>
                   <button v-else
-                    class="flex items-center w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ui-text hover:bg-[var(--ui-surface-muted)] hover:text-[var(--ui-text)] border border-transparent"
+                    class="flex items-center w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ui-text hover:bg-(--ui-surface-muted) hover:text-(--ui-text) border border-transparent"
                     @click="handleProfileAction(item)">
                     <div
-                      class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2 ui-surface-muted ui-text group-hover:bg-[var(--ui-bg)]">
+                      class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-2 sm:mr-3 shrink-0 transition-colors ml-1 sm:ml-2 ui-surface-muted ui-text group-hover:bg-(--ui-bg)">
                       <Icon v-if="item.icon" :icon="item.icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <span class="flex-1 truncate font-semibold ui-text text-xs sm:text-md">
@@ -756,10 +756,10 @@ watch(resolvedUserAvatarUrl, () => {
               </div>
               <div class="border-t ui-border-strong py-2">
                 <button
-                  class="flex items-center w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ui-danger hover:bg-[var(--ui-danger-soft)] border border-transparent"
+                  class="flex items-center w-full px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ui-danger hover:bg-(--ui-danger-soft) border border-transparent"
                   @click="handleLogout">
                   <div
-                    class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-1 sm:mr-1 shrink-0 transition-colors ml-1 sm:ml-2 ui-danger-soft ui-danger group-hover:bg-[var(--ui-danger-soft)]">
+                    class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg mr-1 sm:mr-1 shrink-0 transition-colors ml-1 sm:ml-2 ui-danger-soft ui-danger group-hover:bg-(--ui-danger-soft)">
                     <Icon icon="sign-out-alt" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
                   <span class="truncate font-semibold ui-danger text-xs sm:text-md">

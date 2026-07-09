@@ -91,7 +91,7 @@ const cancel = () => {
           v-model="days"
           type="number"
           min="0"
-          class="w-full px-3 py-2.5 border rounded-md focus:ring-2 focus:ring-[var(--ui-primary)] focus:outline-none ui-surface  "
+          class="w-full px-3 py-2.5 border rounded-md focus:ring-2 focus:ring-(--ui-primary) focus:outline-none ui-surface  "
         >
       </div>
 
@@ -141,7 +141,7 @@ const cancel = () => {
 
         <button
           type="button"
-          class="px-5 py-2 rounded-md  ui-primary-bg ui-text hover:bg-[var(--ui-primary-strong)] shadow"
+          class="px-5 py-2 rounded-md  ui-primary-bg ui-text hover:bg-(--ui-primary-strong) shadow"
           @click="save"
         >
           Add Reminder

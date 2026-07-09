@@ -13,7 +13,7 @@ describe('Button', () => {
     const wrapper = mount(Button, {
       props: { variant: 'primaryOutline' }
     })
-    expect(wrapper.classes()).toContain('border-[var(--ui-primary)]')
+    expect(wrapper.classes()).toContain('border-(--ui-primary)')
   })
 
   it('emits click event', async () => {

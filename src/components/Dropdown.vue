@@ -65,13 +65,13 @@ const isOpen = ref(false)
 const dropdownRef = ref(null)
 
 const triggerVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-primary)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-primary) focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'ui-text ui-primary-bg hover:bg-[var(--ui-primary-strong)]',
+        default: 'ui-text ui-primary-bg hover:bg-(--ui-primary-strong)',
         outline: '  border ui-text ui-surface hover:brightness-105',
-        ghost: 'ui-text hover:bg-[var(--ui-surface)] hover:text-[var(--ui-text)]'
+        ghost: 'ui-text hover:bg-(--ui-surface) hover:text-(--ui-text)'
       }
     }
   }

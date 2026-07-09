@@ -12,7 +12,7 @@ const props = defineProps({
 })
 
 const tabVariants = cva(
-  "relative z-10 rounded-lg font-medium transition-all duration-200 border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-primary)]",
+  "relative z-10 rounded-lg font-medium transition-all duration-200 border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-primary)",
   {
     variants: {
       size: {
@@ -163,7 +163,7 @@ provide("tabsContext", {
       role="tablist"
     >
       <span
-        class="pointer-events-none absolute top-1.5 bottom-1.5 rounded-lg bg-[var(--ui-primary)] opacity-10 transition-all duration-250 ease-out z-0"
+        class="pointer-events-none absolute top-1.5 bottom-1.5 rounded-lg bg-(--ui-primary) opacity-10 transition-all duration-250 ease-out z-0"
         :style="indicatorStyle"
       />
       <button
@@ -175,8 +175,8 @@ provide("tabsContext", {
         :class="cn(
           tabVariants({ size: props.size, variant: props.variant }),
           activeIndex === index
-            ? 'bg-[var(--ui-primary)] text-[var(--ui-text-inverse)] shadow-sm'
-            : 'border-transparent ui-text-muted hover:ui-text hover:bg-[var(--ui-surface)]',
+            ? 'bg-(--ui-primary) text-(--ui-text-inverse) shadow-sm'
+            : 'border-transparent ui-text-muted hover:ui-text hover:bg-(--ui-surface)',
           props.loading && 'cursor-not-allowed opacity-50'
         )"
         :aria-selected="activeIndex === index"

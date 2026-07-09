@@ -250,13 +250,13 @@ const iconClasses = computed(() => {
 
 const dismissButtonClasses = computed(() => {
   const colors = {
-    info: 'ui-primary hover:text-[var(--ui-primary)] hover:bg-[var(--ui-primary-soft)]',
-    success: 'ui-success hover:text-[var(--ui-success)] hover:bg-[var(--ui-success-soft)]',
-    warning: 'ui-warning hover:text-[var(--ui-warning)] hover:bg-[var(--ui-warning-soft)]',
-    error: 'ui-danger hover:text-[var(--ui-danger)] hover:bg-[var(--ui-danger-soft)]',
-    default: 'ui-text hover:text-[var(--ui-text)] hover:bg-[var(--ui-surface)]',
+    info: 'ui-primary hover:text-(--ui-primary) hover:bg-(--ui-primary-soft)',
+    success: 'ui-success hover:text-(--ui-success) hover:bg-(--ui-success-soft)',
+    warning: 'ui-warning hover:text-(--ui-warning) hover:bg-(--ui-warning-soft)',
+    error: 'ui-danger hover:text-(--ui-danger) hover:bg-(--ui-danger-soft)',
+    default: 'ui-text hover:text-(--ui-text) hover:bg-(--ui-surface)',
     danger:
-      'ui-danger hover:text-[var(--ui-danger)] hover:bg-[var(--ui-danger-soft)]'
+      'ui-danger hover:text-(--ui-danger) hover:bg-(--ui-danger-soft)'
   }
   return ['shrink-0 p-1 rounded-md transition-colors duration-200', colors[props.variant]]
 })

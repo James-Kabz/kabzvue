@@ -30,7 +30,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const switchVariants = cva(
-  'inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-ring)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ui-ring) focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       size: {
@@ -39,8 +39,8 @@ const switchVariants = cva(
         lg: 'h-7 w-12'
       },
       checked: {
-        true: 'ui-danger-bg border-[var(--ui-danger)]',
-        false: 'ui-surface-soft border-[var(--ui-border-strong)]'
+        true: 'ui-danger-bg border-(--ui-danger)',
+        false: 'ui-surface-soft border-(--ui-border-strong)'
       }
     }
   }

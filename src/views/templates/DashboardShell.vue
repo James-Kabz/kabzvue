@@ -106,7 +106,7 @@ const handleMobileSidebarToggle = () => {
 
 <template>
   <div
-    class="min-h-screen  bg-[var(--ui-bg)] overflow-hidden"
+    class="min-h-screen  bg-(--ui-bg) overflow-hidden"
     :style="{
       '--module-primary': '#dc2626',
       '--module-soft': 'rgba(220, 38, 38, 0.11)',
@@ -156,13 +156,13 @@ const handleMobileSidebarToggle = () => {
         <div class="mb-6 flex items-center gap-3">
           <router-link
             to="/templates/overview"
-            class="px-3 py-1.5 rounded-md text-sm font-medium border ui-border-strong hover:bg-[var(--ui-surface)]"
+            class="px-3 py-1.5 rounded-md text-sm font-medium border ui-border-strong hover:bg-(--ui-surface)"
           >
             Dashboard
           </router-link>
           <router-link
             to="/components"
-            class="px-3 py-1.5 rounded-md text-sm font-medium border x-strong hover:bg-[var(--ui-surface)]"
+            class="px-3 py-1.5 rounded-md text-sm font-medium border x-strong hover:bg-(--ui-surface)"
           >
             Component Showcase
           </router-link>

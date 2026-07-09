@@ -73,7 +73,7 @@ const itemVariants = cva('', {
   variants: {
     variant: {
       default: '',
-      interactive: 'hover:bg-[var(--ui-surface)] cursor-pointer'
+      interactive: 'hover:bg-(--ui-surface) cursor-pointer'
     }
   }
 })

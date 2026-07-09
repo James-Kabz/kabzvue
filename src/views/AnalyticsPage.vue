@@ -10,14 +10,14 @@
   >
     <!-- Custom logo -->
     <template #logo>
-      <div class="w-8 h-8 bg-linear-to-br from-[var(--ui-primary)] to-[var(--ui-accent)] rounded-lg flex items-center justify-center">
+      <div class="w-8 h-8 bg-linear-to-br from-(--ui-primary) to-(--ui-accent) rounded-lg flex items-center justify-center">
         <span class="ui-text font-bold text-sm">D</span>
       </div>
     </template>
 
     <!-- Header right content -->
     <template #header-right>
-      <button class="p-2 rounded-lg ui-text hover:bg-[var(--ui-surface)] relative">
+      <button class="p-2 rounded-lg ui-text hover:bg-(--ui-surface) relative">
         <svg
           class="w-6 h-6"
           fill="none"

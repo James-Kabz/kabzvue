@@ -81,11 +81,11 @@ const linkVariants = cva(
   {
     variants: {
       variant: {
-        primary: "ui-primary hover:text-[var(--ui-primary-strong)]",
-        secondary: "ui-text hover:text-[var(--ui-primary)]",
-        muted: "text-[var(--ui-text-muted)] hover:text-[var(--ui-text)]",
-        danger: "ui-danger hover:text-[var(--ui-danger-strong)]",
-        success: "ui-success hover:text-[var(--ui-success-strong)]",
+        primary: "ui-primary hover:text-(--ui-primary-strong)",
+        secondary: "ui-text hover:text-(--ui-primary)",
+        muted: "text-(--ui-text-muted) hover:text-(--ui-text)",
+        danger: "ui-danger hover:text-(--ui-danger-strong)",
+        success: "ui-success hover:text-(--ui-success-strong)",
       },
       size: {
         xs: "text-xs",

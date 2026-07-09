@@ -31,14 +31,14 @@ const emit = defineEmits(['dismiss'])
 const visible = ref(true)
 
 const notificationVariants = cva(
-  'pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-lg ring-1 ring-[var(----ui-bg)] ring-opacity-5   ui-surface',
+  'pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-lg ring-1 ring-(----ui-bg) ring-opacity-5   ui-surface',
   {
     variants: {
       variant: {
-        default: 'border-l-4 border-[var(--ui-primary)]',
-        success: 'border-l-4 border-[var(--ui-success)]',
-        warning: 'border-l-4 border-[var(--ui-warning)]',
-        danger: 'border-l-4 border-[var(--ui-danger)]'
+        default: 'border-l-4 border-(--ui-primary)',
+        success: 'border-l-4 border-(--ui-success)',
+        warning: 'border-l-4 border-(--ui-warning)',
+        danger: 'border-l-4 border-(--ui-danger)'
       }
     }
   }

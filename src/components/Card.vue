@@ -251,7 +251,7 @@ const cardVariants = cva(
         true: 'hover:shadow-lg hover:scale-[1.02]'
       },
       clickable: {
-        true: 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--ui-ring)] focus:ring-offset-2'
+        true: 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-(--ui-ring) focus:ring-offset-2'
       },
       loading: {
         true: ''
@@ -281,7 +281,7 @@ const cardVariants = cva(
       {
         clickable: true,
         hoverable: false,
-        class: 'hover:bg-[var(--ui-surface)]'
+        class: 'hover:bg-(--ui-surface)'
       }
     ],
     defaultVariants: {

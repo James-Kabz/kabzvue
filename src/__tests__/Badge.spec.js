@@ -101,21 +101,21 @@ describe('Badge', () => {
     const wrapper = mount(Badge, {
       props: { variant: 'primaryOutline' }
     })
-    expect(wrapper.classes()).toContain('border-[var(--ui-primary)]')
+    expect(wrapper.classes()).toContain('border-(--ui-primary)')
   })
 
   it('applies dangerOutline variant classes', () => {
     const wrapper = mount(Badge, {
       props: { variant: 'dangerOutline' }
     })
-    expect(wrapper.classes()).toContain('border-[var(--ui-danger)]')
+    expect(wrapper.classes()).toContain('border-(--ui-danger)')
   })
 
   it('applies successOutline variant classes', () => {
     const wrapper = mount(Badge, {
       props: { variant: 'successOutline' }
     })
-    expect(wrapper.classes()).toContain('border-[var(--ui-success)]')
+    expect(wrapper.classes()).toContain('border-(--ui-success)')
   })
 
   it('applies gradient variant classes', () => {

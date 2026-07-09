@@ -69,13 +69,13 @@ export default {
     drawerAccentMap: {
       type: Object,
       default: () => ({
-        complied: 'bg-[var(--ui-success)]',
-        complete: 'bg-[var(--ui-success)]',
-        partial: 'bg-[var(--ui-info)]',
-        in_progress: 'bg-[var(--ui-info)]',
-        pending: 'bg-[var(--ui-warning)]',
-        overdue: 'bg-[var(--ui-danger)]',
-        open: 'bg-[var(--ui-danger)]'
+        complied: 'bg-(--ui-success)',
+        complete: 'bg-(--ui-success)',
+        partial: 'bg-(--ui-info)',
+        in_progress: 'bg-(--ui-info)',
+        pending: 'bg-(--ui-warning)',
+        overdue: 'bg-(--ui-danger)',
+        open: 'bg-(--ui-danger)'
       })
     },
     showViewMoreDetails: {
@@ -96,15 +96,15 @@ export default {
     },
     drawerHeaderCardClass: {
       type: String,
-      default: 'rounded-xl border ui-border bg-[var(--ui-surface-muted)] p-4'
+      default: 'rounded-xl border ui-border bg-(--ui-surface-muted) p-4'
     },
     drawerSectionCardClass: {
       type: String,
-      default: 'rounded-lg border ui-border bg-[var(--ui-surface)] p-3'
+      default: 'rounded-lg border ui-border bg-(--ui-surface) p-3'
     },
     drawerViewDetailsButtonClass: {
       type: String,
-      default: 'inline-flex items-center rounded-md bg-[var(--ui-primary)] px-3 py-1.5 text-xs font-medium text-[var(--ui-text-inverse)] hover:opacity-90 transition-opacity'
+      default: 'inline-flex items-center rounded-md bg-(--ui-primary) px-3 py-1.5 text-xs font-medium text-(--ui-text-inverse) hover:opacity-90 transition-opacity'
     },
     drawerEmptyDocumentsClass: {
       type: String,
@@ -459,23 +459,23 @@ export default {
     },
     getEventColorClass(color) {
       const colorMap = {
-        blue: 'bg-[var(--ui-primary-soft)] text-[var(--ui-primary-strong)] border-l-2 border-[var(--ui-primary)]',
-        red: 'bg-[var(--ui-danger-soft)] text-[var(--ui-danger-strong)] border-l-2 border-[var(--ui-danger)]',
-        green: 'bg-[var(--ui-success-soft)] text-[var(--ui-success-strong)] border-l-2 border-[var(--ui-success)]',
-        purple: 'bg-[var(--ui-accent-soft)] text-[var(--ui-accent-strong)] border-l-2 border-[var(--ui-accent)]',
-        orange: 'bg-[var(--ui-warning-soft)] text-[var(--ui-warning-strong)] border-l-2 border-[var(--ui-warning)]',
+        blue: 'bg-(--ui-primary-soft) text-(--ui-primary-strong) border-l-2 border-(--ui-primary)',
+        red: 'bg-(--ui-danger-soft) text-(--ui-danger-strong) border-l-2 border-(--ui-danger)',
+        green: 'bg-(--ui-success-soft) text-(--ui-success-strong) border-l-2 border-(--ui-success)',
+        purple: 'bg-(--ui-accent-soft) text-(--ui-accent-strong) border-l-2 border-(--ui-accent)',
+        orange: 'bg-(--ui-warning-soft) text-(--ui-warning-strong) border-l-2 border-(--ui-warning)',
       }
-      return colorMap[color] || 'ui-surface-soft ui-text-muted border-l-2 border-[var(--ui-border-strong)]'
+      return colorMap[color] || 'ui-surface-soft ui-text-muted border-l-2 border-(--ui-border-strong)'
     },
     getColorStripClass(color) {
       const colorMap = {
-        blue: 'bg-[var(--ui-primary)]',
-        red: 'bg-[var(--ui-danger)]',
-        green: 'bg-[var(--ui-success)]',
-        purple: 'bg-[var(--ui-accent)]',
-        orange: 'bg-[var(--ui-warning)]',
+        blue: 'bg-(--ui-primary)',
+        red: 'bg-(--ui-danger)',
+        green: 'bg-(--ui-success)',
+        purple: 'bg-(--ui-accent)',
+        orange: 'bg-(--ui-warning)',
       }
-      return colorMap[color] || 'bg-[var(--ui-border-strong)]'
+      return colorMap[color] || 'bg-(--ui-border-strong)'
     },
     getEventsAtTime(events, timeSlot) {
       return events.filter(event => {
@@ -508,14 +508,14 @@ export default {
     <div :class="['flex items-center justify-between border-b ui-border ui-surface shrink-0', sizePreset.toolbarPaddingClass]">
       <div class="flex items-center gap-2">
         <button
-          :class="['font-medium border ui-border-strong rounded-md ui-text hover:bg-[var(--ui-surface-muted)] transition-colors', sizePreset.controlButtonClass]"
+          :class="['font-medium border ui-border-strong rounded-md ui-text hover:bg-(--ui-surface-muted) transition-colors', sizePreset.controlButtonClass]"
           @click="goToToday"
         >
           Today
         </button>
         <div class="flex">
           <button
-            :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-[var(--ui-surface-soft)] transition-colors', sizePreset.iconButtonClass]"
+            :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors', sizePreset.iconButtonClass]"
             @click="previousPeriod"
           >
             <Icon
@@ -524,7 +524,7 @@ export default {
             />
           </button>
           <button
-            :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-[var(--ui-surface-soft)] transition-colors', sizePreset.iconButtonClass]"
+            :class="['flex items-center justify-center rounded-md ui-text-muted hover:bg-(--ui-surface-soft) transition-colors', sizePreset.iconButtonClass]"
             @click="nextPeriod"
           >
             <Icon
@@ -546,7 +546,7 @@ export default {
           :class="[
             'font-medium rounded-md transition-colors capitalize',
             sizePreset.viewButtonClass,
-            viewMode === v ? 'ui-surface ui-text shadow-sm' : 'ui-text-muted hover:text-[var(--ui-text)]'
+            viewMode === v ? 'ui-surface ui-text shadow-sm' : 'ui-text-muted hover:text-(--ui-text)'
           ]"
           @click="viewMode = v"
         >
@@ -570,7 +570,7 @@ export default {
               class="border ui-border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
               @click="selectMonthFromYear(month.index)"
             >
-              <div class="px-3 py-2 bg-[var(--ui-surface-muted)] border-b ui-border">
+              <div class="px-3 py-2 bg-(--ui-surface-muted) border-b ui-border">
                 <h3 class="text-xs font-semibold ui-text">
                   {{ month.name }}
                 </h3>
@@ -590,14 +590,14 @@ export default {
                     class="relative aspect-square flex items-center justify-center text-[10px] rounded-full"
                     :class="[
                       !day.isCurrentMonth ? 'ui-text-soft opacity-60' : 'ui-text-muted',
-                      day.isToday ? 'bg-[var(--ui-primary)] text-[var(--ui-text-inverse)] font-semibold' : '',
+                      day.isToday ? 'bg-(--ui-primary) text-(--ui-text-inverse) font-semibold' : '',
                       day.events.length > 0 && day.isCurrentMonth && !day.isToday ? 'font-semibold ui-text' : ''
                     ]"
                   >
                     {{ day.dayNumber }}
                     <span
                       v-if="day.events.length > 0 && day.isCurrentMonth && !day.isToday"
-                      class="absolute bottom-px left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--ui-primary)]"
+                      class="absolute bottom-px left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-(--ui-primary)"
                     />
                   </div>
                 </div>
@@ -624,16 +624,16 @@ export default {
               :class="[
                 'border-r border-b ui-border p-1.5 cursor-pointer transition-colors',
                 sizePreset.monthDayCellClass,
-                !day.isCurrentMonth ? 'bg-[var(--ui-surface-muted)]' : 'ui-surface hover:bg-[var(--ui-surface-muted)]',
-                day.isToday ? 'bg-[var(--ui-primary-soft)] hover:bg-[var(--ui-primary-soft)]' : '',
-                selectedDate === day.date ? 'ring-2 ring-inset ring-[var(--ui-primary)]' : ''
+                !day.isCurrentMonth ? 'bg-(--ui-surface-muted)' : 'ui-surface hover:bg-(--ui-surface-muted)',
+                day.isToday ? 'bg-(--ui-primary-soft) hover:bg-(--ui-primary-soft)' : '',
+                selectedDate === day.date ? 'ring-2 ring-inset ring-(--ui-primary)' : ''
               ]"
               @click="selectDay(day)"
             >
               <div
                 class="w-10 h-8 flex items-center justify-center rounded-full text-xl mb-1 font-semibold"
                 :class="[
-                  day.isToday ? 'bg-[var(--ui-primary)] text-[var(--ui-text-inverse)] font-semibold' : '',
+                  day.isToday ? 'bg-(--ui-primary) text-(--ui-text-inverse) font-semibold' : '',
                   !day.isToday && day.isCurrentMonth ? 'ui-text' : 'ui-text-soft opacity-60'
                 ]"
               >
@@ -672,14 +672,14 @@ export default {
               v-for="day in weekViewDays"
               :key="day.date"
               class="py-2 text-center border-r ui-border last:border-r-0"
-              :class="day.isToday ? 'bg-[var(--ui-primary-soft)]' : ''"
+              :class="day.isToday ? 'bg-(--ui-primary-soft)' : ''"
             >
               <div class="text-[10px] font-semibold ui-text-soft uppercase tracking-wider">
                 {{ day.dayName }}
               </div>
               <div
                 class="mx-auto mt-1 w-7 h-7 flex items-center justify-center rounded-full text-sm font-medium"
-                :class="day.isToday ? 'bg-[var(--ui-primary)] text-[var(--ui-text-inverse)]' : 'ui-text'"
+                :class="day.isToday ? 'bg-(--ui-primary) text-(--ui-text-inverse)' : 'ui-text'"
               >
                 {{ day.dayNumber }}
               </div>
@@ -687,7 +687,7 @@ export default {
           </div>
 
           <div
-            class="grid border-b ui-border bg-[var(--ui-surface-muted)] shrink-0"
+            class="grid border-b ui-border bg-(--ui-surface-muted) shrink-0"
             style="grid-template-columns: 52px repeat(7, 1fr)"
           >
             <div class="border-r ui-border px-1 py-1 text-[10px] ui-text-soft text-right flex items-center justify-end">
@@ -719,14 +719,14 @@ export default {
                 v-for="slot in timeSlots"
                 :key="slot.time"
               >
-                <div class="h-14 border-b border-r border-[var(--ui-border)] px-1.5 pt-1 text-[10px] ui-text-soft text-right leading-none">
+                <div class="h-14 border-b border-r border-(--ui-border) px-1.5 pt-1 text-[10px] ui-text-soft text-right leading-none">
                   {{ slot.display }}
                 </div>
                 <div
                   v-for="day in weekViewDays"
                   :key="day.date + slot.time"
-                  class="h-14 border-b border-r border-[var(--ui-border)] last:border-r-0 p-0.5"
-                  :class="day.isToday ? 'bg-[var(--ui-primary-soft)]' : ''"
+                  class="h-14 border-b border-r border-(--ui-border) last:border-r-0 p-0.5"
+                  :class="day.isToday ? 'bg-(--ui-primary-soft)' : ''"
                 >
                   <div
                     v-for="event in getEventsAtTime(day.events, slot)"
@@ -747,7 +747,7 @@ export default {
         <template v-if="viewMode === 'day'">
           <div
             class="flex items-center justify-center gap-3 px-4 py-3 border-b ui-border shrink-0"
-            :class="dayViewDate.isToday ? 'bg-[var(--ui-primary-soft)]' : 'ui-surface'"
+            :class="dayViewDate.isToday ? 'bg-(--ui-primary-soft)' : 'ui-surface'"
           >
             <span class="text-xs font-semibold uppercase tracking-wider ui-text-soft">{{ dayViewDate.dayName }}</span>
             <span
@@ -760,7 +760,7 @@ export default {
 
           <div
             v-if="getAllDayEvents(dayViewDate.events).length"
-            class="flex border-b ui-border bg-[var(--ui-surface-muted)] shrink-0"
+            class="flex border-b ui-border bg-(--ui-surface-muted) shrink-0"
           >
             <div class="w-[52px] border-r ui-border px-1.5 py-1 text-[10px] ui-text-soft text-right flex items-center justify-end shrink-0">
               All day
@@ -787,12 +787,12 @@ export default {
                 v-for="slot in timeSlots"
                 :key="slot.time"
               >
-                <div class="h-14 border-b border-r border-[var(--ui-border)] px-1.5 pt-1 text-[10px] ui-text-soft text-right leading-none">
+                <div class="h-14 border-b border-r border-(--ui-border) px-1.5 pt-1 text-[10px] ui-text-soft text-right leading-none">
                   {{ slot.display }}
                 </div>
                 <div
-                  class="h-14 border-b border-[var(--ui-border)] p-0.5"
-                  :class="dayViewDate.isToday ? 'bg-[var(--ui-primary-soft)]' : ''"
+                  class="h-14 border-b border-(--ui-border) p-0.5"
+                  :class="dayViewDate.isToday ? 'bg-(--ui-primary-soft)' : ''"
                 >
                   <div
                     v-for="event in getEventsAtTime(dayViewDate.events, slot)"
@@ -942,7 +942,7 @@ export default {
                 <div
                   v-for="(doc, idx) in getSelectedEventDocuments()"
                   :key="doc.doc_id || doc.id || doc.filename || idx"
-                  class="rounded-md border ui-border bg-[var(--ui-surface-muted)] p-2.5"
+                  class="rounded-md border ui-border bg-(--ui-surface-muted) p-2.5"
                 >
                   <p class="truncate text-sm font-semibold ui-text">
                     {{ doc.filename || doc.name || 'Document' }}
@@ -953,21 +953,21 @@ export default {
                   <div class="mt-2 flex gap-2">
                     <button
                       v-if="drawerDocumentActions.view"
-                      class="rounded-md border ui-border px-2 py-1 text-xs ui-text hover:bg-[var(--ui-surface)]"
+                      class="rounded-md border ui-border px-2 py-1 text-xs ui-text hover:bg-(--ui-surface)"
                       @click="handleDocumentView(doc)"
                     >
                       View
                     </button>
                     <button
                       v-if="drawerDocumentActions.download"
-                      class="rounded-md border ui-border px-2 py-1 text-xs ui-text hover:bg-[var(--ui-surface)]"
+                      class="rounded-md border ui-border px-2 py-1 text-xs ui-text hover:bg-(--ui-surface)"
                       @click="handleDocumentDownload(doc)"
                     >
                       Download
                     </button>
                     <button
                       v-if="drawerDocumentActions.delete"
-                      class="rounded-md border border-[var(--ui-danger)] px-2 py-1 text-xs text-[var(--ui-danger)] hover:bg-[var(--ui-danger-soft)]"
+                      class="rounded-md border border-(--ui-danger) px-2 py-1 text-xs text-(--ui-danger) hover:bg-(--ui-danger-soft)"
                       @click="handleDocumentDelete(doc)"
                     >
                       Delete

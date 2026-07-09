@@ -77,19 +77,19 @@ const props = defineProps({
     },
     valueLabelClasses: {
         type: String,
-        default: 'fill-[var(--ui-surface)] text-sm font-bold drop-shadow-md'
+        default: 'fill-(--ui-surface) text-sm font-bold drop-shadow-md'
     },
     centerTextClasses: {
         type: String,
-        default: 'fill-[var(--ui-text)] text-2xl font-bold'
+        default: 'fill-(--ui-text) text-2xl font-bold'
     },
     centerLabelClasses: {
         type: String,
-        default: 'fill-[var(--ui-text)] text-sm'
+        default: 'fill-(--ui-text) text-sm'
     },
     legendTextClasses: {
         type: String,
-        default: 'fill-[var(--ui-text)] text-xs font-medium'
+        default: 'fill-(--ui-text) text-xs font-medium'
     }
 })
 

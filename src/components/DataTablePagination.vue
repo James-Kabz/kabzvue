@@ -228,9 +228,9 @@ defineEmits(['update:currentPage', 'update:pageSize'])
 const footerVariants = cva('border ui-border-strong rounded-2xl', {
   variants: {
     variant: {
-      default: 'bg-[var(--ui-bg)] ',
+      default: 'bg-(--ui-bg) ',
       minimal: 'bg-transparent ui-border-strong ',
-      bordered: 'bg-[var(--ui-bg)] border-2 ui-border-strong '
+      bordered: 'bg-(--ui-bg) border-2 ui-border-strong '
     },
     padding: {
       compact: 'px-4 py-2',
@@ -247,9 +247,9 @@ const footerVariants = cva('border ui-border-strong rounded-2xl', {
 const pageButtonVariants = cva('text-sm font-medium border rounded-md transition-colors duration-200', {
   variants: {
     state: {
-      active: 'ui-text border-[var(--ui-border-strong)] bg-[var(--ui-primary-soft)] ui-primary',
-      inactive: 'bg-[var(--ui-bg)]  ui-text ui-border-strong  hover:text-[var(--ui-text)]',
-      disabled: 'bg-[var(--ui-bg)]  ui-text ui-border-strong  cursor-not-allowed'
+      active: 'ui-text border-(--ui-border-strong) bg-(--ui-primary-soft) ui-primary',
+      inactive: 'bg-(--ui-bg)  ui-text ui-border-strong  hover:text-(--ui-text)',
+      disabled: 'bg-(--ui-bg)  ui-text ui-border-strong  cursor-not-allowed'
     },
     size: {
       sm: 'px-2 py-1',
@@ -276,7 +276,7 @@ const labelVariants = cva('ui-text', {
   }
 })
 
-const selectVariants = cva('border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] text-sm min-w-[60px] focus:border-transparent', {
+const selectVariants = cva('border ui-border-strong  rounded-md focus:outline-none focus:ring-2 focus:ring-(--ui-primary) text-sm min-w-[60px] focus:border-transparent', {
   variants: {
     size: {
       sm: 'px-2 py-1',

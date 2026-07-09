@@ -50,8 +50,8 @@ const sections = [
               :class="[
                 'block rounded-md border px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'ui-primary-soft ui-primary border-[var(--ui-primary)]'
-                  : 'border-transparent ui-text-muted hover:bg-[var(--ui-surface-soft)] hover:text-[var(--ui-text)]'
+                  ? 'ui-primary-soft ui-primary border-(--ui-primary)'
+                  : 'border-transparent ui-text-muted hover:bg-(--ui-surface-soft) hover:text-(--ui-text)'
               ]"
               @click="navigate"
             >

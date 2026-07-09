@@ -544,14 +544,14 @@ const handleCancel = () => emit('cancel')
                         :placeholder="field.placeholder"
                         :disabled="isLoading || field.disabled"
                         :readonly="field.readonly || field.disabled"
-                        :class="[hasError ? 'border-[var(--ui-danger)]' : 'ui-border-strong', field.inputClass || '']"
+                        :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
                         :aria-describedby="ariaDescribedBy"
                         @update:model-value="setFieldValue(field.name, $event)"
                       />
                       <button
                         v-if="hasTrailingIcon(field)"
                         type="button"
-                        :class="['absolute right-3 top-1/2 -translate-y-1/2 ui-text hover:text-[var(--ui-text)] transition-colors', isTrailingIconDisabled(field) ? 'opacity-50 cursor-not-allowed' : '']"
+                        :class="['absolute right-3 top-1/2 -translate-y-1/2 ui-text hover:text-(--ui-text) transition-colors', isTrailingIconDisabled(field) ? 'opacity-50 cursor-not-allowed' : '']"
                         :title="getTrailingIconTitle(field)"
                         :aria-label="getTrailingIconAriaLabel(field)"
                         :disabled="isTrailingIconDisabled(field)"
@@ -572,7 +572,7 @@ const handleCancel = () => emit('cancel')
                       :disabled="isLoading || field.disabled"
                       :readonly="field.readonly || field.disabled"
                       :rows="field.rows || 3"
-                      :class="['w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)]', hasError ? 'border-[var(--ui-danger)]' : 'ui-border-strong', field.inputClass || '']"
+                      :class="['w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--ui-primary)', hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
                       :aria-describedby="ariaDescribedBy"
                       @update:model-value="setFieldValue(field.name, $event)"
                     />
@@ -682,8 +682,8 @@ const handleCancel = () => emit('cancel')
                         :aria-checked="getFieldValue(field.name)"
                         :disabled="isLoading || field.disabled"
                         :class="[
-                          'relative inline-flex h-6 w-11 items-center rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:ring-offset-2',
-                          getFieldValue(field.name) ? 'ui-primary-bg border-[var(--ui-primary)]' : 'ui-surface-soft border-[var(--ui-border-strong)]',
+                          'relative inline-flex h-6 w-11 items-center rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:ring-offset-2',
+                          getFieldValue(field.name) ? 'ui-primary-bg border-(--ui-primary)' : 'ui-surface-soft border-(--ui-border-strong)',
                           (isLoading || field.disabled) ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                         ]"
                         @click="setFieldValue(field.name, !getFieldValue(field.name))"
@@ -798,7 +798,7 @@ const handleCancel = () => emit('cancel')
                       :model-value="getFieldValue(field.name)"
                       type="time"
                       :disabled="isLoading || field.disabled"
-                      :class="[hasError ? 'border-[var(--ui-danger)]' : 'ui-border-strong', field.inputClass || '']"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
                       :aria-describedby="ariaDescribedBy"
                       @update:model-value="setFieldValue(field.name, $event)"
                     />
@@ -825,7 +825,7 @@ const handleCancel = () => emit('cancel')
                       :model-value="getFieldValue(field.name)"
                       type="month"
                       :disabled="isLoading || field.disabled"
-                      :class="[hasError ? 'border-[var(--ui-danger)]' : 'ui-border-strong', field.inputClass || '']"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
                       :aria-describedby="ariaDescribedBy"
                       @update:model-value="setFieldValue(field.name, $event)"
                     />
@@ -835,7 +835,7 @@ const handleCancel = () => emit('cancel')
                       :model-value="getFieldValue(field.name)"
                       type="week"
                       :disabled="isLoading || field.disabled"
-                      :class="[hasError ? 'border-[var(--ui-danger)]' : 'ui-border-strong', field.inputClass || '']"
+                      :class="[hasError ? 'border-(--ui-danger)' : 'ui-border-strong', field.inputClass || '']"
                       :aria-describedby="ariaDescribedBy"
                       @update:model-value="setFieldValue(field.name, $event)"
                     />

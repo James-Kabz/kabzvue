@@ -598,7 +598,7 @@ onMounted(loadEntries)
 
           <RouterLink
             to="/components/components"
-            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-[var(--ui-surface-soft)]"
+            class="rounded-md border ui-border-strong px-3 py-1.5 text-sm font-medium hover:bg-(--ui-surface-soft)"
           >
             Open Docs Components Page
           </RouterLink>
@@ -649,7 +649,7 @@ onMounted(loadEntries)
 
               <RouterLink
                 :to="`/components/components/${entry.slug}`"
-                class="rounded-md border ui-border-strong px-2.5 py-1 text-xs font-medium hover:bg-[var(--ui-surface-soft)]"
+                class="rounded-md border ui-border-strong px-2.5 py-1 text-xs font-medium hover:bg-(--ui-surface-soft)"
               >
                 Detailed Playground
               </RouterLink>
@@ -725,7 +725,7 @@ onMounted(loadEntries)
                     <template v-else-if="control.control === 'number'">
                       <input
                         type="number"
-                        class="w-full rounded-md border ui-border-strong bg-[var(--ui-surface)] px-2 py-1.5 text-xs"
+                        class="w-full rounded-md border ui-border-strong bg-(--ui-surface) px-2 py-1.5 text-xs"
                         :value="entry.interactiveProps[control.name]"
                         @input="updateInteractiveNumber(entry, control.name, $event)"
                       >
@@ -733,7 +733,7 @@ onMounted(loadEntries)
 
                     <template v-else-if="control.control === 'json'">
                       <textarea
-                        class="min-h-20 w-full rounded-md border ui-border-strong bg-[var(--ui-surface)] px-2 py-1.5 text-xs font-mono"
+                        class="min-h-20 w-full rounded-md border ui-border-strong bg-(--ui-surface) px-2 py-1.5 text-xs font-mono"
                         :value="entry.interactiveJsonDrafts[control.name]"
                         @input="updateInteractiveJson(entry, control.name, $event)"
                       />
@@ -748,7 +748,7 @@ onMounted(loadEntries)
                     <template v-else>
                       <input
                         type="text"
-                        class="w-full rounded-md border ui-border-strong bg-[var(--ui-surface)] px-2 py-1.5 text-xs"
+                        class="w-full rounded-md border ui-border-strong bg-(--ui-surface) px-2 py-1.5 text-xs"
                         :value="entry.interactiveProps[control.name]"
                         @input="updateInteractiveText(entry, control.name, $event)"
                       >

@@ -31,7 +31,7 @@
         <!-- Clear -->
         <button
           v-if="!loading && clearable"
-          class="ui-text hover:text-[var(--ui-text)] transition-colors p-1 rounded-full hover:bg-[var(--ui-surface)]"
+          class="ui-text hover:text-(--ui-text) transition-colors p-1 rounded-full hover:bg-(--ui-surface)"
           :aria-label="clearLabel"
           @click="handleClear"
         >
@@ -290,7 +290,7 @@ const highlightMatch = (text) => {
 
 // Variants
 const inputVariants = cva(
-  'block w-full rounded-lg border ui-surface  transition-colors duration-200 placeholder:text-[var(--ui-text)] disabled:bg-[var(--ui-surface)] disabled:text-[var(--ui-text)] disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:border-[var(--ui-primary)]',
+  'block w-full rounded-lg border ui-surface  transition-colors duration-200 placeholder:text-(--ui-text) disabled:bg-(--ui-surface) disabled:text-(--ui-text) disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:border-(--ui-primary)',
   {
     variants: {
       size: {
@@ -321,7 +321,7 @@ const resultsClasses = computed(() =>
 )
 const getResultClasses = (i) =>
   cn(
-    'flex items-center w-full px-4 py-3 text-left transition-colors duration-150 hover:bg-[var(--ui-surface)] focus:bg-[var(--ui-surface)] focus:outline-none',
+    'flex items-center w-full px-4 py-3 text-left transition-colors duration-150 hover:bg-(--ui-surface) focus:bg-(--ui-surface) focus:outline-none',
     { 'ui-surface-muted': focusedIndex.value === i }
   )
 

@@ -162,7 +162,7 @@ const itemVariants = cva('transition-all duration-200', {
   variants: {
     variant: {
       default: ' border ui-border-strong rounded-lg overflow-hidden shadow-sm hover:shadow-md',
-      bordered: ' border-2  ui-border-strong rounded-xl overflow-hidden hover:border-[var(--ui-border)]',
+      bordered: ' border-2  ui-border-strong rounded-xl overflow-hidden hover:border-(--ui-border)',
       filled: ' border ui-border-strong rounded-xl overflow-hidden shadow-sm',
       flush: ''
     }
@@ -170,14 +170,14 @@ const itemVariants = cva('transition-all duration-200', {
 })
 
 const headerVariants = cva(
-  'flex items-center justify-between w-full text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ui-primary)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex items-center justify-between w-full text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-(--ui-primary) focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'hover:bg-[var(--ui-surface-strong)]',
+        default: 'hover:bg-(--ui-surface-strong)',
         bordered: 'hover:bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 50%)]',
         filled: 'hover:bg-[color:color-mix(in oklab, var(--ui-surface), transparent 30%)]',
-        flush: 'hover:bg-[var(--ui-surface)]'
+        flush: 'hover:bg-(--ui-surface)'
       },
       size: {
         sm: 'px-4 py-3',
@@ -219,7 +219,7 @@ const itemClasses = computed(() =>
 const headerClasses = (index) =>
   cn(
     headerVariants({ variant: props.variant, size: props.size }),
-    isExpanded(index) && props.variant === 'bordered' && 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 70%)] border-[var(--ui-border-strong)]',
+    isExpanded(index) && props.variant === 'bordered' && 'bg-[color:color-mix(in oklab, var(--ui-primary-soft), transparent 70%)] border-(--ui-border-strong)',
     isExpanded(index) && props.variant === 'filled' && 'ui-surface',
     isExpanded(index) && props.variant === 'default' && 'ui-bg',
     (props.disabled || props.items[index]?.disabled) && 'cursor-not-allowed opacity-50'
