@@ -188,13 +188,47 @@ jobs:
         fi
 
     - name: Version bump and publish
+      env:
+        PACKAGE_NAME: kabzvue
       run: |
         npm config delete always-auth --location=user || true
         echo "Version bump reason: ${{ steps.version.outputs.reason }}"
         echo "Bump type: ${{ steps.version.outputs.bump }}"
 
-        # Bump version
-        npm version ${{ steps.version.outputs.bump }} --no-git-tag-version
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version 2>/dev/null || true)
+
+        echo "Current package.json version: $CURRENT_VERSION"
+        echo "Latest published npm version: ${PUBLISHED_VERSION:-<none>}"
+
+        NEXT_VERSION=$(node -e '
+          const current = process.argv[1];
+          const published = process.argv[2];
+          const bump = process.argv[3];
+
+          const parse = (value) => value.split(".").map((part) => Number(part));
+          const compare = (left, right) => {
+            for (let index = 0; index < 3; index += 1) {
+              if (left[index] !== right[index]) return left[index] - right[index];
+            }
+            return 0;
+          };
+          const increment = (value, type) => {
+            const [major, minor, patch] = parse(value);
+            if (type === "major") return `${major + 1}.0.0`;
+            if (type === "minor") return `${major}.${minor + 1}.0`;
+            return `${major}.${minor}.${patch + 1}`;
+          };
+
+          const base = published && compare(parse(published), parse(current)) > 0
+            ? published
+            : current;
+
+          process.stdout.write(increment(base, bump));
+        ' "$CURRENT_VERSION" "$PUBLISHED_VERSION" "${{ steps.version.outputs.bump }}")
+
+        echo "Resolved next version: $NEXT_VERSION"
+        npm version "$NEXT_VERSION" --no-git-tag-version
 
         # Get new version
         NEW_VERSION=$(node -p "require('./package.json').version")
